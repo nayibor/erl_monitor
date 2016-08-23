@@ -1,0 +1,29 @@
+<erl>
+-include("myapp.hrl").
+%% we have the session record there
+%% we must set the include_path in the yaws.conf file
+%% in order for the compiler to find that file
+
+		kv(K,L) ->
+		{value, {K, V}} = lists:keysearch(K,1,L),
+		V.
+		
+		out(A) ->
+		L = yaws_api:parse_post(A),
+		User = kv(user, L),
+		Pwd = kv(passwd, L),
+		case myapp:auth(User, Pwd) of
+		ok ->
+		S = #session{user = User,
+		passwd = Pwd,
+		udata = []},
+		%% Now register the session to the session server
+		Cookie = yaws_api:new_cookie_session(S),
+		[{redirect_local, kv(url, L)},
+		yaws_api:set_cookie("myapp_sid",Cookie,[])]
+		Err ->
+		{ehtml,
+		{html, [],
+		{p, [], f("Bad login: ~p",[Err])}}}
+		end.
+</erl>

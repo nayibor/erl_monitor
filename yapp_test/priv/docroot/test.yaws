@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>testing server</title>
+</head>
+<body>
+<h1> Example 1 </h1>
+<erl>	
+-record(state_data,{data}). % state_data variable
+	
+	
+out(A) when A#arg.state == undefined ->
+			State=#state_data{data=[]},
+			New_State_Data=process_multipart(A, State),
+			io:format("request method ~p\n",[New_State_Data#state_data.data]),
+			io:format("auth data ~p~n",[[myapp:auth(1,2)]]),
+			Req = A#arg.req,
+			Headers = A#arg.headers,		
+			H = yaws_api:reformat_header(Headers),
+			{ehtml,
+			[
+			{h4,[],<<"the headers passed to us were:">>},
+			{hr},
+			{ol,[],lists:map(fun(S) -> {li,[],{p,[],S}} end,H)}
+			]
+			}.
+process_multipart(A,State_old)->
+		   case yaws_api:parse_multipart_post(A) of
+		   {cont, Cont, Res} ->
+				  {get_more, Cont,handle_res(Res,State_old)};
+		   {result, Res} ->
+				  handle_res(Res,State_old);
+		   {error, Reason} ->
+				  io:format("An error occured: ~p", [Reason])
+		   end.
+handle_res(Res=[{head,{Name, Hdrs}},{Part_body,Data_Body}|T],State_old = #state_data{data=Data_state}) ->
+		   handle_res(T,State_old#state_data{data=[{Name,Hdrs,Part_body,Data_Body}|Data_state]});
+handle_res([],State_old = #state_data{data=Data_state}) ->
+		   State_old#state_data{data=lists:reverse(Data_state)}.
+
+
+		
+		   
+		   
+</erl>
+</body>
+</html>

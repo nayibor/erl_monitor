@@ -1,0 +1,4 @@
+%% encoding: UTF-8
+{application,yapp_test}.
+{modules,[myapp_auth,myapp_dash_layout,myapp_dashboard,myapp_dashboard_old,
+          myapp_user]}.

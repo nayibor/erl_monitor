@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module yapp_test_lib_usermod</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module yapp_test_lib_usermod</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>yapp_test_lib_usermod module.
+<p>Copyright © Nuku Ameyibor &lt;nayibor@startmail.com&gt;</p>
+
+
+<h2><a name="description">Description</a></h2>yapp_test_lib_usermod module.
+  <br>contains basic functions for performing CRUD functionality for users,roles
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-link_type">link_type()</a></h3>
+<p><tt>link_type() = sidebar | ajax</tt></p>
+
+
+<h3 class="typedecl"><a name="type-single_link_tp">single_link_tp()</a></h3>
+<p><tt>single_link_tp() = {atom(), atom(), atom()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-single_user_cat">single_user_cat()</a></h3>
+<p><tt>single_user_cat() = {atom(), [<a href="#type-single_link_tp">single_link_tp()</a>, ...]}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-user_cat">user_cat()</a></h3>
+<p><tt>user_cat() = [<a href="#type-single_user_cat">single_user_cat()</a>, ...] | []</tt></p>
+
+
+<h3 class="typedecl"><a name="type-usermod_links">usermod_links()</a></h3>
+<p><tt>usermod_links() = #usermod_links{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-usermod_role_links">usermod_role_links()</a></h3>
+<p><tt>usermod_role_links() = #usermod_role_links{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-usermod_roles">usermod_roles()</a></h3>
+<p><tt>usermod_roles() = #usermod_roles{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-usermod_users">usermod_users()</a></h3>
+<p><tt>usermod_users() = #usermod_users{}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-usermod_users_roles">usermod_users_roles()</a></h3>
+<p><tt>usermod_users_roles() = #usermod_users_roles{}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_link-7">add_link/7</a></td><td>add link.</td></tr>
+<tr><td valign="top"><a href="#add_role-3">add_role/3</a></td><td>this is for testing purposes,in the real world an id would have been created in the db without the need for an id.</td></tr>
+<tr><td valign="top"><a href="#add_role_link-2">add_role_link/2</a></td><td>add role_link.</td></tr>
+<tr><td valign="top"><a href="#add_user-7">add_user/7</a></td><td>add user function which enables you to add users
+ id would have to be created specially in real worl scenario
+ will have to check whether user with email exists first before trying to add
+ validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
+ basic validation carried out for everything which is done here before anything is inserted.</td></tr>
+<tr><td valign="top"><a href="#add_user_roles-2">add_user_roles/2</a></td><td>add user_roles.</td></tr>
+<tr><td valign="top"><a href="#get_links-0">get_links/0</a></td><td>get links.</td></tr>
+<tr><td valign="top"><a href="#get_role_links-1">get_role_links/1</a></td><td>get_role_links.</td></tr>
+<tr><td valign="top"><a href="#get_roles-0">get_roles/0</a></td><td>get_roles.</td></tr>
+<tr><td valign="top"><a href="#get_user_links-1">get_user_links/1</a></td><td>this gets all the links for a particular user
+  data is put into a category format after this.</td></tr>
+<tr><td valign="top"><a href="#get_user_roles-1">get_user_roles/1</a></td><td></td></tr>
+<tr><td valign="top"><a href="#get_users-0">get_users/0</a></td><td>get_users.</td></tr>
+<tr><td valign="top"><a href="#get_users_filter-1">get_users_filter/1</a></td><td>get_users_filter .</td></tr>
+<tr><td valign="top"><a href="#install-1">install/1</a></td><td>this is used to create the basic tables that will be used in setups as well as in tests.</td></tr>
+<tr><td valign="top"><a href="#temp_create_role_tab-1">temp_create_role_tab/1</a></td><td>temp table for creating adhoc tables.</td></tr>
+<tr><td valign="top"><a href="#verify_user-2">verify_user/2</a></td><td>verify_user
+ hash will have to be done of password before password is put into system
+ user is locked out after password is tried for  a predefined number of times.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="add_link-7">add_link/7</a></h3>
+<div class="spec">
+<p><tt>add_link(Id::pos_integer(), Controller::string(), Link_action::string(), Link_allow::string(), Link_category::string(), Link_name::string(), Link_type::<a href="#type-link_type">link_type()</a>) -&gt; ok | term()</tt><br></p>
+</div><p>add link</p>
+
+<h3 class="function"><a name="add_role-3">add_role/3</a></h3>
+<div class="spec">
+<p><tt>add_role(Id::pos_integer(), Role_short_name::string(), Role_long_name::string()) -&gt; ok | term()</tt><br></p>
+</div><p>this is for testing purposes,in the real world an id would have been created in the db without the need for an id</p>
+
+<h3 class="function"><a name="add_role_link-2">add_role_link/2</a></h3>
+<div class="spec">
+<p><tt>add_role_link(RoleId::pos_integer(), LinkId::pos_integer()) -&gt; ok | {error, check_role_link} | term()</tt><br></p>
+</div><p>add role_link</p>
+
+<h3 class="function"><a name="add_user-7">add_user/7</a></h3>
+<div class="spec">
+<p><tt>add_user(Email::string(), Id::pos_integer(), Password::string(), Fname::string(), Lname::string(), Siteid::pos_integer(), Instid::pos_integer()) -&gt; {error, user_exists} | ok | term()</tt><br></p>
+</div><p>add user function which enables you to add users
+ id would have to be created specially in real worl scenario
+ will have to check whether user with email exists first before trying to add
+ validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
+ basic validation carried out for everything which is done here before anything is inserted</p>
+
+<h3 class="function"><a name="add_user_roles-2">add_user_roles/2</a></h3>
+<div class="spec">
+<p><tt>add_user_roles(UserId::pos_integer(), RoleId::pos_integer()) -&gt; ok | {error, check_user_role} | term()</tt><br></p>
+</div><p>add user_roles</p>
+
+<h3 class="function"><a name="get_links-0">get_links/0</a></h3>
+<div class="spec">
+<p><tt>get_links() -&gt; [<a href="#type-usermod_links">usermod_links()</a>] | [] | term()</tt><br></p>
+</div><p>get links</p>
+
+<h3 class="function"><a name="get_role_links-1">get_role_links/1</a></h3>
+<div class="spec">
+<p><tt>get_role_links(RoleId::pos_integer()) -&gt; [<a href="#type-usermod_role_links">usermod_role_links()</a>] | [] | term()</tt><br></p>
+</div><p>get_role_links</p>
+
+<h3 class="function"><a name="get_roles-0">get_roles/0</a></h3>
+<div class="spec">
+<p><tt>get_roles() -&gt; [<a href="#type-usermod_roles">usermod_roles()</a>] | [] | term()</tt><br></p>
+</div><p>get_roles</p>
+
+<h3 class="function"><a name="get_user_links-1">get_user_links/1</a></h3>
+<div class="spec">
+<p><tt>get_user_links(UserId::pos_integer()) -&gt; <a href="#type-user_cat">user_cat()</a></tt><br></p>
+</div><p>this gets all the links for a particular user
+  data is put into a category format after this</p>
+
+<h3 class="function"><a name="get_user_roles-1">get_user_roles/1</a></h3>
+<div class="spec">
+<p><tt>get_user_roles(UserId::pos_integer()) -&gt; [<a href="#type-usermod_users_roles">usermod_users_roles()</a>] | [] | term()</tt><br></p>
+</div>
+
+<h3 class="function"><a name="get_users-0">get_users/0</a></h3>
+<div class="spec">
+<p><tt>get_users() -&gt; [<a href="#type-usermod_users">usermod_users()</a>] | [] | term()</tt><br></p>
+</div><p>get_users</p>
+
+<h3 class="function"><a name="get_users_filter-1">get_users_filter/1</a></h3>
+<div class="spec">
+<p><tt>get_users_filter(UserDet::string()) -&gt; [<a href="#type-usermod_users">usermod_users()</a> | [] | term()]</tt><br></p>
+</div><p>get_users_filter . filtered by fname,email,lname</p>
+
+<h3 class="function"><a name="install-1">install/1</a></h3>
+<div class="spec">
+<p><tt>install(Nodes::[atom()] | []) -&gt; ok | {badrpc, term()}</tt><br></p>
+</div><p>this is used to create the basic tables that will be used in setups as well as in tests</p>
+
+<h3 class="function"><a name="temp_create_role_tab-1">temp_create_role_tab/1</a></h3>
+<div class="spec">
+<p><tt>temp_create_role_tab(Nodes::[atom()] | []) -&gt; ok</tt><br></p>
+</div><p>temp table for creating adhoc tables</p>
+
+<h3 class="function"><a name="verify_user-2">verify_user/2</a></h3>
+<div class="spec">
+<p><tt>verify_user(Email::string(), Password::string()) -&gt; {error, check_username_password} | {error, check_username_password_lock} | {ok, pos_integer(), string()} | term()</tt><br></p>
+</div><p>verify_user
+ hash will have to be done of password before password is put into system
+ user is locked out after password is tried for  a predefined number of times</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Aug 23 2016, 04:55:00.</i></p>
+</body>
+</html>

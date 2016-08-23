@@ -1,0 +1,4 @@
+%% encoding: UTF-8
+{application,yapp_test_lib}.
+{modules,[yapp_test_lib,yapp_test_lib_sess,yapp_test_lib_sup,
+          yapp_test_lib_usermod]}.
