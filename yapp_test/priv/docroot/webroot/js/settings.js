@@ -141,6 +141,14 @@ var settings={
             _this.load_content(link);  
         }); 
         
+        
+        
+          $("#search_butt").live('click',function(e) {
+            e.preventDefault();
+            var link = $("#search_user_url").val();
+              _this.load_users_data(link); 
+		}); 
+        
           $("#search_user").live('keyup',function(e) {
             e.preventDefault();
             var link = $("#search_user_url").val();
@@ -165,12 +173,9 @@ var settings={
                _this.show_message("Retrieving Users...");    
             },
             success:function(Data) {
-                //  console.log(data);
-                //  alert("data has been loaded");
-                
                _this.close_message_diag();
                _this.enable_okbutt_mgdialg();
-               console.log(Data);
+               $("#table_info").html(Data);
                       
             },
             error:function(data){

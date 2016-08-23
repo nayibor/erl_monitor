@@ -54,10 +54,12 @@ out(Arg,ok,ok) ->
 		outa(Arg,Method,Path).
 		
 %% @doc	this is for the index_dashboard action get method
-outa(Arg,'GET',["yapp_test","user","get_users"])->
+outa(_Arg,'GET',["yapp_test","user","get_users"])->
 		Title_Page = "Users",
-		Data = get_users(Arg),
-		Response = myapp_dash_layout:get_secondLevelContent(Title_Page,Data),
+		Users = yapp_test_lib_usermod:get_users(),
+		SubUidata = [myapp_dash_layout:gen_content_upper(),myapp_dash_layout:gen_content_real(Users)],	 
+		Uidata=myapp_dash_layout:get_out_content(SubUidata),		
+		Response = myapp_dash_layout:get_secondLevelContent(Title_Page,Uidata),
 		{ehtml,Response};
 
 
@@ -65,162 +67,61 @@ outa(Arg,'GET',["yapp_test","user","get_users"])->
 %% 		returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query
 outa(Arg,'GET',["yapp_test","user","search_user"])->
-		Search_query = yaws_api:parse_query(Arg),
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
-		   undefined ->
-				io:format("no filter");
-		   Filter ->
-				io:format("filter is  ~n~p",[Filter])
-		   
-		end,
-		ok;	
+		   {ok,Filter} ->
+				Users = yapp_test_lib_usermod:get_users_filter(Filter),
+				UiData = myapp_dash_layout:gen_content_real(Users),
+				{ehtml,UiData}; 
+			undefined ->
+				Users = yapp_test_lib_usermod:get_users(),
+				UiData =myapp_dash_layout:gen_content_real(Users),
+				{ehtml,UiData}
+		end;
+		
 			
-			
-%% @doc this is used for getting roles for a particular user
-%% 		returns an erlydtl html page 
-outa(Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
-		ok;
-	
-	
-%% @doc this is for updating roles
-%%		insertion part
-%% 		returns a messagpack object showing status 
-outa(Arg,'POST',["yapp_test","user","save_roles_user",UserId])->
-		ok;	
-	
-
 %% @doc for adding a new user
 %% 		retrieving user interface part
 %% 		returns an erlydtl html page
-outa(Arg,'GET',["yapp_test","user","get_add_user"])->
+outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 		ok;
 
 	
 %% @doc for inserting a new user .
 %%		insertion part
 %% 		returns a messagpack object showing status 
-outa(Arg,'POST',["yapp_test","user","save_add_user"])->
+outa(_Arg,'POST',["yapp_test","user","save_add_user"])->
 		ok;	
 	
 	
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part 
-outa(Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
+outa(_Arg,'GET',["yapp_test","user","get_edit_user",_UserId])->
+		ok;			
+			
+				
+%% @doc this is used for getting roles for a particular user
+%% 		returns an erlydtl html page 
+outa(_Arg,'GET',["yapp_test","user","get_roles_user",_UserId])->
 		ok;
 	
 	
+%% @doc this is for updating roles
+%%		insertion part
+%% 		returns a messagpack object showing status 
+outa(_Arg,'POST',["yapp_test","user","save_roles_user",_UserId])->
+		ok;	
+	
+
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		insertion part
 %%		return a messagepack object showing status 
-outa(Arg,'POST',["yapp_test","user","save_edit_user",UserId])->
+outa(_Arg,'POST',["yapp_test","user","save_edit_user",_UserId])->
 		ok;	
 	
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
 outa(Arg,_Method,_)->
 		{page,yapp:prepath(Arg)++?PG_404}.
-
-
-%% @doc this is a wrapper function so all you need to show data is the actual content and not any other data
-
-get_out_content(Data) ->
-		{'div',[{class,"tableWrapper"}],
-			Data
-		}.	
-
-%% @doc this is used for getting the users
-%%% depending on whether a filter is used or not 
-get_users(Arg)->
-		Users = yapp_test_lib_usermod:get_users(),
-		Data = [gen_content_upper(),gen_content_real(Users)],	 
-		get_out_content(Data).
-
-
-%% @doc this is used for generating the top content of the inner page b4 the actual contnt 
-gen_content_upper()->
-		{'div',[{class,"tableHeader"}],
-					[
-						{'ul',[{class,"tableActions"}],
-							[
-								{'li',[],
-									{'a',[{name,"add_user"},{id,"add_user"},{title,"add_user"},{href,"#"},{class,"inlineIcon iconAdvertiserAdd"}],
-										"Add New User"
-									}
-								},
-								{'li',[],
-									{'input',[{type,"text"},{name,"search_user"},{id,"search_user"},{placeholder,"Search By Name or Email"}]}	
-								},
-								{'li',[],
-									{'input',[{type,"button"},{id,"search_butt"},{name,"search_butt"},{value,"Search"}]}
-								
-								}
-							]
-						},
-						{'div',[{class,"clear"}]},
-						{'div',[{class,"corner left"}]},
-						{'div',[{class,"corner right"}]}
-					]		
-		}.
-
-
-%% @doc this is used for generating the actual content of the page 
-gen_content_real(Users)->
-		{'div',[{id,"table_info"},{name,"table_info"}],
-			{'table',[{cellspacing,"0"}],
-				[
-					{'thead',[],
-						{'tr',[],
-							[
-								{'th',[{class,"sortup"}],"Name"},{'th',[{class,"sortup"}],"Email"},{'th',[],"Site"},{'th',[]},
-								{'th',[],"Status"},{'th',[]},{'th',[]},{'th',[]},{'th',[{class,"last alignRight"}]},
-								{'th',[]},{'th',[]},{'th',[]},{'th',[]}
-							]
-						}
-					
-					},
-					{'tbody',[],
-						lists:map(fun(#usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_Id,lname=Lname,lock_status=_Lock_stat})-> 
-						          {'tr',[{id,Id}],
-									[
-										{'td',[{class,"name_info"}],lists:concat([Fname," ",Lname])},
-										{'td',[],Email},
-										{'td',[],Site_Id},
-										{'td',[]},
-										{'td',[],"lock_stat"},
-										{'td'},{td},{td},
-										{'td',[],
-											{'ul',[{class,"rowActions"}],
-												[
-													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences edit_user"}],"Edit"}
-													},
-													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconAdvertiser"}],"Roles"}
-													},
-													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconActivate reset_pass"}],"Reset Pass"}
-													},
-													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconlock lock"}],"Lock"}
-													}
-												]
-											}
-										
-										},
-										{'td'},{'td'},{'td'},{'td'}
-									]
-						          }
-						
-								  end,
-						Users)
-					
-					}
-				]
-			}
-		
-		}.
-
-		

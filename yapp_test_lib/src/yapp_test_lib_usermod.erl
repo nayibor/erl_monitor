@@ -178,19 +178,35 @@ add_user_roles(UserId,RoleId) ->
 
 
 %%% @doc get_users
--spec get_users() -> [usermod_users()] | [] | term().
+-spec get_users() -> [string()] | [] | term().
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [S ||
-	             S <- mnesia:table(usermod_users)
+	            [{Id,Email,Fname,Site_id,Lname,Lock_stat} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
+								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
 		end,
 	    mnesia:activity(transaction, F).
 
+
 %%%	@doc get_users_filter . filtered by fname,email,lname
--spec get_users_filter(string()) -> [usermod_users() | [] | term()] .
-get_users_filter(UserDet)->
+-spec get_users_filter(string()) -> [string()] | [] | term() .
+get_users_filter(UserDet) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Id,Email,Fname,Site_id,Lname,Lock_stat} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
+							    lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users),
+				Email =:= UserDet orelse Fname =:= UserDet orelse Lname =:= UserDet				  
+	            ]))
+		end,
+	    mnesia:activity(transaction, F).
+
+
+%%%	@doc get_users_filter . filtered by fname,email,lname
+-spec get_users_filter_old(string()) -> [usermod_users() | [] | term()] .
+get_users_filter_old(UserDet)->
 		Match = ets:fun2ms(
 		fun(S=#usermod_users{user_email=Email,id=Id,fname=Fname,
 							   lname=Lname,site_id=Siteid,inst_id=Instid

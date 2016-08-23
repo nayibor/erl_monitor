@@ -15,7 +15,10 @@
 -export([
 		 out/3,
 		 show_dashboard/1,
-		 get_secondLevelContent/2
+		 get_secondLevelContent/2,
+		 gen_content_upper/0,
+		 gen_content_real/1,
+		 get_out_content/1
 		 ]).
 
 -include_lib("yaws/include/yaws_api.hrl").
@@ -53,6 +56,13 @@ out(Arg,Title_Page,Content_layout) ->
 			}
 		].
 %%name="setting_dialog-message" id="setting_dialog-message" title="Message">
+
+%% @doc this is a wrapper function so all you need to show data is the actual content and not any other data
+get_out_content(Data) ->
+		{'div',[{class,"tableWrapper"}],
+			Data
+		}.	
+
 
 %% @doc this is used to get the div for the layout and the actual content
 get_secondLevelContent(Layout_Title,Page_Content)->
@@ -104,3 +114,91 @@ get_sidebar(Arg,Links_Allowd) ->
 			}		
 		
 		}.
+		
+
+%% @doc this is used for generating the top content of the inner page b4 the actual contnt 
+gen_content_upper()->
+		{'div',[{class,"tableHeader"}],
+					[
+						{'ul',[{class,"tableActions"}],
+							[
+								{'li',[],
+									{'a',[{name,"add_user"},{id,"add_user"},{title,"add_user"},{href,"#"},{class,"inlineIcon iconAdvertiserAdd"}],
+										"Add New User"
+									}
+								},
+								{'li',[],
+									{'input',[{type,"text"},{name,"search_user"},{id,"search_user"},{placeholder,"Search By Name or Email"}]}	
+								},
+								{'li',[],
+									{'input',[{type,"button"},{id,"search_butt"},{name,"search_butt"},{value,"Search"}]}
+								
+								}
+							]
+						},
+						{'div',[{class,"clear"}]},
+						{'div',[{class,"corner left"}]},
+						{'div',[{class,"corner right"}]}
+					]		
+		}.	
+		
+
+%% @doc this is used for generating the actual content of the page 
+gen_content_real(Users)->
+		{'div',[{id,"table_info"},{name,"table_info"}],
+			{'table',[{cellspacing,"0"}],
+				[
+					{'thead',[],
+						{'tr',[],
+							[
+								{'th',[{class,"sortup"}],"Name"},{'th',[{class,"sortup"}],"Email"},{'th',[],"Site"},{'th',[]},
+								{'th',[],"Status"},{'th',[]},{'th',[]},{'th',[]},{'th',[{class,"last alignRight"}]},
+								{'th',[]},{'th',[]},{'th',[]},{'th',[]}
+							]
+						}
+					
+					},
+					{'tbody',[],
+						lists:map(fun({Id,Email,Fname,Site_id,Lname,_Lock_stat})-> 
+						          {'tr',[{id,Id}],
+									[
+										{'td',[{class,"name_info"}],lists:concat([Fname," ",Lname])},
+										{'td',[],Email},
+										{'td',[],Site_id},
+										{'td',[]},
+										{'td',[],"lock_stat"},
+										{'td'},{td},{td},
+										{'td',[],
+											{'ul',[{class,"rowActions"}],
+												[
+													{'li',[],
+														{'a',[{href,"#"},{class,"inlineIcon preferences edit_user"}],"Edit"}
+													},
+													{'li',[],
+														{'a',[{href,"#"},{class,"inlineIcon preferences iconAdvertiser"}],"Roles"}
+													},
+													{'li',[],
+														{'a',[{href,"#"},{class,"inlineIcon preferences iconActivate reset_pass"}],"Reset Pass"}
+													},
+													{'li',[],
+														{'a',[{href,"#"},{class,"inlineIcon preferences iconlock lock"}],"Lock"}
+													}
+												]
+											}
+										
+										},
+										{'td'},{'td'},{'td'},{'td'}
+									]
+						          }
+						
+								  end,
+						Users)
+					
+					}
+				]
+			}
+		
+		}.
+
+		
+			
