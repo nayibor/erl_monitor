@@ -1,0 +1,4 @@
+This sample application and libraries is used for showing how web applications can be created using the erlang programming language 
+and the yaws web server .
+the yapp_test_lib contains libraries for the application . 
+hte yapp_test is the web application
