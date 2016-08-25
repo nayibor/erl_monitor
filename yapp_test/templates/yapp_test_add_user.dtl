@@ -1,6 +1,8 @@
 
 <div>
-<h1>for proplists</h1>	
+<h1>for proplists below</h1>	
+<br>[{test1,"testa"},{test2,"testb"},{test3,"testc"},{dicttest,D3},{listtest,[S||S<-lists:seq(1,10),S rem 2 =/= 0]}]<br>
+
 <br>{{ test1 }}</br>
 <br>{{ test2 }}</br>
 <br>{{ test3 }}</br>
@@ -13,9 +15,12 @@
 <br>length of list is {{ listtest| length}}</br>
 
 <h1>for tags</h1>
-{% for athlete in athlete_list %}
-    <li>{{ athlete.name }}</li>
+{% for listitem in listtest %}
+    {{ listitem }}
 {% endfor %}
+
+<h1></h1>
+<br>template inheritance very interesting</br>
 	
 </div>
 
