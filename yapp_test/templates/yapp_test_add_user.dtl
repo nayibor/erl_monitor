@@ -1,0 +1,89 @@
+
+<div>
+<h1>for proplists</h1>	
+<br>{{ test1 }}</br>
+<br>{{ test2 }}</br>
+<br>{{ test3 }}</br>
+<br>{{ dicttest.s1|default:"nothing" }}</br>
+<br>{{ dicttest.s2 }}</br>
+<br>{{ dicttest.s3 }}</br>
+<h1>for filters</h1>
+<br>uppercase of  {{ test1 }} is {{ test1|upper }}</br>
+<br>lists joined together with comma is  {{ listtest|join:", "}}</br>
+<br>length of list is {{ listtest| length}}</br>
+
+<h1>for tags</h1>
+{% for athlete in athlete_list %}
+    <li>{{ athlete.name }}</li>
+{% endfor %}
+	
+</div>
+
+
+<form name="add_user_form" id="add_user_form" class="cmxform">
+    <div class='tableWrapper'>
+        <div class='tableHeader' style="border: 0px !important;">
+            <ul class='tableActions'>
+                <li>
+                    <label> First Name </label>       
+                </li> 
+                <li>
+                    <input type="hidden" required name="id" id="id"  
+                    value="{# echo isset($User) ? $User['User']['id'] : ""; #}" />      
+{# This is a comment #}
+                    <input type="text" class="ca" required name="fname" id="fname" 
+                    value="{# echo isset($User) ? $User['User']['fname'] : ""; #}" />      
+                </li>
+            </ul>  
+            <ul class='tableActions'>
+                <li>
+                    <label>  Last  Name </label> 
+                </li>
+                <li>
+                    <input type="text" class="ca" required name="lname" id="lname" 
+                    value="{# echo isset($User) ? $User['User']['lname'] : ""; #}" />      
+                </li>
+            </ul>
+            <ul class='tableActions'>
+                <li>
+                    <label>  Email </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+
+                    <input type="email" class="ca" required {# if (isset($User)) {echo "readonly=readonly";}  #} 
+                   name="email" id="email" 
+                   value="{# echo isset($User) ? $User['User']['user_email'] : ""; #}" />      
+                </li>
+
+
+            </ul>
+            <ul class='tableActions'>
+                <li>
+                    <label>  </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+                    <input type="hidden" required name="add_user" id="add_user"  value="1" />      
+
+
+                </li>
+
+
+            </ul>
+
+
+
+            <div class='clear'></div>
+            <div class='corner left'></div>
+            <div class='corner right'></div>
+        </div>
+
+    </div>
+    <input type="hidden"  name="save_eve" id="save_eve" value="save" />      
+
+</form>
+
+

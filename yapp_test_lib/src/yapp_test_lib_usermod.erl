@@ -33,7 +33,7 @@
 		 get_users/0,
 		 get_links/0,
 		 verify_user/2,
-		get_users_filter/1
+		 get_users_filter/1
 		 ]).
 
  

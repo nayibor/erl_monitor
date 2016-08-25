@@ -16,12 +16,12 @@
 		 out/3,
 		 out404/3,
 		 out401/3,
-		 crashmsg/3
+		 crashmsg/3,
+		 compile_templates/2
 		 ]).
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").
-
 
 
 
@@ -109,7 +109,10 @@ crashmsg(Arg,_Auth, _Realm) ->
 	%% {html,"<h1>pg unauth</h1>"}.
 	   {page,yapp:prepath(Arg)++?PG_CRASH}.	  
 	   
-		
+compile_templates(Indir,Outdir)->
+
+
+		ok.
 	  
 	   
 				

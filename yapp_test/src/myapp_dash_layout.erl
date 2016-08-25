@@ -50,7 +50,8 @@ out(Arg,Title_Page,Content_layout) ->
 					},
 					{'div',[{name,"setting_dialog-message"},{id,"setting_dialog-message"},{title,"Message"}],
 						{'p',[{class,"message"}]}
-					}
+					},
+					{'div',[{name,"add_edit_user"},{id,"add_edit_user"},{title,"Message"}]}
 					
 				]
 			}

@@ -7,7 +7,47 @@
 var settings={
     message_diag:("#setting_dialog-message"),
     confirm_diag:("#setting_dialog-confirm"),
+    add_edit_diag:("#add_edit_user"),
     
+    
+    configure_add:function(){
+		_this=this;
+        var diag = $(_this.add_edit_diag);
+        
+        diag.dialog({
+			width: 500,
+			height: 300,
+			position:"center",
+			modal:false,
+            buttons: {
+				Cancel:function(){
+				    $( this ).dialog( "close" );	
+				},
+				Save: function() {
+					_this.checkfields($(this));
+				
+				
+                }
+               
+            }
+        });
+    
+        diag.dialog('close');
+		
+		
+		
+	},
+	
+	checkfields:function(diag_ref){
+	_this=this;	
+		
+	},
+     
+    save_data:function(diag_ref){
+	_this=this;
+		
+	}, 
+     
     configure_message_dialog:function(){
         _this=this;
         var diag = $(_this.message_diag);
@@ -115,6 +155,7 @@ var settings={
     
         _this.configure_message_dialog();
         _this.configure_confirmation();
+        _this.configure_add();
        
         
         $("#A_128").live('click',function(e){
@@ -149,7 +190,7 @@ var settings={
               _this.load_users_data(link); 
 		}); 
         
-          $("#search_user").live('keyup',function(e) {
+        $("#search_user").live('keyup',function(e) {
             e.preventDefault();
             var link = $("#search_user_url").val();
             if(e.which==13){
@@ -157,10 +198,49 @@ var settings={
             }
         }); 
         
+	    $("#add_user").live('click',function(e) {
+		  e.preventDefault();
+		  var link =$("#get_add_user_url").val();
+		  _this.load_add_user(link);
+	
+		});
+
+    
 		},
 		
-		
-	load_users_data:function(link){
+	//for loading the add user functionality
+	
+	    load_add_user:function(link){
+		_this=this;
+	//	$(_this.add_edit_diag).dialog().load(link,function(rdata){
+    //            
+    //    })
+		var val="abc";
+		$.ajax({
+            url: link,
+            method:"GET",
+            dataType:'html',
+            data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+              // _this.disable_okbutt_mgdialg() ;
+              // _this.show_message("Retrieving Add Modal...");    
+            },
+            success:function(Data) {
+               _this.close_message_diag();
+               $("#add_edit_user").html(Data);
+               $(_this.add_edit_diag).dialog('open');
+       
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+        	
+		},
+	
+	//for loading the users list when a search is made
+		load_users_data:function(link){
 		_this=this;
 		var val=$("#search_user").val();
 		 $.ajax({
@@ -182,12 +262,11 @@ var settings={
                _this.enable_okbutt_mgdialg();
                _this.show_message("Error<br>"+"Please Try Again");      
             }
-        }); 
-        
-        
-			
+        }); 	
 		},	
 		
+		
+	//for loading the content from the side links into the main viewing divs	
 	load_content:function(users_url){
 		
 		_this=this;

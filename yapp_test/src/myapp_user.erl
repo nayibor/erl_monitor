@@ -81,10 +81,20 @@ outa(Arg,'GET',["yapp_test","user","search_user"])->
 		
 			
 %% @doc for adding a new user
-%% 		retrieving user interface part
+%% 		retrieving user interface partt
 %% 		returns an erlydtl html page
 outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
-		ok;
+
+		%%{ok,UiData} = yapp_test_add_user:render([{test1,"testa"},{test2,"testb"},{test3,"testc"}]),
+		%%{ok,UiData} = yapp_test_add_user:render([{test1,"testa"},{test2,"testb"},{test3,"testc"}]),
+		D0=  dict:new(),
+		D1 = dict:store(s1,"", D0),
+		D2 = dict:store(s2,"2 inches", D1),
+		D3 = dict:store(s3,"15 inches . 11'th world wonder !!", D2),
+		{ok,UiData} = yapp_test_add_user:render(
+		[{test1,"testa"},{test2,"testb"},{test3,"testc"},{dicttest,D3},{listtest,[S||S<-lists:seq(1,10),S rem 2 =/= 0]}]
+		),
+		{html,UiData};
 
 	
 %% @doc for inserting a new user .
