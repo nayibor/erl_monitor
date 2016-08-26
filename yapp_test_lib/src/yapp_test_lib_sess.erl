@@ -56,7 +56,7 @@ check_perm_page(Arg,Cookie)->
 			[] ->
 				error;
 			Cookie_Unique ->
-				io:format("cookie unique value is ~n~p~n",[Cookie_Unique]),
+				%%io:format("cookie unique value is ~n~p~n",[Cookie_Unique]),
 				case yaws_api:cookieval_to_opaque(Cookie_Unique) of
 					{ok, _OP=#session_data{id=_Id,userdata=_UseData,links_allowed=Links_Allowd}} ->						
 						case lists:member(Test,get_cont_act(Links_Allowd)) of

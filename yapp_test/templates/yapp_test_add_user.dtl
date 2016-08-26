@@ -1,30 +1,4 @@
 
-<div>
-<h1>for proplists below</h1>	
-<br>[{test1,"testa"},{test2,"testb"},{test3,"testc"},{dicttest,D3},{listtest,[S||S<-lists:seq(1,10),S rem 2 =/= 0]}]<br>
-
-<br>{{ test1 }}</br>
-<br>{{ test2 }}</br>
-<br>{{ test3 }}</br>
-<br>{{ dicttest.s1|default:"nothing" }}</br>
-<br>{{ dicttest.s2 }}</br>
-<br>{{ dicttest.s3 }}</br>
-<h1>for filters</h1>
-<br>uppercase of  {{ test1 }} is {{ test1|upper }}</br>
-<br>lists joined together with comma is  {{ listtest|join:", "}}</br>
-<br>length of list is {{ listtest| length}}</br>
-
-<h1>for tags</h1>
-{% for listitem in listtest %}
-    {{ listitem }}
-{% endfor %}
-
-<h1></h1>
-<br>template inheritance very interesting</br>
-	
-</div>
-
-
 <form name="add_user_form" id="add_user_form" class="cmxform">
     <div class='tableWrapper'>
         <div class='tableHeader' style="border: 0px !important;">
