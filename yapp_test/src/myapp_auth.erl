@@ -17,12 +17,12 @@
 		 out404/3,
 		 out401/3,
 		 crashmsg/3,
-		 compile_templates/2
+		 compile_temp/0
 		 ]).
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").
-
+ 
 
 
 
@@ -100,19 +100,41 @@ out404(Arg,_GC,_SC) ->
 %% @doc for unauthorized pages messages
 out401(Arg,_Auth, _Realm) ->
 
-	%% {html,"<h1>pg unauth</h1>"}.
-	   {page,yapp:prepath(Arg)++?PG_401}.
+	 %% {html,"<h1>pg unauth</h1>"}.
+	    {page,yapp:prepath(Arg)++?PG_401}.
 	   
 %%% @doc for crashes which occur	   
 crashmsg(Arg,_Auth, _Realm) ->
 
-	%% {html,"<h1>pg unauth</h1>"}.
-	   {page,yapp:prepath(Arg)++?PG_CRASH}.	  
+	%%  {html,"<h1>pg unauth</h1>"}.
+	    {page,yapp:prepath(Arg)++?PG_CRASH}.	  
+
+
+%%shortcut for compiling template for project 
+-spec compile_temp() -> term() . 
+compile_temp() ->
+		compile_templates([
+							{"/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/yapp_test/templates","/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/yapp_test/ebin"
+							}
+						  ]
+						 ).
 	   
-compile_templates(Indir,Outdir)->
+	   
+%%%% @doc compiles erdtl templates submite to an output folder
+-spec  compile_templates([{Indir::string(),Outdir::string()}])-> term() .   
+compile_templates(Listdir) ->
+		lists:map(fun({Indir,Outdir})-> compile_temp_dir(Indir,Outdir) end,Listdir).
 
 
-		ok.
+%%%% @doc compiles the individual files in the directory	
+-spec 	compile_temp_dir([string()],[string()]) -> [ok] | term() . 
+compile_temp_dir(Indir,Outdir) ->
+		Directlist =string:tokens(os:cmd("ls "++Indir),"\n"),
+		io:format("items_directory ~p~n",[Indir]),
+		lists:map(fun(File)-> 
+		%%io:format("~p--~p-~p~n,",[File,lists:nth(1,string:tokens(File,".")),Outdir])
+				erlydtl:compile_file(Indir++"/"++File,lists:nth(1,string:tokens(File,".")), [{out_dir,Outdir}])  
+				end,Directlist).
 	  
 	   
 				

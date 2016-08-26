@@ -21,10 +21,14 @@
 %%%  usermod_users_roles for roles for users .type bag
 -record(usermod_users_roles,{user_id,role_id}).
 
-%%%  usermod_users_links for links for users .%%type bag
+%%%  usermod_users_links for links for roles .%%type bag
 -record(usermod_role_links,{role_id,link_id}). 
 
 
 %%%  test_new_rec
 -record(test_rec,{name,fname,lname}).
+
+
+%%  auto_inc_table
+-record(auto_inc,{name,cvalue}).
 

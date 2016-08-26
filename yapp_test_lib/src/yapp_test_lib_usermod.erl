@@ -15,7 +15,10 @@
 
 %%% for installing the basic tables needed for role based functionality/creating temp tables in case neede
 -export([install/1,
-		 temp_create_role_tab/1]).
+		 temp_create/1,
+		 add_auto_table/1,
+		 get_auto_all/0,
+		 get_set_auto/1]).
 
 %%% for role stuff
 -export([add_role_link/2,
@@ -44,6 +47,7 @@
 -type usermod_links() :: #usermod_links{}.
 -type usermod_users_roles() :: #usermod_users_roles{}.
 -type usermod_role_links() :: #usermod_role_links{}.
+-type auto_inc() :: #auto_inc{}.
 
 %%type definition for user category return type
 -type single_link_tp() :: {atom(),atom(),atom()} .
@@ -92,12 +96,52 @@ install(Nodes)->
 		rpc:multicall(Nodes, application, stop, [mnesia]).
 		
 %%% @doc temp table for creating adhoc tables
--spec temp_create_role_tab([atom()]|[])->ok.
-temp_create_role_tab(Nodes) ->
-		mnesia:create_table(usermod_links,
-							[{attributes, record_info(fields, usermod_links)},
-							 {index, [#usermod_links.link_controller,#usermod_links.link_action]},
+-spec temp_create([atom()]|[])->ok.
+temp_create(Nodes) ->
+		mnesia:create_table(auto_inc,
+							[{attributes, record_info(fields, auto_inc)},
+							 {index, [#auto_inc.cvalue]},
 							 {disc_copies, Nodes}]).
+
+%%% for adding records to autoincrement table
+add_auto_table(Tablename) ->
+		F= fun()-> mnesia:write(#auto_inc{name=Tablename,cvalue=0}) end ,
+		mnesia:activity(transaction,F).
+
+%%% @doc get getting records in the autoincrement table 
+-spec get_auto_all() -> [{atom(),atom()}] | [].
+get_auto_all() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Tablename,Cvalue} ||
+	             #auto_inc{name=Tablename,cvalue=Cvalue} <- mnesia:table(auto_inc)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+%%%  @doc gets current autoincrement and gives it to requestor
+%%%  resets value to cvalue +1 
+get_set_auto(TableName)->
+		
+		Ofun=fun()->	
+				F=fun()-> 
+					  mnesia:read({auto_inc,TableName}) 
+				end,
+				case mnesia:activity(transaction,F) of
+					[]->
+						exit(error);
+					[S = #auto_inc{name=Tablename,cvalue=Cvalue}]->
+						ok=mnesia:activity(transaction,fun()->mnesia:write(S#auto_inc{cvalue=Cvalue+1})end),
+						Cvalue
+				end
+		end,	
+		mnesia:activity(transaction,Ofun).
+		
+	
+%%  reset autoincremet value for table
+%%reset_table_auto(TableName)
+%%   	ok=mnesia:activity(transaction,fun()->mnesia:write(S#auto_inc{cvalue=Cvalue+1})end),
+%% 
 
 %%% @doc add user function which enables you to add users
 %%id would have to be created specially in real worl scenario
@@ -260,7 +304,7 @@ verify_user(Email,Password)->
 						[] -> 
 							{error,check_username_password}; 
 						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Rc_pass =/= Password andalso Lock_status < ?LOCKOUT_COUNTER_MAX  -> 
-							mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
+							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
 							{error,check_username_password}; 
 						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/= Rc_pass  andalso Lock_status >= ?LOCKOUT_COUNTER_MAX  -> 
 							{error,check_username_password_lock}; 

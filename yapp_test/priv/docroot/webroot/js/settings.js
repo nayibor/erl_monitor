@@ -41,10 +41,35 @@ var settings={
 	checkfields:function(diag_ref){
 	_this=this;	
 		
+        
+        var counter=0;
+        $(".ca").each(function(){
+            if(!(document.getElementById($(this).attr("id")).checkValidity())){
+                $(this).css("border","solid #F44 2px"); 
+                counter++;
+            }else
+            {
+                $(this).css("border","solid grey 1px");       
+
+            }
+        });
+              
+        if(counter==0)
+        {
+            _this.save_data(diag_ref);
+        }
+        else{
+  
+            settings.show_message("Please Enter Fields");
+        }
+      		
+		
 	},
      
     save_data:function(diag_ref){
 	_this=this;
+	
+	alert("about to save data");
 		
 	}, 
      
@@ -99,7 +124,7 @@ var settings={
         _this=this;
         $(_this.confirm_diag).dialog('close');
         //   $("#dialog-confirm").attr("title",message);
-        $("#setting_dialog-confirm p.messsage").html(message);
+        $("#setting_dialog-confirm p.message").html(message);
         $(_this.confirm_diag).dialog('open');
 
     },
@@ -108,7 +133,7 @@ var settings={
     show_message:function(message){
         _this=this;
         $(_this.message_diag).dialog('close');
-        $("#setting_dialog-message p.messsage").html(message);
+        $("#setting_dialog-message p.message").html(message);
         $(_this.message_diag).dialog('open');
 
     },
@@ -220,7 +245,7 @@ var settings={
             url: link,
             method:"GET",
             dataType:'html',
-            data:(val!="") ? "filter="+val : "",
+            //data:(val!="") ? "filter="+val : "",
             beforeSend:function(){
               // _this.disable_okbutt_mgdialg() ;
               // _this.show_message("Retrieving Add Modal...");    
