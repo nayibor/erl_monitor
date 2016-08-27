@@ -24,7 +24,7 @@ var settings={
 				    $( this ).dialog( "close" );	
 				},
 				Save: function() {
-					_this.checkfields($(this));
+					_this.checkfields();
 				
 				
                 }
@@ -38,38 +38,69 @@ var settings={
 		
 	},
 	
-	checkfields:function(diag_ref){
+	checkfields:function(){
 	_this=this;	
 		
         
-        var counter=0;
-        $(".ca").each(function(){
-            if(!(document.getElementById($(this).attr("id")).checkValidity())){
-                $(this).css("border","solid #F44 2px"); 
-                counter++;
-            }else
-            {
-                $(this).css("border","solid grey 1px");       
+	var counter=0;
+	$(".ca").each(function(){
+		if(!(document.getElementById($(this).attr("id")).checkValidity())){
+			$(this).css("border","solid #F44 2px"); 
+			counter++;
+		}else
+		{
+			$(this).css("border","solid grey 1px");       
 
-            }
-        });
-              
-        if(counter==0)
-        {
-            _this.save_data(diag_ref);
-        }
-        else{
-  
-            settings.show_message("Please Enter Fields");
-        }
-      		
+		}
+	});
+		  
+	if(counter==0)
+	{
+		_this.save_data_user();
+	}
+	else{
+
+		settings.show_message("Please Enter All Fields In Correct Format");
+	}
+		
 		
 	},
      
-    save_data:function(diag_ref){
+     
+    //this is for adding a new user to the system 
+    save_data_user:function(){
 	_this=this;
 	
-	alert("about to save data");
+	 var link=$("#save_add_user_url").val();
+     var formdata=$("#add_user_form.cmxform").serialize(); 
+		$.ajax({
+            url: link,
+            type:"POST",
+            dataType:"html",
+            data:formdata,
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+               _this.disable_okbutt_mgdialg() ;
+               _this.show_message("Saving Data");    
+            },
+            success:function(Data) {
+               //_this.close_message_diag();
+              //  _this.enable_okbutt_mgdialg();
+                _this.show_message(Data); 
+                setTimeout(function() {
+				$(_this.add_edit_diag).dialog('close');	                   
+				_this.load_users_data($("#search_user_url").val());
+			}, 2000);	
+               //$("#add_edit_user").html(Data);
+               //$(_this.add_edit_diag).dialog('close');
+       
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 
+	
 		
 	}, 
      
@@ -243,7 +274,7 @@ var settings={
 		var val="abc";
 		$.ajax({
             url: link,
-            method:"GET",
+            type:"GET",
             dataType:'html',
             //data:(val!="") ? "filter="+val : "",
             beforeSend:function(){
@@ -270,7 +301,7 @@ var settings={
 		var val=$("#search_user").val();
 		 $.ajax({
             url: link,
-            method:"GET",
+            type:"GET",
             dataType:'html',
             data:(val!="") ? "filter="+val : "",
             beforeSend:function(){
@@ -295,10 +326,9 @@ var settings={
 	load_content:function(users_url){
 		
 		_this=this;
-		var val=$("#search_user").val();
 		 $.ajax({
             url: users_url,
-            method:"GET",
+            type:"GET",
             dataType:'html',
             beforeSend:function(){
                     _this.disable_okbutt_mgdialg() ;
@@ -310,7 +340,7 @@ var settings={
                 
                 _this.close_message_diag();
                 _this.enable_okbutt_mgdialg();
-               console.log(Data)
+              // console.log(Data)
                $("#secondLevelContent").remove();
                $("#firstLevelContent").append(Data);                 
             },

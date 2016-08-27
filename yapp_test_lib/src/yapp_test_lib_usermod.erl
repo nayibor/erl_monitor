@@ -31,7 +31,7 @@
 		 
 %%% for user stuff		 
 -export([get_user_roles/1,
-		 add_user/7,
+		 add_user/5,
 		 add_user_roles/2,
 		 get_users/0,
 		 get_links/0,
@@ -149,17 +149,17 @@ get_set_auto(TableName)->
 %%validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
 %%basic validation carried out for everything which is done here before anything is inserted
 %% @end
--spec add_user(string(),pos_integer(),string(),string(),string(),pos_integer(),pos_integer())-> {error,user_exists} | ok | term()  .
-add_user(Email,Id,Password,Fname,Lname,Siteid,Instid) ->    
+-spec add_user(string(),string(),string(),pos_integer(),pos_integer())-> {error,user_exists} | ok | term()  .
+add_user(Email,Fname,Lname,Siteid,Instid) ->    
 		F = fun() ->
 				case check_email(Email) of 
 					ok ->
 						Fun_add = fun() ->
-							mnesia:write(#usermod_users{user_email=Email,id=Id,
-								   password=Password,fname=Fname,
-								   lname=Lname,site_id=Siteid,
-								   inst_id=Instid
-								   })
+									mnesia:write(#usermod_users{user_email=Email,id=get_set_auto(usermod_users),
+										   password=gen_pass(),fname=Fname,
+										   lname=Lname,site_id=Siteid,
+										   inst_id=Instid
+										   })
 						end,
 						mnesia:activity(transaction, Fun_add);
 					exists ->
@@ -226,8 +226,8 @@ add_user_roles(UserId,RoleId) ->
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Site_id,Lname,Lock_stat} ||
-	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
+	            [{Id,Email,Fname,Lname,Site_id,Lock_stat} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
 								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
 		end,
@@ -389,5 +389,19 @@ find_link_details(Linkid)->
 	        [S] -> S
 	    end.
  
+ 
+ 		
+%%%%@doc very very weak internal way for generating passwords
+%%%%%	 dont use even if your life is being threatened :):).no seriously!!!
+gen_pass() ->
+		Base = "-_=+abcdefghijklmnopqrstuvwxyz!@#$%^&ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+		<<A:32, B:32, C:32>> = crypto:rand_bytes(12),
+		random:seed(A,B,C),
+		lists:append([gen_weak_char(Base)||_<-lists:seq(1,10)]).
+
+
+gen_weak_char(Base) ->
+		Select_dig = random:uniform(string:len(Base)),
+		string:sub_string(Base,Select_dig,Select_dig).
+ 
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
- %% @TODO seperate error checking code from normal code    

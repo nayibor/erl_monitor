@@ -126,7 +126,7 @@ compile_templates(Listdir) ->
 		lists:map(fun({Indir,Outdir})-> compile_temp_dir(Indir,Outdir) end,Listdir).
 
 
-%%%% @doc compiles the individual files in the directory	
+%%%% @doc compiles the individual files in the template directory	
 -spec 	compile_temp_dir([string()],[string()]) -> [ok] | term() . 
 compile_temp_dir(Indir,Outdir) ->
 		Directlist =string:tokens(os:cmd("ls "++Indir),"\n"),

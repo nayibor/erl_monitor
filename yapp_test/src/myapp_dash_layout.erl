@@ -160,7 +160,7 @@ gen_content_real(Users)->
 					
 					},
 					{'tbody',[],
-						lists:map(fun({Id,Email,Fname,Site_id,Lname,_Lock_stat})-> 
+						lists:map(fun({Id,Email,Fname,Lname,Site_id,_Lock_stat} )-> 
 						          {'tr',[{id,Id}],
 									[
 										{'td',[{class,"name_info"}],lists:concat([Fname," ",Lname])},

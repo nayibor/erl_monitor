@@ -128,3 +128,8 @@ get_sidebar_links(List_cat)->
 %%%	@end
 get_cont_act(List_cat)->
 	lists:append(lists:foldl(fun({_C,ListEl},Acc)-> [lists:map(fun({Fi,Si,_Ti,_Fti})->{Fi,Si} end,ListEl) | Acc]   end ,[],List_cat)).
+	
+	
+
+
+		

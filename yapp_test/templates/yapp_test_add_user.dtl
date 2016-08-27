@@ -1,3 +1,4 @@
+{# This is another comment #}
 
 <form name="add_user_form" id="add_user_form" class="cmxform">
     <div class='tableWrapper'>
@@ -7,9 +8,13 @@
                     <label> First Name </label>       
                 </li> 
                 <li>
-                    <input type="hidden" required name="id" id="id"  
-                    value="{# echo isset($User) ? $User['User']['id'] : ""; #}" />      
-{# This is a comment #}
+					{% if type_user_tran == "add_user" %}
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% elif type_user_tran == "edit_user" %}
+                    <input type="hidden" required name="id" id="id"   value="" /> 
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% endif %}
+{# This is a commentttt #}
                     <input type="text" class="ca" required name="fname" id="fname" 
                     value="{# echo isset($User) ? $User['User']['fname'] : ""; #}" />      
                 </li>
@@ -45,24 +50,14 @@
                 <li>
                 </li>
                 <li>
-                    <input type="hidden" required name="add_user" id="add_user"  value="1" />      
-
-
                 </li>
-
-
             </ul>
-
-
-
             <div class='clear'></div>
             <div class='corner left'></div>
             <div class='corner right'></div>
         </div>
 
     </div>
-    <input type="hidden"  name="save_eve" id="save_eve" value="save" />      
-
 </form>
 
 
