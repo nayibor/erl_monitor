@@ -11,12 +11,11 @@
 					{% if type_user_tran == "add_user" %}
                     <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
 					{% elif type_user_tran == "edit_user" %}
-                    <input type="hidden" required name="id" id="id"   value="" /> 
+                    <input type="hidden" required name="id" id="id"   value="{{ id }}" /> 
                     <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
 					{% endif %}
 {# This is a commentttt #}
-                    <input type="text" class="ca" required name="fname" id="fname" 
-                    value="{# echo isset($User) ? $User['User']['fname'] : ""; #}" />      
+                    <input type="text" class="ca" required name="fname" id="fname" value="{{ fname|default:"" }}" />      
                 </li>
             </ul>  
             <ul class='tableActions'>
@@ -24,8 +23,7 @@
                     <label>  Last  Name </label> 
                 </li>
                 <li>
-                    <input type="text" class="ca" required name="lname" id="lname" 
-                    value="{# echo isset($User) ? $User['User']['lname'] : ""; #}" />      
+                    <input type="text" class="ca" required name="lname" id="lname" value="{{ lname|default:"" }}" />      
                 </li>
             </ul>
             <ul class='tableActions'>
@@ -36,9 +34,7 @@
                 </li>
                 <li>
 
-                    <input type="email" class="ca" required {# if (isset($User)) {echo "readonly=readonly";}  #} 
-                   name="email" id="email" 
-                   value="{# echo isset($User) ? $User['User']['user_email'] : ""; #}" />      
+                    <input type="email" class="ca" required name="email" id="email" value="{{ email|default:"" }}"" />      
                 </li>
 
 

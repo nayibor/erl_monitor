@@ -52,7 +52,7 @@
 
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_auto_table-1">add_auto_table/1</a></td><td></td></tr>
-<tr><td valign="top"><a href="#add_link-7">add_link/7</a></td><td>add link.</td></tr>
+<tr><td valign="top"><a href="#add_link-6">add_link/6</a></td><td>add link.</td></tr>
 <tr><td valign="top"><a href="#add_role-3">add_role/3</a></td><td>this is for testing purposes,in the real world an id would have been created in the db without the need for an id.</td></tr>
 <tr><td valign="top"><a href="#add_role_link-2">add_role_link/2</a></td><td>add role_link.</td></tr>
 <tr><td valign="top"><a href="#add_user-5">add_user/5</a></td><td>add user function which enables you to add users
@@ -61,12 +61,16 @@
  validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
  basic validation carried out for everything which is done here before anything is inserted.</td></tr>
 <tr><td valign="top"><a href="#add_user_roles-2">add_user_roles/2</a></td><td>add user_roles.</td></tr>
+<tr><td valign="top"><a href="#edit_user-6">edit_user/6</a></td><td> for editing users
+   the user is searched for using the id then the rest of the fields which have values are modified
+  since there is no way to manuall update only portions of a record in mnesia.</td></tr>
 <tr><td valign="top"><a href="#get_auto_all-0">get_auto_all/0</a></td><td>get getting records in the autoincrement table.</td></tr>
 <tr><td valign="top"><a href="#get_links-0">get_links/0</a></td><td>get links.</td></tr>
 <tr><td valign="top"><a href="#get_role_links-1">get_role_links/1</a></td><td>get_role_links.</td></tr>
 <tr><td valign="top"><a href="#get_roles-0">get_roles/0</a></td><td>get_roles.</td></tr>
 <tr><td valign="top"><a href="#get_set_auto-1">get_set_auto/1</a></td><td>gets current autoincrement and gives it to requestor
     resets value to cvalue +1.</td></tr>
+<tr><td valign="top"><a href="#get_user_id-1">get_user_id/1</a></td><td>get users by id.</td></tr>
 <tr><td valign="top"><a href="#get_user_links-1">get_user_links/1</a></td><td>this gets all the links for a particular user
   data is put into a category format after this.</td></tr>
 <tr><td valign="top"><a href="#get_user_roles-1">get_user_roles/1</a></td><td></td></tr>
@@ -86,9 +90,9 @@
 <p><tt>add_auto_table(Tablename) -&gt; any()</tt></p>
 </div>
 
-<h3 class="function"><a name="add_link-7">add_link/7</a></h3>
+<h3 class="function"><a name="add_link-6">add_link/6</a></h3>
 <div class="spec">
-<p><tt>add_link(Id::pos_integer(), Controller::string(), Link_action::string(), Link_allow::string(), Link_category::string(), Link_name::string(), Link_type::<a href="#type-link_type">link_type()</a>) -&gt; ok | term()</tt><br></p>
+<p><tt>add_link(Controller::string(), Link_action::string(), Link_allow::string(), Link_category::string(), Link_name::string(), Link_type::<a href="#type-link_type">link_type()</a>) -&gt; ok | term()</tt><br></p>
 </div><p>add link</p>
 
 <h3 class="function"><a name="add_role-3">add_role/3</a></h3>
@@ -103,7 +107,7 @@
 
 <h3 class="function"><a name="add_user-5">add_user/5</a></h3>
 <div class="spec">
-<p><tt>add_user(Email::string(), Fname::string(), Lname::string(), Siteid::pos_integer(), Instid::pos_integer()) -&gt; {error, user_exists} | ok | term()</tt><br></p>
+<p><tt>add_user(Email::string(), Fname::string(), Lname::string(), Siteid::pos_integer(), Instid::pos_integer()) -&gt; {error, term()} | ok | term()</tt><br></p>
 </div><p>add user function which enables you to add users
  id would have to be created specially in real worl scenario
  will have to check whether user with email exists first before trying to add
@@ -114,6 +118,13 @@
 <div class="spec">
 <p><tt>add_user_roles(UserId::pos_integer(), RoleId::pos_integer()) -&gt; ok | {error, check_user_role} | term()</tt><br></p>
 </div><p>add user_roles</p>
+
+<h3 class="function"><a name="edit_user-6">edit_user/6</a></h3>
+<div class="spec">
+<p><tt>edit_user(Id::pos_integer(), Email::string(), Fname::string(), Lname::string(), Siteid::pos_integer(), Instid::pos_integer()) -&gt; ok | {error, term()} | term()</tt><br></p>
+</div><p> for editing users
+   the user is searched for using the id then the rest of the fields which have values are modified
+  since there is no way to manuall update only portions of a record in mnesia</p>
 
 <h3 class="function"><a name="get_auto_all-0">get_auto_all/0</a></h3>
 <div class="spec">
@@ -140,6 +151,11 @@
 <p><tt>get_set_auto(TableName) -&gt; any()</tt></p>
 </div><p>gets current autoincrement and gives it to requestor
     resets value to cvalue +1</p>
+
+<h3 class="function"><a name="get_user_id-1">get_user_id/1</a></h3>
+<div class="spec">
+<p><tt>get_user_id(Id::pos_integer()) -&gt; tuple()</tt><br></p>
+</div><p>get users by id</p>
 
 <h3 class="function"><a name="get_user_links-1">get_user_links/1</a></h3>
 <div class="spec">
@@ -181,6 +197,6 @@
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Aug 27 2016, 20:42:23.</i></p>
+<p><i>Generated by EDoc, Aug 28 2016, 03:20:09.</i></p>
 </body>
 </html>

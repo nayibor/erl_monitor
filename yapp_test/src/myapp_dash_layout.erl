@@ -17,7 +17,7 @@
 		 show_dashboard/1,
 		 get_secondLevelContent/2,
 		 gen_content_upper/0,
-		 gen_content_real/1,
+		 gen_content_real/2,
 		 get_out_content/1
 		 ]).
 
@@ -145,7 +145,7 @@ gen_content_upper()->
 		
 
 %% @doc this is used for generating the actual content of the page 
-gen_content_real(Users)->
+gen_content_real(Arg,Users)->
 		{'div',[{id,"table_info"},{name,"table_info"}],
 			{'table',[{cellspacing,"0"}],
 				[
@@ -160,20 +160,20 @@ gen_content_real(Users)->
 					
 					},
 					{'tbody',[],
-						lists:map(fun({Id,Email,Fname,Lname,Site_id,_Lock_stat} )-> 
+						lists:map(fun({Id,Email,Fname,Lname,Site_id,Lock_stat,_} )-> 
 						          {'tr',[{id,Id}],
 									[
 										{'td',[{class,"name_info"}],lists:concat([Fname," ",Lname])},
 										{'td',[],Email},
 										{'td',[],Site_id},
 										{'td',[]},
-										{'td',[],"lock_stat"},
+										{'td',[],Lock_stat },
 										{'td'},{td},{td},
 										{'td',[],
 											{'ul',[{class,"rowActions"}],
 												[
-													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences edit_user"}],"Edit"}
+													{'li',[],%%yapp:prepath(Arg)++"get_edit_user"++"/"++Id
+														{'a',[{href,yapp:prepath(Arg)++"user/get_edit_user"++"/"++integer_to_list(Id)},{class,"inlineIcon preferences edit_user"}],"Edit"}
 													},
 													{'li',[],
 														{'a',[{href,"#"},{class,"inlineIcon preferences iconAdvertiser"}],"Roles"}

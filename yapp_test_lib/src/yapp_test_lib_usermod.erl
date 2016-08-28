@@ -23,7 +23,7 @@
 %%% for role stuff
 -export([add_role_link/2,
 		 add_role/3,
-		 add_link/7,
+		 add_link/6,
 		 get_roles/0,
 		 get_role_links/1,
 		 get_user_links/1,
@@ -36,7 +36,10 @@
 		 get_users/0,
 		 get_links/0,
 		 verify_user/2,
-		 get_users_filter/1
+		 get_users_filter/1,
+		 edit_user/6,
+		 check_email/3,
+		 get_user_id/1
 		 ]).
 
  
@@ -130,7 +133,7 @@ get_set_auto(TableName)->
 				case mnesia:activity(transaction,F) of
 					[]->
 						exit(error);
-					[S = #auto_inc{name=Tablename,cvalue=Cvalue}]->
+					[S = #auto_inc{cvalue=Cvalue}]->
 						ok=mnesia:activity(transaction,fun()->mnesia:write(S#auto_inc{cvalue=Cvalue+1})end),
 						Cvalue
 				end
@@ -149,10 +152,10 @@ get_set_auto(TableName)->
 %%validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
 %%basic validation carried out for everything which is done here before anything is inserted
 %% @end
--spec add_user(string(),string(),string(),pos_integer(),pos_integer())-> {error,user_exists} | ok | term()  .
+-spec add_user(string(),string(),string(),pos_integer(),pos_integer())-> {error,term()} | ok | term().
 add_user(Email,Fname,Lname,Siteid,Instid) ->    
 		F = fun() ->
-				case check_email(Email) of 
+				case check_email(Email,add_user,0) of 
 					ok ->
 						Fun_add = fun() ->
 									mnesia:write(#usermod_users{user_email=Email,id=get_set_auto(usermod_users),
@@ -169,9 +172,36 @@ add_user(Email,Fname,Lname,Siteid,Instid) ->
 		mnesia:activity(transaction,F).	
 
 
+%% @doc  for editing users 
+%%  the user is searched for using the id then the rest of the fields which have values are modified
+%% since there is no way to manuall update only portions of a record in mnesia 
+-spec edit_user(pos_integer(),string(),string(),string(),pos_integer(),pos_integer())-> ok |{error,term()} | term(). 
+edit_user(Id,Email,Fname,Lname,Siteid,Instid)->
+
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+			%%mnesia:activity(transaction,fun()->mnesia:read(usermod_users,5)		
+		    case mnesia:activity(transaction,F) of 
+				[S=#usermod_users{}] ->
+						case check_email(Email,edit_user,Id) of 
+							ok ->
+								Edit_tran = fun()-> mnesia:write(S#usermod_users{id=Id,user_email=Email,fname=Fname,lname=Lname,site_id=Siteid}) end,
+								ok=mnesia:activity(transaction,Edit_tran);
+							_ ->
+								{error,email_exists_diff_user}
+						end;
+				_	->
+					{error,user_non_exists}
+			end	
+		end,
+		mnesia:activity(transaction,Fout).
+		
 %%% @doc this is for testing purposes,in the real world an id would have been created in the db without the need for an id 
 -spec add_role(pos_integer(),string(),string()) -> ok | term() .
 add_role(Id,Role_short_name,Role_long_name) -> 
+
 		F = fun() ->
 				mnesia:write(#usermod_roles{id=Id,role_short_name=Role_short_name,
 										role_long_name=Role_long_name})
@@ -180,10 +210,10 @@ add_role(Id,Role_short_name,Role_long_name) ->
 			
 
 %%% @doc add link
--spec add_link(pos_integer(),string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
-add_link(Id,Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
+-spec add_link(string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
+add_link(Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
 		F = fun() ->
-				mnesia:write(#usermod_links{id=Id,link_controller=Controller,link_allow=Link_allow,link_type=Link_type,
+				mnesia:write(#usermod_links{id=get_set_auto(usermod_links),link_controller=Controller,link_allow=Link_allow,link_type=Link_type,
 										link_action=Link_action,link_category=Link_category,link_name=Link_name})
 		end,
 		mnesia:activity(transaction,F).
@@ -219,19 +249,30 @@ add_user_roles(UserId,RoleId) ->
 	    mnesia:activity(transaction,F).
 
 
-
-
 %%% @doc get_users
 -spec get_users() -> [string()] | [] | term().
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,Lock_stat} ||
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
 	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
 								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
 		end,
 	    mnesia:activity(transaction, F).
+
+%% @doc get users by id
+-spec get_user_id(pos_integer()) -> tuple().
+get_user_id(Id) ->
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+		    case mnesia:activity(transaction,F) of 
+				[#usermod_users{id=Id,user_email=Email,fname=Fname,lname=Lname}] ->
+				    {Id,Email,Fname,Lname};
+				_ ->
+				   {error,user_non_exists}
+		    end.
 
 
 %%%	@doc get_users_filter . filtered by fname,email,lname
@@ -239,8 +280,8 @@ get_users() ->
 get_users_filter(UserDet) ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Site_id,Lname,Lock_stat} ||
-	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
 							    lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users),
 				Email =:= UserDet orelse Fname =:= UserDet orelse Lname =:= UserDet				  
 	            ]))
@@ -358,14 +399,22 @@ get_user_links(UserId)->
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%PRIVATE FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%
+%% @private formats lock counter for external viewing
+format_lock_counter(Lock_counter) when Lock_counter >= ?LOCKOUT_COUNTER_MAX-> "Locked";
+format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "Unlocked".
+
+		
 %% @private for checking whether an email exists or not 
--spec check_email(atom()) -> ok | exists . 
-check_email(Email)->
+%% first condition is for checking whether email exists for a new user 
+%% second condition is for making sure a seperate user does not have email address when trying to edit
+-spec check_email(atom(),atom(),pos_integer()) -> ok | exists . 
+check_email(Email,Type,Id)->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [{User_Em} ||
-	             #usermod_users{user_email=User_Em} <- mnesia:table(usermod_users),
-	             User_Em =:= Email]))
+	             #usermod_users{user_email=User_Em,id=Id_old} <- mnesia:table(usermod_users),
+	             User_Em =:= Email andalso Type =:= add_user 
+	             orelse User_Em =:= Email andalso Type =:=  edit_user andalso Id =/= Id_old]))
 			end,
 	    case mnesia:activity(transaction, F) of
 	        [] ->  ok;
@@ -405,3 +454,4 @@ gen_weak_char(Base) ->
 		string:sub_string(Base,Select_dig,Select_dig).
  
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
+ %% @TODO change the hash type

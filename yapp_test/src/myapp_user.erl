@@ -50,14 +50,13 @@ out(Arg,ok,ok) ->
 		Uri = yaws_api:request_url(Arg),
 		Path = string:tokens(Uri#url.path, "/"), 
 		Method = (Arg#arg.req)#http_request.method,
-		%%io:format("~nrequest url ~p~n method is ~p~n",[Path,Method]),
 		outa(Arg,Method,Path).
 		
 %% @doc	this is for the index_dashboard action get method
-outa(_Arg,'GET',["yapp_test","user","get_users"])->
+outa(Arg,'GET',["yapp_test","user","get_users"])->
 		Title_Page = "Users",
 		Users = yapp_test_lib_usermod:get_users(),
-		SubUidata = [myapp_dash_layout:gen_content_upper(),myapp_dash_layout:gen_content_real(Users)],	 
+		SubUidata = [myapp_dash_layout:gen_content_upper(),myapp_dash_layout:gen_content_real(Arg,Users)],	 
 		Uidata=myapp_dash_layout:get_out_content(SubUidata),		
 		Response = myapp_dash_layout:get_secondLevelContent(Title_Page,Uidata),
 		{ehtml,Response};
@@ -71,11 +70,11 @@ outa(Arg,'GET',["yapp_test","user","search_user"])->
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
 				Users = yapp_test_lib_usermod:get_users_filter(Filter),
-				UiData = myapp_dash_layout:gen_content_real(Users),
+				UiData = myapp_dash_layout:gen_content_real(Arg,Users),
 				{ehtml,UiData}; 
 			undefined ->
 				Users = yapp_test_lib_usermod:get_users(),
-				UiData =myapp_dash_layout:gen_content_real(Users),
+				UiData =myapp_dash_layout:gen_content_real(Arg,Users),
 				{ehtml,UiData}
 		end;
 		
@@ -94,20 +93,31 @@ outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 %%  	validation has not been done here but will be done later 
 outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		
-		Userdata = yaws_api:parse_post(Arg),
+		%%Userdata = yaws_api:parse_post(Arg),
 		%%io:format("post data is ~p ",[Userdata]),
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,_Edit_id_val} ->
-				{html,"<p>editing user</p>"};	
+				{ok,Id} = yaws_api:postvar(Arg, "id"),
+				{ok,Email} = yaws_api:postvar(Arg, "email"),
+		        {ok,Fname} = yaws_api:postvar(Arg, "fname"),
+		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
+		        Siteid = 1,
+		        Instid = 1 ,
+				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,Siteid,Instid) of
+					ok ->
+						{html,"<p>User edited successfully</p>"};
+					{error,Reason} ->
+						{html,"<p>"++atom_to_list(Reason)++"</p>"}	
+				end;
 		   undefined ->
-		        {ok,Email} =  yaws_api:postvar(Arg, "email"),
+		        {ok,Email} = yaws_api:postvar(Arg, "email"),
 		        {ok,Fname} = yaws_api:postvar(Arg, "fname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
 		        Siteid = 1,
 		        Instid = 1 ,
 		        case yapp_test_lib_usermod:add_user(Email,Fname,Lname,Siteid,Instid) of 
 					ok ->
-						{html,"<p>user added successfully</p>"};
+						{html,"<p>User added successfully</p>"};
 					{error,user_exists} ->
 						{html,"<p>error!!user already exists</p>"}       
 				end				
@@ -117,8 +127,14 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part 
-outa(_Arg,'GET',["yapp_test","user","get_edit_user",_UserId])->
-		ok;			
+outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
+		case yapp_test_lib_usermod:get_user_id(list_to_integer(UserId)) of 
+			{Id,Email,Fname,Lname} ->
+				{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
+				{html,UiData};
+			_ ->
+				{html,"<p>user doesnt exist</p>"}
+		end;
 			
 				
 %% @doc this is used for getting roles for a particular user
@@ -146,7 +162,6 @@ outa(_Arg,'POST',["yapp_test","user","save_edit_user",_UserId])->
 outa(Arg,_Method,_)->
 		{page,yapp:prepath(Arg)++?PG_404}.
 		
-
 		
  %% @TODO return error return code when an error occurs
  %% @TODO seperate error checking code from normal code  

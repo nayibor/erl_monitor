@@ -261,6 +261,13 @@ var settings={
 	
 		});
 
+         $(".edit_user").live('click',function(e) {
+		  e.preventDefault();
+		  var link=$(this).attr('href');
+		  _this.load_add_user(link);
+	
+		});
+    
     
 		},
 		
@@ -271,7 +278,6 @@ var settings={
 	//	$(_this.add_edit_diag).dialog().load(link,function(rdata){
     //            
     //    })
-		var val="abc";
 		$.ajax({
             url: link,
             type:"GET",
