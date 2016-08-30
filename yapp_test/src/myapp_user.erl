@@ -41,7 +41,7 @@ out(Arg,ok) ->
 
 %% @doc logged in users whom dont have access to page are shown the page for restricted users (exists/no access)
 out(Arg,ok,error) ->
-		io:format("user logged in and but does not have permission to acces page"),
+		%%io:format("user logged in and but does not have permission to acces page"),
 		{page,yapp:prepath(Arg)++?PG_401};
 	
 	
@@ -86,7 +86,20 @@ outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 		{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"add_user"}]),
 		{html,UiData};
 
-	
+
+%% @doc this is used for getting for getting user info/perhaps for editing
+%%		query string part of url may have to be further parsed
+%% 		retrieving user interface part 
+outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
+		case yapp_test_lib_usermod:get_user_id(list_to_integer(UserId)) of 
+			{Id,Email,Fname,Lname} ->
+				{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
+				{html,UiData};
+			_ ->
+				{html,"<p>user doesnt exist</p>"}
+		end;
+
+
 %% @doc for inserting a new user/updating a new user .
 %%		insertion part
 %% 		returns a messagpack object showing status 
@@ -102,8 +115,8 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		        {ok,Fname} = yaws_api:postvar(Arg, "fname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
 		        Siteid = 1,
-		        Instid = 1 ,
-				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,Siteid,Instid) of
+		        %%Instid = 1 ,
+				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,Siteid) of
 					ok ->
 						{html,"<p>User edited successfully</p>"};
 					{error,Reason} ->
@@ -124,38 +137,68 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		end;
 		
 	
-%% @doc this is used for getting for getting user info/perhaps for editing
-%%		query string part of url may have to be further parsed
-%% 		retrieving user interface part 
-outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
-		case yapp_test_lib_usermod:get_user_id(list_to_integer(UserId)) of 
-			{Id,Email,Fname,Lname} ->
-				{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
-				{html,UiData};
-			_ ->
-				{html,"<p>user doesnt exist</p>"}
-		end;
+
 			
 				
 %% @doc this is used for getting roles for a particular user
 %% 		returns an erlydtl html page 
-outa(_Arg,'GET',["yapp_test","user","get_roles_user",_UserId])->
-		ok;
+outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
+		Userrole =  yapp_test_lib_usermod:get_user_roles(list_to_integer(UserId)),
+		Roles = yapp_test_lib_usermod:get_roles(),
+		io:format("list is ~p",[dict:to_list(Roles)]),
+		{ok,UiData} = yapp_test_edit_roles:render([{useroles,Userrole},{roles,Roles}]),
+		{html,UiData};
+		
 	
 	
 %% @doc this is for updating roles
 %%		insertion part
 %% 		returns a messagpack object showing status 
-outa(_Arg,'POST',["yapp_test","user","save_roles_user",_UserId])->
+outa(_Arg,'POST',["yapp_test","user","save_roles_user"])->
 		ok;	
 	
+
+%% @doc this is used for resetting the password of the user 
+%% 		insertion part
+%%		return a messagepack object showing status 
+%% 		message pack functionality has to be worked on 
+%%		this part also is supposed to return a error status code when the change is not succesful
+%%      have to work on that also 
+outa(_Arg,'POST',["yapp_test","user","reset_pass_user",UserId])->
+		
+		Result = yapp_test_lib_usermod:reset_pass(list_to_integer(UserId)),
+		case  Result of
+		  {ok,NewPass} -> {html,"<p>yipee.New Pass is "++NewPass++"</p>"};
+		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		end;
+
 
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		insertion part
 %%		return a messagepack object showing status 
-outa(_Arg,'POST',["yapp_test","user","save_edit_user",_UserId])->
-		ok;	
+outa(_Arg,'POST',["yapp_test","user","lock_account_user",UserId])->
+		
+		Result = yapp_test_lib_usermod:lock_account(list_to_integer(UserId)),
+		case  Result of
+		   ok -> {html,"<p>Account Locked</p>"};
+		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		end;
+	
+		
+%% @doc this is used for getting for getting user info/perhaps for editing
+%%		query string part of url may have to be further parsed
+%% 		insertion part
+%%		return a messagepack object showing status 
+outa(_Arg,'POST',["yapp_test","user","unlock_account_user",UserId])->
+		Result = yapp_test_lib_usermod:unlock_account(list_to_integer(UserId)),
+		case  Result of
+		   ok -> {html,"<p>Account Unlocked</p>"};
+		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		end;	
+		
+				
+
 	
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		

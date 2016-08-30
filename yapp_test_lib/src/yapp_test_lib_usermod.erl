@@ -22,7 +22,7 @@
 
 %%% for role stuff
 -export([add_role_link/2,
-		 add_role/3,
+		 add_role/2,
 		 add_link/6,
 		 get_roles/0,
 		 get_role_links/1,
@@ -37,9 +37,12 @@
 		 get_links/0,
 		 verify_user/2,
 		 get_users_filter/1,
-		 edit_user/6,
+		 edit_user/5,
 		 check_email/3,
-		 get_user_id/1
+		 get_user_id/1,
+		 reset_pass/1,
+		 lock_account/1,
+		 unlock_account/1
 		 ]).
 
  
@@ -50,7 +53,7 @@
 -type usermod_links() :: #usermod_links{}.
 -type usermod_users_roles() :: #usermod_users_roles{}.
 -type usermod_role_links() :: #usermod_role_links{}.
--type auto_inc() :: #auto_inc{}.
+%%-type auto_inc() :: #auto_inc{}.
 
 %%type definition for user category return type
 -type single_link_tp() :: {atom(),atom(),atom()} .
@@ -108,7 +111,7 @@ temp_create(Nodes) ->
 
 %%% for adding records to autoincrement table
 add_auto_table(Tablename) ->
-		F= fun()-> mnesia:write(#auto_inc{name=Tablename,cvalue=0}) end ,
+		F= fun()-> mnesia:write(#auto_inc{name=Tablename,cvalue=1}) end ,
 		mnesia:activity(transaction,F).
 
 %%% @doc get getting records in the autoincrement table 
@@ -172,19 +175,75 @@ add_user(Email,Fname,Lname,Siteid,Instid) ->
 		mnesia:activity(transaction,F).	
 
 
-%% @doc  for editing users 
-%%  the user is searched for using the id then the rest of the fields which have values are modified
-%% since there is no way to manuall update only portions of a record in mnesia 
--spec edit_user(pos_integer(),string(),string(),string(),pos_integer(),pos_integer())-> ok |{error,term()} | term(). 
-edit_user(Id,Email,Fname,Lname,Siteid,Instid)->
-
+%% @doc this is for reseting the pass of the use  
+-spec reset_pass(pos_integer())->{ok,string()} | {error,term()}.
+reset_pass(Id) ->
 		Fout = fun () -> 
 			F = fun()->
 					mnesia:read(usermod_users,Id)
 			end,
+			case mnesia:activity(transaction,F) of
+				[S] ->
+					Npass = gen_pass(),
+					Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Npass}) end,
+					ok=mnesia:activity(transaction,Edit_tran),
+					{ok,Npass};	
+				_ ->
+					{error,user_non_exists}
+			end
+		end,
+		mnesia:activity(transaction,Fout).
+
+
+%% @doc this is for locking the account of the user so the user cant lock in 
+-spec lock_account(pos_integer())-> ok | {error,term()} | term().
+lock_account(Id) ->
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+			case mnesia:activity(transaction,F) of
+				[S] ->
+					Edit_tran = fun()-> mnesia:write(S#usermod_users{lock_status=?LOCKOUT_COUNTER_MAX}) end,
+					mnesia:activity(transaction,Edit_tran);
+				_ ->
+					{error,user_non_exists}
+			end
+		end,
+		mnesia:activity(transaction,Fout).
+
+
+%% @doc this is for unlocking the account of the user so the user cant lock in 
+-spec unlock_account(pos_integer())-> ok | {error,term()} | term().
+unlock_account(Id) ->
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+			case mnesia:activity(transaction,F) of
+				[S] ->
+					Edit_tran = fun()-> mnesia:write(S#usermod_users{lock_status=0}) end,
+					mnesia:activity(transaction,Edit_tran);
+				_ ->
+					{error,user_non_exists}
+			end
+		end,
+		mnesia:activity(transaction,Fout).
+
+
+%% @doc  for editing users 
+%%  the user is searched for using the id then the rest of the fields which have values are modified
+%% since there is no way to manuall update only portions of a record in mnesia 
+-spec edit_user(pos_integer(),string(),string(),string(),pos_integer())-> ok |{error,term()} | term(). 
+edit_user(Id,Email,Fname,Lname,Siteid)->
+
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end, 
 			%%mnesia:activity(transaction,fun()->mnesia:read(usermod_users,5)		
 		    case mnesia:activity(transaction,F) of 
-				[S=#usermod_users{}] ->
+				[S] ->
 						case check_email(Email,edit_user,Id) of 
 							ok ->
 								Edit_tran = fun()-> mnesia:write(S#usermod_users{id=Id,user_email=Email,fname=Fname,lname=Lname,site_id=Siteid}) end,
@@ -199,11 +258,11 @@ edit_user(Id,Email,Fname,Lname,Siteid,Instid)->
 		mnesia:activity(transaction,Fout).
 		
 %%% @doc this is for testing purposes,in the real world an id would have been created in the db without the need for an id 
--spec add_role(pos_integer(),string(),string()) -> ok | term() .
-add_role(Id,Role_short_name,Role_long_name) -> 
+-spec add_role(string(),string()) -> ok | term() .
+add_role(Role_short_name,Role_long_name) -> 
 
 		F = fun() ->
-				mnesia:write(#usermod_roles{id=Id,role_short_name=Role_short_name,
+				mnesia:write(#usermod_roles{id=get_set_auto(usermod_roles),role_short_name=Role_short_name,
 										role_long_name=Role_long_name})
 		end,
 		mnesia:activity(transaction,F).
@@ -309,11 +368,17 @@ get_users_filter_old(UserDet)->
 -spec get_roles() -> [usermod_roles()] | [] | term().
 get_roles() ->
 		F = fun() ->
-				qlc:eval(qlc:q(
-	            [S ||
-	             S <- mnesia:table(usermod_roles)
-	            ]))
+			Qh=	qlc:eval(qlc:q(
+	            [{Id,Long_name} ||
+	             #usermod_roles{id=Id,role_long_name=Long_name} <- mnesia:table(usermod_roles)
+	            ])),
+	            qlc:fold(fun({Id,Long_name}, Dict) ->
+						dict:store(Id,Long_name, Dict)
+						end,
+						dict:new(),
+						Qh)
 		end,
+		
 	    mnesia:activity(transaction, F).
 	
 %%% @doc get links
@@ -331,7 +396,7 @@ get_links() ->
 %%hash will have to be done of password before password is put into system
 %%user is locked out after password is tried for  a predefined number of times
 %% @end
--spec verify_user(string(),string())-> {error,check_username_password} | {error,check_username_password_lock} | {ok,pos_integer(),string()} | term() .
+-spec verify_user(string(),string())-> {error,check_username_password} | {error,check_username_password_lock} | {ok,pos_integer(),string(),pos_integer(),pos_integer()} | term() .
 verify_user(Email,Password)->
 	
 		F_out=fun()->
@@ -341,17 +406,20 @@ verify_user(Email,Password)->
 					S = #usermod_users{user_email=Rc_email} <- mnesia:table(usermod_users),
 					Rc_email =:= Email ]))
 				end,
-				case mnesia:activity(transaction,F) of 
+				%%useranme and password is wrong and lock is less th
+				case mnesia:activity(transaction,F) of  
 						[] -> 
 							{error,check_username_password}; 
-						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Rc_pass =/= Password andalso Lock_status < ?LOCKOUT_COUNTER_MAX  -> 
+						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/=Rc_pass andalso Lock_status < ?LOCKOUT_COUNTER_MAX  -> 
 							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
 							{error,check_username_password}; 
 						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/= Rc_pass  andalso Lock_status >= ?LOCKOUT_COUNTER_MAX  -> 
 							{error,check_username_password_lock}; 
-						[S=#usermod_users{password=Rc_pass,id=Id,fname=Fname}] when Rc_pass =:= Password  ->	
+						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status >= ?LOCKOUT_COUNTER_MAX ->	
+							{error,check_username_password_lock}; 
+						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status < ?LOCKOUT_COUNTER_MAX ->	
 							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
-							{ok,Id,Fname}
+							{ok,Id,Fname,Site_id,Inst_id}
 				end
 		end,
 		mnesia:activity(transaction,F_out).
@@ -367,12 +435,15 @@ get_role_links(RoleId) ->
 	    
 %%get_user_roles 
 -spec get_user_roles(pos_integer()) -> [usermod_users_roles()] | [] | term() .
-get_user_roles(UserId) ->
-		F = fun()->
-				mnesia:read(usermod_users_roles,UserId)
-		end,
-	    mnesia:activity(transaction,F).
-
+get_user_roles(Userid_search) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [Roleid ||
+	             #usermod_users_roles{user_id=Userid,role_id=Roleid} <- mnesia:table(usermod_users_roles),
+	             Userid_search =:= Userid
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
 
 
 %%% @doc this gets all the links for a particular user 
@@ -401,7 +472,7 @@ get_user_links(UserId)->
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %% @private formats lock counter for external viewing
 format_lock_counter(Lock_counter) when Lock_counter >= ?LOCKOUT_COUNTER_MAX-> "Locked";
-format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "Unlocked".
+format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "Active".
 
 		
 %% @private for checking whether an email exists or not 

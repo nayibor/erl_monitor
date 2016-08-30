@@ -40,7 +40,7 @@
 
 <h3 class="typedecl"><a name="type-usermod_role_links">usermod_role_links()</a></h3>
 <p><tt>usermod_role_links() = #usermod_role_links{}</tt></p>
-
+<p> -type auto_inc() :: #auto_inc{}.</p>
 
 <h3 class="typedecl"><a name="type-usermod_roles">usermod_roles()</a></h3>
 <p><tt>usermod_roles() = #usermod_roles{}</tt></p>
@@ -53,7 +53,7 @@
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_auto_table-1">add_auto_table/1</a></td><td></td></tr>
 <tr><td valign="top"><a href="#add_link-6">add_link/6</a></td><td>add link.</td></tr>
-<tr><td valign="top"><a href="#add_role-3">add_role/3</a></td><td>this is for testing purposes,in the real world an id would have been created in the db without the need for an id.</td></tr>
+<tr><td valign="top"><a href="#add_role-2">add_role/2</a></td><td>this is for testing purposes,in the real world an id would have been created in the db without the need for an id.</td></tr>
 <tr><td valign="top"><a href="#add_role_link-2">add_role_link/2</a></td><td>add role_link.</td></tr>
 <tr><td valign="top"><a href="#add_user-5">add_user/5</a></td><td>add user function which enables you to add users
  id would have to be created specially in real worl scenario
@@ -61,7 +61,7 @@
  validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
  basic validation carried out for everything which is done here before anything is inserted.</td></tr>
 <tr><td valign="top"><a href="#add_user_roles-2">add_user_roles/2</a></td><td>add user_roles.</td></tr>
-<tr><td valign="top"><a href="#edit_user-6">edit_user/6</a></td><td> for editing users
+<tr><td valign="top"><a href="#edit_user-5">edit_user/5</a></td><td> for editing users
    the user is searched for using the id then the rest of the fields which have values are modified
   since there is no way to manuall update only portions of a record in mnesia.</td></tr>
 <tr><td valign="top"><a href="#get_auto_all-0">get_auto_all/0</a></td><td>get getting records in the autoincrement table.</td></tr>
@@ -77,7 +77,10 @@
 <tr><td valign="top"><a href="#get_users-0">get_users/0</a></td><td>get_users.</td></tr>
 <tr><td valign="top"><a href="#get_users_filter-1">get_users_filter/1</a></td><td>get_users_filter .</td></tr>
 <tr><td valign="top"><a href="#install-1">install/1</a></td><td>this is used to create the basic tables that will be used in setups as well as in tests.</td></tr>
+<tr><td valign="top"><a href="#lock_account-1">lock_account/1</a></td><td>this is for locking the account of the user so the user cant lock in.</td></tr>
+<tr><td valign="top"><a href="#reset_pass-1">reset_pass/1</a></td><td>this is for reseting the pass of the use.</td></tr>
 <tr><td valign="top"><a href="#temp_create-1">temp_create/1</a></td><td>temp table for creating adhoc tables.</td></tr>
+<tr><td valign="top"><a href="#unlock_account-1">unlock_account/1</a></td><td>this is for unlocking the account of the user so the user cant lock in.</td></tr>
 <tr><td valign="top"><a href="#verify_user-2">verify_user/2</a></td><td>verify_user
  hash will have to be done of password before password is put into system
  user is locked out after password is tried for  a predefined number of times.</td></tr>
@@ -95,9 +98,9 @@
 <p><tt>add_link(Controller::string(), Link_action::string(), Link_allow::string(), Link_category::string(), Link_name::string(), Link_type::<a href="#type-link_type">link_type()</a>) -&gt; ok | term()</tt><br></p>
 </div><p>add link</p>
 
-<h3 class="function"><a name="add_role-3">add_role/3</a></h3>
+<h3 class="function"><a name="add_role-2">add_role/2</a></h3>
 <div class="spec">
-<p><tt>add_role(Id::pos_integer(), Role_short_name::string(), Role_long_name::string()) -&gt; ok | term()</tt><br></p>
+<p><tt>add_role(Role_short_name::string(), Role_long_name::string()) -&gt; ok | term()</tt><br></p>
 </div><p>this is for testing purposes,in the real world an id would have been created in the db without the need for an id</p>
 
 <h3 class="function"><a name="add_role_link-2">add_role_link/2</a></h3>
@@ -119,9 +122,9 @@
 <p><tt>add_user_roles(UserId::pos_integer(), RoleId::pos_integer()) -&gt; ok | {error, check_user_role} | term()</tt><br></p>
 </div><p>add user_roles</p>
 
-<h3 class="function"><a name="edit_user-6">edit_user/6</a></h3>
+<h3 class="function"><a name="edit_user-5">edit_user/5</a></h3>
 <div class="spec">
-<p><tt>edit_user(Id::pos_integer(), Email::string(), Fname::string(), Lname::string(), Siteid::pos_integer(), Instid::pos_integer()) -&gt; ok | {error, term()} | term()</tt><br></p>
+<p><tt>edit_user(Id::pos_integer(), Email::string(), Fname::string(), Lname::string(), Siteid::pos_integer()) -&gt; ok | {error, term()} | term()</tt><br></p>
 </div><p> for editing users
    the user is searched for using the id then the rest of the fields which have values are modified
   since there is no way to manuall update only portions of a record in mnesia</p>
@@ -165,7 +168,7 @@
 
 <h3 class="function"><a name="get_user_roles-1">get_user_roles/1</a></h3>
 <div class="spec">
-<p><tt>get_user_roles(UserId::pos_integer()) -&gt; [<a href="#type-usermod_users_roles">usermod_users_roles()</a>] | [] | term()</tt><br></p>
+<p><tt>get_user_roles(Userid_search::pos_integer()) -&gt; [<a href="#type-usermod_users_roles">usermod_users_roles()</a>] | [] | term()</tt><br></p>
 </div>
 
 <h3 class="function"><a name="get_users-0">get_users/0</a></h3>
@@ -183,20 +186,35 @@
 <p><tt>install(Nodes::[atom()] | []) -&gt; ok | {badrpc, term()}</tt><br></p>
 </div><p>this is used to create the basic tables that will be used in setups as well as in tests</p>
 
+<h3 class="function"><a name="lock_account-1">lock_account/1</a></h3>
+<div class="spec">
+<p><tt>lock_account(Id::pos_integer()) -&gt; ok | {error, term()} | term()</tt><br></p>
+</div><p>this is for locking the account of the user so the user cant lock in</p>
+
+<h3 class="function"><a name="reset_pass-1">reset_pass/1</a></h3>
+<div class="spec">
+<p><tt>reset_pass(Id::pos_integer()) -&gt; {ok, string()} | {error, term()}</tt><br></p>
+</div><p>this is for reseting the pass of the use</p>
+
 <h3 class="function"><a name="temp_create-1">temp_create/1</a></h3>
 <div class="spec">
 <p><tt>temp_create(Nodes::[atom()] | []) -&gt; ok</tt><br></p>
 </div><p>temp table for creating adhoc tables</p>
 
+<h3 class="function"><a name="unlock_account-1">unlock_account/1</a></h3>
+<div class="spec">
+<p><tt>unlock_account(Id::pos_integer()) -&gt; ok | {error, term()} | term()</tt><br></p>
+</div><p>this is for unlocking the account of the user so the user cant lock in</p>
+
 <h3 class="function"><a name="verify_user-2">verify_user/2</a></h3>
 <div class="spec">
-<p><tt>verify_user(Email::string(), Password::string()) -&gt; {error, check_username_password} | {error, check_username_password_lock} | {ok, pos_integer(), string()} | term()</tt><br></p>
+<p><tt>verify_user(Email::string(), Password::string()) -&gt; {error, check_username_password} | {error, check_username_password_lock} | {ok, pos_integer(), string(), pos_integer(), pos_integer()} | term()</tt><br></p>
 </div><p>verify_user
  hash will have to be done of password before password is put into system
  user is locked out after password is tried for  a predefined number of times</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Aug 28 2016, 03:20:09.</i></p>
+<p><i>Generated by EDoc, Aug 30 2016, 02:12:00.</i></p>
 </body>
 </html>

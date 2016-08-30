@@ -70,9 +70,9 @@ out(Arg,error) ->
 		_ ->
 				%%io:format("correct data received"),
 				case yapp_test_lib_usermod:verify_user(Username,Password) of
-					{ok,Id,Fname} ->
-						User_Links = yapp_test_lib_usermod:get_user_links(Id),
-						Cookie = yapp_test_lib_sess:setup_session(Id,Fname,?SESSION_MAX_TIME,User_Links),
+					{ok,Id,Fname,Site_id,Inst_id} ->
+						User_Links = yapp_test_lib_usermod:get_user_links(Id),						
+						Cookie = yapp_test_lib_sess:setup_session(Id,Fname,Site_id,Inst_id,?SESSION_MAX_TIME,User_Links),
 						Data = {redirect_local, yapp:prepath(Arg)++?PG_DASHBOARD},
 						%%io:format("new link for dashboard ~p",[yapp:prepath(Arg)++?PG_DASHBOARD]),
 						CO = yaws_api:set_cookie(?COOKIE_VARIABLE,Cookie,[{path,yapp:prepath(Arg)}]),

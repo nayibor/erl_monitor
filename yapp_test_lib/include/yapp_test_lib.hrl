@@ -24,11 +24,19 @@
 %%%  usermod_users_links for links for roles .%%type bag
 -record(usermod_role_links,{role_id,link_id}). 
 
-
 %%%  test_new_rec
 -record(test_rec,{name,fname,lname}).
 
-
 %%  auto_inc_table
 -record(auto_inc,{name,cvalue}).
+
+%%% record for storing session information
+-record(session_data,{id,site_id,inst_id,fname,userdata=[],links_allowed=[]}). 
+
+%%% record for storing the site information
+-record(usermod_sites,{id,site_short_name,site_long_name}).
+
+%%% record for storing the institution information
+-record(usermod_inst,{id,inst_short_name,inst_long_name}).
+
 

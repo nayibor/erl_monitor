@@ -8,6 +8,7 @@ var settings={
     message_diag:("#setting_dialog-message"),
     confirm_diag:("#setting_dialog-confirm"),
     add_edit_diag:("#add_edit_user"),
+    get_role_diag:("#get_role_div"),
     
     
     configure_add:function(){
@@ -37,6 +38,34 @@ var settings={
 		
 		
 	},
+	configure_roles:function(){
+		_this=this;
+        var diag = $(_this.get_role_diag);
+        
+        diag.dialog({
+			width: 500,
+			height: 300,
+			position:"center",
+			modal:false,
+            buttons: {
+				Cancel:function(){
+				    $( this ).dialog( "close" );	
+				},
+				Save: function() {
+					_this.checkfields();
+				
+				
+                }
+               
+            }
+        });
+    
+        diag.dialog('close');
+		
+		
+		
+	},
+	
 	
 	checkfields:function(){
 	_this=this;	
@@ -212,25 +241,29 @@ var settings={
         _this.configure_message_dialog();
         _this.configure_confirmation();
         _this.configure_add();
+        _this.configure_roles();
+
        
-        
+        //for loggin out a user 
         $("#A_128").live('click',function(e){
                 
             settings.disable_okbutt_mgdialg();    
             settings.show_message("Logging Out");
         })
         
-        
+        //for opening the logout div 
         $("#A_116").live('click',function(e){
             $("#UL_120").toggle(); 
             $("#UL_81").hide(); 
         });
         
+        //for opening the notification div
         $("#A_78").live('click',function(e){
             $("#UL_120").hide(); 
             $("#UL_81").toggle(); 
         });      
         
+        //for loading content from the left hand div to the inner view 
         $(".load_content").live('click',function(e){
             e.preventDefault();
             var link=$(this).attr('href');
@@ -239,13 +272,14 @@ var settings={
         }); 
         
         
-        
+        //searching for a user when the search button is clicked
           $("#search_butt").live('click',function(e) {
             e.preventDefault();
             var link = $("#search_user_url").val();
               _this.load_users_data(link); 
 		}); 
         
+        //for searching for a user when the enter button is presed
         $("#search_user").live('keyup',function(e) {
             e.preventDefault();
             var link = $("#search_user_url").val();
@@ -254,6 +288,7 @@ var settings={
             }
         }); 
         
+        //for editing  a user
 	    $("#add_user").live('click',function(e) {
 		  e.preventDefault();
 		  var link =$("#get_add_user_url").val();
@@ -268,9 +303,117 @@ var settings={
 	
 		});
     
+    //for gettting the roles of a user
+		 $(".get_roles").live('click',function(e) {
+		  e.preventDefault();
+		  var link=$(this).attr('href');
+		  _this.get_roles(link);
+	
+		});
     
+    //for resetting the pass of a user 
+    	 $(".reset_pass").live('click',function(e) {
+		  e.preventDefault();
+		  var link=$(this).attr('href');
+		  _this.reset_pass(link);
+	
+		});
+    
+    //for locking/unlocking a use 
+      	 $(".iconlock,.iconopen").live('click',function(e) {
+		  e.preventDefault();
+		  var link=$(this).attr('href');
+		  _this.lock_action(link);
+	
+		});
 		},
 		
+		//for locking or unlocking a user f
+			//ajax link for restting the pass of the user 
+		lock_action(link){
+			
+			_this=this;
+
+		$.ajax({
+            url: link,
+            type:"POST",
+            dataType:'html',
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+               _this.disable_okbutt_mgdialg() ;
+               _this.show_message("Performing action ...");    
+            },
+            success:function(Data) {
+             _this.show_message(Data);    
+                 setTimeout(function() {
+				_this.load_users_data($("#search_user_url").val());
+			}, 2000);	
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+        			
+		},
+		
+		
+		
+		//ajax link for restting the pass of the user 
+		reset_pass(link){
+			
+			_this=this;
+
+		$.ajax({
+            url: link,
+            type:"POST",
+            dataType:'html',
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+               _this.disable_okbutt_mgdialg() ;
+               _this.show_message("Resetting Pass...");    
+            },
+            success:function(Data) {
+             _this.enable_okbutt_mgdialg();
+             _this.show_message(Data);  
+       
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+        			
+		},
+		
+		
+		//for getting the roles for a user
+		get_roles:function(link){
+		_this=this;
+
+		$.ajax({
+            url: link,
+            type:"GET",
+            dataType:'html',
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+              // _this.disable_okbutt_mgdialg() ;
+              // _this.show_message("Retrieving Add Modal...");    
+            },
+            success:function(Data) {
+               _this.close_message_diag();
+               $("#get_role_div").html(Data);
+               $(_this.get_role_diag).dialog('open');
+       
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+        	
+		},
+				
 	//for loading the add user functionality
 	
 	    load_add_user:function(link){

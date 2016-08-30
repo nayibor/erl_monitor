@@ -51,7 +51,9 @@ out(Arg,Title_Page,Content_layout) ->
 					{'div',[{name,"setting_dialog-message"},{id,"setting_dialog-message"},{title,"Message"}],
 						{'p',[{class,"message"}]}
 					},
-					{'div',[{name,"add_edit_user"},{id,"add_edit_user"},{title,"Message"}]}
+					{'div',[{name,"add_edit_user"},{id,"add_edit_user"},{title,"Message"}]},
+					{'div',[{name,"get_role_div"},{id,"get_role_div"},{title,"Message"}]}
+
 					
 				]
 			}
@@ -176,13 +178,13 @@ gen_content_real(Arg,Users)->
 														{'a',[{href,yapp:prepath(Arg)++"user/get_edit_user"++"/"++integer_to_list(Id)},{class,"inlineIcon preferences edit_user"}],"Edit"}
 													},
 													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconAdvertiser"}],"Roles"}
+														{'a',[{href,yapp:prepath(Arg)++"user/get_roles_user"++"/"++integer_to_list(Id)},{class,"inlineIcon preferences iconAdvertiser get_roles"}],"Roles"}
 													},
 													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconActivate reset_pass"}],"Reset Pass"}
+														{'a',[{href,yapp:prepath(Arg)++"user/reset_pass_user"++"/"++integer_to_list(Id)},{class,"inlineIcon preferences iconActivate reset_pass"}],"Reset Pass"}
 													},
 													{'li',[],
-														{'a',[{href,"#"},{class,"inlineIcon preferences iconlock lock"}],"Lock"}
+														{'a',[{href,yapp:prepath(Arg)++status_url_form(Lock_stat)++integer_to_list(Id)},{class,"inlineIcon preferences"++lock_stat_check(Lock_stat)}],lock_stat_label(Lock_stat)}
 													}
 												]
 											}
@@ -201,5 +203,20 @@ gen_content_real(Arg,Users)->
 		
 		}.
 
-		
+status_url_form(Lock_stat) ->
+	case Lock_stat  of
+	"Active" -> "user/lock_account_user"++"/";
+	"Locked" -> "user/unlock_account_user"++"/"
+	end.
+lock_stat_check(Lock_stat) ->
+	case Lock_stat  of
+	"Active" -> " iconlock lock";
+	"Locked" -> " iconopen unlock"
+	end.
+	
+lock_stat_label(Lock_stat) ->
+	case Lock_stat  of
+	"Active" -> "Lock";
+	"Locked" -> "Unlock"
+	end.	
 			

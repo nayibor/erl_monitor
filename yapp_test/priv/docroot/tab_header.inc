@@ -2,7 +2,8 @@
     <input type="hidden" name="search_user_url" id="search_user_url" value="/yapp_test/user/search_user">
 	<input type="hidden" name="get_add_user_url" id="get_add_user_url" value="/yapp_test/user/get_add_user">
 	<input type="hidden" name="save_add_user_url" id="save_add_user_url" value="/yapp_test/user/save_add_user">
-	<input type="hidden" name="get_edit_url" id="get_edit_url" value="/yapp_test/user/get_edit_user">
+	<input type="hidden" name="save_roles_user" id="save_roles_user" value="/yapp_test/user/save_roles_user">
+
         <div id="oaHeader">
             <div id="oaNavigationExtraTop">
 

@@ -9,19 +9,17 @@
 -github("https://bitbucket.com/nameyibor").
 -license("Apache License 2.0").
 -include_lib("yaws/include/yaws_api.hrl").
+-include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
 
 
 %%%functions for checking user/page permissions
 -export([check_login/2,
 		 check_perm_page/2,
 		 kill_session/2,
-		 setup_session/4,
+		 setup_session/6,
 		 get_user_data/2
 		 ]).
 
-
-%%% record for storing session information
--record(session_data,{id,fname,userdata=[],links_allowed=[]}). 
 
 
 %%% @doc for checking whether a user is logged in or not
@@ -105,8 +103,8 @@ get_user_data(Arg,Cookie)->
 %%% putting that data in the yaws session variable
 %%% also for getting  other user specific setup data and putting it in mnesia
 %%% @end
-setup_session(Userid,Fname,_Cookie_MaxTime,UserData)->
-    S=#session_data{id=Userid,fname=Fname,links_allowed=UserData},
+setup_session(Userid,Fname,Site_id,Inst_id,_Cookie_MaxTime,UserData)->
+    S=#session_data{id=Userid,fname=Fname,site_id=Site_id,inst_id=Inst_id,links_allowed=UserData},
 	yaws_api:new_cookie_session(S).
 
 %%%% used to check whether a link exists for user and exists if link found in user link list					
