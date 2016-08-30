@@ -1,0 +1,5 @@
+{% extends "yapp_test_content_header.dtl" %}
+
+	{% block yapp_test_content_header %}{{title}}{% endblock %}
+	
+	{% block yapp_test_content_inner %}{% endblock %} 

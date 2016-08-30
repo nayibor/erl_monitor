@@ -1,0 +1,55 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th class="sortup" >Name</th>
+								<th class="sortup" >Email</th>
+								<th>Site</th>
+								<th></th>
+								<th>Status</th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th class="last alignRight"></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for id,email,fname,lname,site_id,lock_stat,url_tr,class_tr,label_tr in data %}
+								<tr id="{{id}}">
+									<td>{{lname|add:" "|add:fname}}</td>
+									<td>{{email}}</td>
+									<td>{{site_id}}</td>
+									<td></td>
+									<td>{{lock_stat}}</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td>
+	<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"user/get_edit_user/"|add:id}}" class="inlineIcon preferences edit_user">Edit</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"user/get_roles_user/"|add:id}}" class="inlineIcon preferences iconAdvertiser get_roles">Roles</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"user/reset_pass_user/"|add:id}}" class="inlineIcon preferences iconAdvertiser reset_pass">Reset Pass</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:url_tr|add:id}}" class="{{class_tr}}">{{label_tr}}</a>
+		</li>
+	</ul>
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

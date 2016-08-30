@@ -1,0 +1,15 @@
+
+	<div id="secondLevelContent">
+			<div id="thirdLevelHeader">
+				<div class="breadcrumb hasIcon iconBannersLarge ">
+					<h3 class="noBreadcrumb">
+	
+						<span class="label">{% block yapp_test_content_header %}{% endblock %}</span>
+					</h3>
+				</div>
+			</div>
+			<div id="thirdLevelContent" style="min-height: 456px;">
+					{% block yapp_test_content_inner %}{% endblock %}    
+			</div>
+	</div>	
+	

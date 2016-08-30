@@ -56,10 +56,8 @@ out(Arg,ok,ok) ->
 outa(Arg,'GET',["yapp_test","user","get_users"])->
 		Title_Page = "Users",
 		Users = yapp_test_lib_usermod:get_users(),
-		SubUidata = [myapp_dash_layout:gen_content_upper(),myapp_dash_layout:gen_content_real(Arg,Users)],	 
-		Uidata=myapp_dash_layout:get_out_content(SubUidata),		
-		Response = myapp_dash_layout:get_secondLevelContent(Title_Page,Uidata),
-		{ehtml,Response};
+		{ok,UiData} = yapp_test_users_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Users}]),
+		{html,UiData};
 
 
 %% @doc this is used for filtering list . query strings will be used here 
@@ -70,11 +68,11 @@ outa(Arg,'GET',["yapp_test","user","search_user"])->
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
 				Users = yapp_test_lib_usermod:get_users_filter(Filter),
-				UiData = myapp_dash_layout:gen_content_real(Arg,Users),
+				{ok,UiData} = yapp_test_user_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Users}]),		
 				{ehtml,UiData}; 
 			undefined ->
 				Users = yapp_test_lib_usermod:get_users(),
-				UiData =myapp_dash_layout:gen_content_real(Arg,Users),
+				{ok,UiData} = yapp_test_user_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Users}]),		
 				{ehtml,UiData}
 		end;
 		
@@ -96,7 +94,7 @@ outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
 				{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
 				{html,UiData};
 			_ ->
-				{html,"<p>user doesnt exist</p>"}
+				yapp_test_lib_util:message_client(500,"User Does Not Exist")
 		end;
 
 
@@ -118,9 +116,9 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		        %%Instid = 1 ,
 				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,Siteid) of
 					ok ->
-						{html,"<p>User edited successfully</p>"};
+						yapp_test_lib_util:message_client(200,"User edited successfully");
 					{error,Reason} ->
-						{html,"<p>"++atom_to_list(Reason)++"</p>"}	
+						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 				end;
 		   undefined ->
 		        {ok,Email} = yaws_api:postvar(Arg, "email"),
@@ -130,9 +128,9 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		        Instid = 1 ,
 		        case yapp_test_lib_usermod:add_user(Email,Fname,Lname,Siteid,Instid) of 
 					ok ->
-						{html,"<p>User added successfully</p>"};
-					{error,user_exists} ->
-						{html,"<p>error!!user already exists</p>"}       
+						yapp_test_lib_util:message_client(200,"User added successfully");
+					{error,Reason} ->
+						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 				end				
 		end;
 		
@@ -168,8 +166,9 @@ outa(_Arg,'POST',["yapp_test","user","reset_pass_user",UserId])->
 		
 		Result = yapp_test_lib_usermod:reset_pass(list_to_integer(UserId)),
 		case  Result of
-		  {ok,NewPass} -> {html,"<p>yipee.New Pass is "++NewPass++"</p>"};
-		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		  {ok,NewPass} -> 
+		  yapp_test_lib_util:message_client(200,"New Pass is "++NewPass);
+		  {error,Reason} -> yapp_test_lib_util:message_client(500,"Error "++atom_to_list(Reason))
 		end;
 
 
@@ -181,8 +180,8 @@ outa(_Arg,'POST',["yapp_test","user","lock_account_user",UserId])->
 		
 		Result = yapp_test_lib_usermod:lock_account(list_to_integer(UserId)),
 		case  Result of
-		   ok -> {html,"<p>Account Locked</p>"};
-		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		  ok -> yapp_test_lib_util:message_client(200,"Account Locked");
+		  {error,Reason} -> yapp_test_lib_util:message_client(500,"Error "++atom_to_list(Reason))
 		end;
 	
 		
@@ -193,8 +192,8 @@ outa(_Arg,'POST',["yapp_test","user","lock_account_user",UserId])->
 outa(_Arg,'POST',["yapp_test","user","unlock_account_user",UserId])->
 		Result = yapp_test_lib_usermod:unlock_account(list_to_integer(UserId)),
 		case  Result of
-		   ok -> {html,"<p>Account Unlocked</p>"};
-		  {error,Reason} -> {html,"<p>Error "++atom_to_list(Reason)++"</p>"}
+		  ok -> yapp_test_lib_util:message_client(200,"Account Unlocked");
+		  {error,Reason} -> yapp_test_lib_util:message_client(500,"Error "++atom_to_list(Reason))
 		end;	
 		
 				

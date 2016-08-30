@@ -1,0 +1,36 @@
+{% extends "yapp_test_dash_layout.dtl" %}
+
+    {% block fname %}{{fname}}{% endblock %}
+	
+	{% block sidebar %}
+		<div id="secondLevelNavigation">
+			<ul class="navigation first">	
+				{% for category, link_list in data %}
+					<li class="active">
+						<a href="#">
+							<label>{{ category }}</label>
+							<span class="top"></span>
+							<span class="bottom"></span>
+						</a>
+						<ul class="navigation">
+								{% for controller,action,label,notneeded in link_list %}
+									<li class="passive">
+										<a class="load_content" href="{{yapp_prepath|add:controller|add:"/"|add:action}}">{{label}}</a>
+										<span class="top"></span>
+										<span class="bottom"></span>
+									</li>
+								{% endfor %}
+						</ul>		
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	 {% endblock %}
+	 
+	{% block content %}
+		{% include "yapp_test_content_insert.dtl"   %}
+	{% endblock %}
+	
+
+
+

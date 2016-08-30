@@ -124,9 +124,9 @@ var settings={
                //$(_this.add_edit_diag).dialog('close');
        
             },
-            error:function(data){
+            error:function(Data){
                _this.enable_okbutt_mgdialg();
-               _this.show_message("Error<br>"+"Please Try Again");      
+               _this.show_message(Data.responseText);      
             }
         }); 
 	
@@ -351,7 +351,7 @@ var settings={
             },
             error:function(data){
                _this.enable_okbutt_mgdialg();
-               _this.show_message("Error<br>"+"Please Try Again");      
+               _this.show_message(Data.responseText);       
             }
         }); 	
         			
@@ -378,9 +378,9 @@ var settings={
              _this.show_message(Data);  
        
             },
-            error:function(data){
+            error:function(Data){
                _this.enable_okbutt_mgdialg();
-               _this.show_message("Error<br>"+"Please Try Again");      
+               _this.show_message(Data.responseText);       
             }
         }); 	
         			
@@ -436,7 +436,7 @@ var settings={
                $(_this.add_edit_diag).dialog('open');
        
             },
-            error:function(data){
+            error:function(Data){
                _this.enable_okbutt_mgdialg();
                _this.show_message("Error<br>"+"Please Try Again");      
             }

@@ -42,7 +42,8 @@
 		 get_user_id/1,
 		 reset_pass/1,
 		 lock_account/1,
-		 unlock_account/1
+		 unlock_account/1,
+		 get_users_terminal/0
 		 ]).
 
  
@@ -308,13 +309,27 @@ add_user_roles(UserId,RoleId) ->
 	    mnesia:activity(transaction,F).
 
 
+
+%%% @doc get_users for terminal
+-spec get_users_terminal() -> [string()] | [] | term().
+get_users_terminal() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
+								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
+	            ]))
+		end,
+	    mnesia:activity(transaction, F).
+
+
 %%% @doc get_users
 -spec get_users() -> [string()] | [] | term().
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
-	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat)} ||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
 								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
 		end,
@@ -339,8 +354,8 @@ get_user_id(Id) ->
 get_users_filter(UserDet) ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
-	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat)}||
+	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
 							    lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users),
 				Email =:= UserDet orelse Fname =:= UserDet orelse Lname =:= UserDet				  
 	            ]))
@@ -348,21 +363,7 @@ get_users_filter(UserDet) ->
 	    mnesia:activity(transaction, F).
 
 
-%%%	@doc get_users_filter . filtered by fname,email,lname
--spec get_users_filter_old(string()) -> [usermod_users() | [] | term()] .
-get_users_filter_old(UserDet)->
-		Match = ets:fun2ms(
-		fun(S=#usermod_users{user_email=Email,id=Id,fname=Fname,
-							   lname=Lname,site_id=Siteid,inst_id=Instid
-							   })
-			when Email =:= UserDet orelse Fname =:= UserDet orelse Lname =:= UserDet ->
-				S
-		end
-		),
-		F=fun() -> mnesia:select(usermod_users, Match) end,
-		mnesia:activity(transaction, F).
 
-   
 
 %%% @doc get_roles
 -spec get_roles() -> [usermod_roles()] | [] | term().
@@ -415,7 +416,7 @@ verify_user(Email,Password)->
 							{error,check_username_password}; 
 						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/= Rc_pass  andalso Lock_status >= ?LOCKOUT_COUNTER_MAX  -> 
 							{error,check_username_password_lock}; 
-						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status >= ?LOCKOUT_COUNTER_MAX ->	
+						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status >= ?LOCKOUT_COUNTER_MAX ->	
 							{error,check_username_password_lock}; 
 						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status < ?LOCKOUT_COUNTER_MAX ->	
 							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
@@ -470,6 +471,18 @@ get_user_links(UserId)->
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%PRIVATE FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%
+
+status_url_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "user/unlock_account_user"++"/" ;
+status_url_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "user/lock_account_user"++"/" .
+
+
+lock_class_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "inlineIcon preferences "++"iconopen unlock" ;
+lock_class_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "inlineIcon preferences "++"iconlock lock" .
+
+lock_label_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "Unlock" ;
+lock_label_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "Lock" .
+
+ 
 %% @private formats lock counter for external viewing
 format_lock_counter(Lock_counter) when Lock_counter >= ?LOCKOUT_COUNTER_MAX-> "Locked";
 format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "Active".
