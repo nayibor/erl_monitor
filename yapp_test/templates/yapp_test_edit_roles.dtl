@@ -1,48 +1,31 @@
 
-<style type="text/css">
-    #role_div {
-        margin: 10px !important;
-    }
-</style>
-
-<h1>roles</h1>
-{% for key, value in roles.items %}
- {{ key }} {{ value }} 
-{% endfor %}
-
-
-
-<h1>roleids for user</h1>
-{% for role in useroles %}
-   {{ role }}
-{% endfor %}
-
 
 
 <div id="role_div" name="role_div">
 
     <select id="user_roles" name="user_roles" multiple="multiple">
-      {#  <?php foreach ($roles as $val) { ?> #}
-            <option value="{#<?php echo $val['Role']['id'] ?>#}"
-           {# <?php if (in_array($val['Role']['id'], $user_roles)) {?>#}
-                        selected="selected"
-               {#     <?php } ?> #}
-                    >
-                       {# <?php echo $val['Role']['role_long_name'] ?> #}
-            </option>
-
-     {#   <?php } ?> #}
+        	{% for iterator in roles %}
+	            <option value="{{iterator.id}}"
+					{%  if iterator.id in useroles  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                       {{iterator.role_long_name}}
+	            </option>
+			{% endfor %}
     </select>
 
 </div>
+
+
 <ul  id="roles_sys" name="roles_sys" style="visibility: hidden;" >
-   {# <?php foreach ($roles as $val) { ?> #}
-        <li value="{# <?php echo$val['Role']['id'] ?>"><?php echo$val['Role']['role_long_name'] ?> #}</li>
-    <?php } ?>
+        	{% for iterator in roles %}
+				<li value="{{iterator.id}}">{{iterator.role_long_name}}</li>
+			{% endfor%}
 </ul>
-<ul  id="roles_sys_user" name="roles_sys_user"style="visibility: hidden;" >
-    {#<?php foreach ($roles as $val) { ?>#}
-        <li value="{#<?php echo $val ?>#}"></li>
-   {# <?php } ?>#}
+<ul  id="roles_sys_user" name="roles_sys_user" style="visibility: hidden;" >
+		   	{% for iterator in roles %}
+		        <li value="{{iterator.id}}"></li>
+		    {% endfor%}
 </ul>
 

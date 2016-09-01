@@ -43,7 +43,9 @@
 		 reset_pass/1,
 		 lock_account/1,
 		 unlock_account/1,
-		 get_users_terminal/0
+		 get_users_terminal/0,
+		 add_user_role_list/2,
+		 delete_user_roles/1
 		 ]).
 
  
@@ -309,6 +311,39 @@ add_user_roles(UserId,RoleId) ->
 	    mnesia:activity(transaction,F).
 
 
+%% @doc for adding a list of roles for user .
+%% deletes old user roles and inserts a new list  .have to find better way of throwing exceptions 
+-spec add_user_role_list(pos_integer(),[pos_integer()])-> ok | {error,check_user_role} | term().
+add_user_role_list(Userid,RoleListId)->
+		
+		F = fun() ->
+		
+				case mnesia:read({usermod_users, Userid}) =:= [] of
+					true ->
+						{error,check_user_role};
+					false ->
+						ok = delete_user_roles(Userid),
+						Res=lists:map(fun(Role)->add_user_roles(Userid,Role)end,RoleListId),
+						case lists:member({error,check_user_role},Res) of
+							true ->
+								exit(error);
+							false  -> 
+								ok
+						end
+				end
+				
+		end ,		
+		mnesia:activity(transaction,F).
+
+		
+		
+%% @doc for deleting a users role
+-spec delete_user_roles(pos_integer()) -> ok | term().		
+delete_user_roles(Userid)->	
+		F = fun()->
+				mnesia:delete({usermod_users_roles,Userid}) end , 
+		mnesia:activity(transaction,F).
+
 
 %%% @doc get_users for terminal
 -spec get_users_terminal() -> [string()] | [] | term().
@@ -365,9 +400,9 @@ get_users_filter(UserDet) ->
 
 
 
-%%% @doc get_roles
--spec get_roles() -> [usermod_roles()] | [] | term().
-get_roles() ->
+%%% @doc get_roles old version
+-spec get_roles_old() -> [usermod_roles()] | [] | term().
+get_roles_old() ->
 		F = fun() ->
 			Qh=	qlc:eval(qlc:q(
 	            [{Id,Long_name} ||
@@ -381,6 +416,20 @@ get_roles() ->
 		end,
 		
 	    mnesia:activity(transaction, F).
+	
+	
+	
+%%% @doc get roles
+-spec get_roles() -> [usermod_roles()] | [] | term().
+get_roles() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S <- mnesia:table(usermod_roles)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+	
 	
 %%% @doc get links
 -spec get_links() -> [usermod_links()] | [] | term().

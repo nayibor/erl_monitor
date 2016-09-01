@@ -37,7 +37,7 @@
 			<a href="{{yapp_prepath|add:"user/get_roles_user/"|add:id}}" class="inlineIcon preferences iconAdvertiser get_roles">Roles</a>
 		</li>
 		<li>
-			<a href="{{yapp_prepath|add:"user/reset_pass_user/"|add:id}}" class="inlineIcon preferences iconAdvertiser reset_pass">Reset Pass</a>
+			<a href="{{yapp_prepath|add:"user/reset_pass_user/"|add:id}}" class="inlineIcon preferences iconActivate reset_pass">Reset Pass</a>
 		</li>
 		<li>
 			<a href="{{yapp_prepath|add:url_tr|add:id}}" class="{{class_tr}}">{{label_tr}}</a>

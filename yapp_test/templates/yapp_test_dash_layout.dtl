@@ -24,8 +24,6 @@
         <script type="text/javascript" src="/yapp_test/webroot/js/jquery-ui-timepicker-addon.js"></script>
         <script type="text/javascript" src="/yapp_test/webroot/js/settings.js"></script>
         <script type="text/javascript" src="/yapp_test/webroot/js/chosen.jquery.js"></script>
-        <script type="text/javascript" src="/yapp_test/webroot/js/socket.io/socket.io-1.3.5.js"></script>
-        <script type="text/javascript" src="/yapp_test/webroot/js/socket.io/printClient.js"></script>
         <style>
             /* css for timepicker */
             .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }

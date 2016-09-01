@@ -19,7 +19,6 @@
 		 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").
--include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
 
 
 %%% @doc check to see whether use is logged in 
@@ -143,7 +142,6 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
 		Userrole =  yapp_test_lib_usermod:get_user_roles(list_to_integer(UserId)),
 		Roles = yapp_test_lib_usermod:get_roles(),
-		io:format("list is ~p",[dict:to_list(Roles)]),
 		{ok,UiData} = yapp_test_edit_roles:render([{useroles,Userrole},{roles,Roles}]),
 		{html,UiData};
 		
@@ -152,10 +150,28 @@ outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
 %% @doc this is for updating roles
 %%		insertion part
 %% 		returns a messagpack object showing status 
-outa(_Arg,'POST',["yapp_test","user","save_roles_user"])->
-		ok;	
-	
+outa(Arg,'POST',["yapp_test","user","save_roles_user"])->
+		
+		case  yaws_api:postvar(Arg,"roles") =:= {ok,[]} orelse
+		      yaws_api:postvar(Arg,"roles") =:= undefined orelse
+		      yaws_api:postvar(Arg,"id") =:= {ok,[]} orelse 
+		      yaws_api:postvar(Arg,"id") =:= undefined of
+					true ->
+						yapp_test_lib_util:message_client(500,"Required Field is Empty");
+					false ->
+						Data = lists:map(fun({Postkey,Postval})-> {Postkey,lists:map(fun(Pv)->list_to_integer(Pv)end,string:tokens(Postval,","))}  end ,yaws_api:parse_post(Arg)),
+						[Id] = proplists:get_value("id",Data),
+						Roles_save = proplists:get_value("roles",Data),
+						case yapp_test_lib_usermod:add_user_role_list(Id,Roles_save) of
+							{error,Reason} ->
+								yapp_test_lib_util:message_client(500,"Error "++atom_to_list(Reason));
+							ok ->
+								yapp_test_lib_util:message_client(200,"Save Successful")
+						end
 
+		end;
+		
+	
 %% @doc this is used for resetting the password of the user 
 %% 		insertion part
 %%		return a messagepack object showing status 

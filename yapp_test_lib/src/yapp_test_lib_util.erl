@@ -15,6 +15,19 @@
 		 message_client/2
 		 ]).
 
+%%included so that records can be added when compiling templates
+-include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
+
+-define(RECORDS_INFO_IN,[{usermod_users, record_info(fields, usermod_users)},
+							{usermod_roles, record_info(fields, usermod_roles)},
+							{usermod_links, record_info(fields, usermod_links)},
+							{usermod_users_roles, record_info(fields, usermod_users_roles)},
+							{test_rec, record_info(fields, test_rec)},
+							{auto_inc, record_info(fields, auto_inc)}
+							{session_data, record_info(fields, session_data)},
+							{usermod_sites, record_info(fields, usermod_sites)},
+							{usermod_inst, record_info(fields, usermod_inst)}]).
+
 
 %%shortcut for compiling template for project 
 -spec compile_temp() -> term() . 
@@ -39,10 +52,17 @@ compile_temp_dir(Indir,Outdir) ->
 		%%io:format("items_directory ~p~n",[Indir]),
 		lists:map(fun(File)-> 
 		%%io:format("~p--~p-~p~n,",[File,lists:nth(1,string:tokens(File,".")),Outdir])
-				erlydtl:compile_file(Indir++"/"++File,lists:nth(1,string:tokens(File,".")), [{out_dir,Outdir}])  
+				erlydtl:compile_file(Indir++"/"++File,lists:nth(1,string:tokens(File,".")), 
+				[
+					{out_dir,Outdir},{record_info,
+										[
+											{usermod_roles, record_info(fields, usermod_roles)}
+										]
+									 }
+				])  
 				end,Directlist).
 	  
-
+ 
 %%%sends a response with  a code and a reason for why what happened happend
 %%%put here so that all messages sent back to the client can have one format and if possile encoded using one messaging pattern
 %%% message pack will be added soon for the encoding :):) . you like that huh 
