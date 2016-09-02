@@ -18,11 +18,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for id,email,fname,lname,site_id,lock_stat,url_tr,class_tr,label_tr in data %}
+							{% for id,email,fname,lname,site_id,lock_stat,url_tr,class_tr,label_tr,site_name in data %}
 								<tr id="{{id}}">
 									<td>{{lname|add:" "|add:fname}}</td>
 									<td>{{email}}</td>
-									<td>{{site_id}}</td>
+									<td>{{site_name}}</td>
 									<td></td>
 									<td>{{lock_stat}}</td>
 									<td></td>

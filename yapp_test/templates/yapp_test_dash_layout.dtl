@@ -1375,6 +1375,10 @@
                 outline: rgb(68, 68, 68) none 0px;
             }/*#I_129:before*/
 
+			.tableWrapper{
+			width:80% !important;
+			}
+
 
         </style>
     </head>

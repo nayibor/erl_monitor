@@ -34,7 +34,7 @@
 -record(session_data,{id,site_id,inst_id,fname,userdata=[],links_allowed=[]}). 
 
 %%% record for storing the site information
--record(usermod_sites,{id,site_short_name,site_long_name}).
+-record(usermod_sites,{id,site_short_name,site_long_name,inst_id}).
 
 %%% record for storing the institution information
 -record(usermod_inst,{id,inst_short_name,inst_long_name}).

@@ -80,7 +80,8 @@ outa(Arg,'GET',["yapp_test","user","search_user"])->
 %% 		retrieving user interface partt
 %% 		returns an erlydtl html page
 outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
-		{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"add_user"}]),
+		Sites = yapp_test_lib_usermod:get_sites(), 
+		{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{type_user_tran,"add_user"}]),
 		{html,UiData};
 
 
@@ -90,7 +91,8 @@ outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
 		case yapp_test_lib_usermod:get_user_id(list_to_integer(UserId)) of 
 			{Id,Email,Fname,Lname} ->
-				{ok,UiData} = yapp_test_add_user:render([{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
+				Sites = yapp_test_lib_usermod:get_sites(), 
+				{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
 				{html,UiData};
 			_ ->
 				yapp_test_lib_util:message_client(500,"User Does Not Exist")
@@ -111,9 +113,8 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 				{ok,Email} = yaws_api:postvar(Arg, "email"),
 		        {ok,Fname} = yaws_api:postvar(Arg, "fname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
-		        Siteid = 1,
-		        %%Instid = 1 ,
-				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,Siteid) of
+		        {ok,Siteid} = yaws_api:postvar(Arg, "site"),
+				case yapp_test_lib_usermod:edit_user(list_to_integer(Id),Email,Fname,Lname,list_to_integer(Siteid)) of
 					ok ->
 						yapp_test_lib_util:message_client(200,"User edited successfully");
 					{error,Reason} ->
@@ -123,9 +124,8 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 		        {ok,Email} = yaws_api:postvar(Arg, "email"),
 		        {ok,Fname} = yaws_api:postvar(Arg, "fname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
-		        Siteid = 1,
-		        Instid = 1 ,
-		        case yapp_test_lib_usermod:add_user(Email,Fname,Lname,Siteid,Instid) of 
+		        {ok,Siteid} = yaws_api:postvar(Arg, "site"),
+		        case yapp_test_lib_usermod:add_user(Email,Fname,Lname,list_to_integer(Siteid)) of 
 					ok ->
 						yapp_test_lib_util:message_client(200,"User added successfully");
 					{error,Reason} ->

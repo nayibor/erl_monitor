@@ -31,7 +31,7 @@
 		 
 %%% for user stuff		 
 -export([get_user_roles/1,
-		 add_user/5,
+		 add_user/4,
 		 add_user_roles/2,
 		 get_users/0,
 		 get_links/0,
@@ -48,6 +48,25 @@
 		 delete_user_roles/1
 		 ]).
 
+ %%for site stuff
+-export([
+		add_site/3,
+		get_sites/0,
+		get_site_name/1
+		]).
+ 
+ 
+ 
+ %%for inst stuff
+-export([
+		add_inst/2,
+		get_inst/0
+ 
+		]).
+ 
+ 
+ 
+ 
  
 
 %%type definitions fore the above records
@@ -56,6 +75,10 @@
 -type usermod_links() :: #usermod_links{}.
 -type usermod_users_roles() :: #usermod_users_roles{}.
 -type usermod_role_links() :: #usermod_role_links{}.
+-type usermod_sites() :: #usermod_sites{}.
+-type usermod_inst() :: #usermod_inst{}.
+
+
 %%-type auto_inc() :: #auto_inc{}.
 
 %%type definition for user category return type
@@ -107,9 +130,9 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(auto_inc,
-							[{attributes, record_info(fields, auto_inc)},
-							 {index, [#auto_inc.cvalue]},
+		mnesia:create_table(usermod_inst,
+							[{attributes, record_info(fields, usermod_inst)},
+							 {index, [#usermod_inst.inst_short_name]},
 							 {disc_copies, Nodes}]).
 
 %%% for adding records to autoincrement table
@@ -157,26 +180,26 @@ get_set_auto(TableName)->
 %%will have to check whether user with email exists first before trying to add
 %%validation may have to be carried out to make sure data is safe and of correct size and also required fields are avail
 %%basic validation carried out for everything which is done here before anything is inserted
+%%validation added to make sure user site already exists
 %% @end
--spec add_user(string(),string(),string(),pos_integer(),pos_integer())-> {error,term()} | ok | term().
-add_user(Email,Fname,Lname,Siteid,Instid) ->    
-		F = fun() ->
-				case check_email(Email,add_user,0) of 
-					ok ->
-						Fun_add = fun() ->
+-spec add_user(string(),string(),string(),pos_integer())-> {error,term()} | ok | term().
+add_user(Email,Fname,Lname,Siteid) ->    
+		F = fun() ->	
+				case check_email(Email,add_user,0) =:= exists orelse
+	                 mnesia:read({usermod_sites, Siteid}) =:= [] of
+						true ->
+							{error,check_user_site};
+						false ->
+							Fun_add = fun() ->
 									mnesia:write(#usermod_users{user_email=Email,id=get_set_auto(usermod_users),
 										   password=gen_pass(),fname=Fname,
-										   lname=Lname,site_id=Siteid,
-										   inst_id=Instid
+										   lname=Lname,site_id=Siteid
 										   })
 						end,
-						mnesia:activity(transaction, Fun_add);
-					exists ->
-						{error,user_exists}
+						mnesia:activity(transaction, Fun_add)
 				end
-		end,
-		mnesia:activity(transaction,F).	
-
+		end,	
+		mnesia:activity(transaction,F).
 
 %% @doc this is for reseting the pass of the use  
 -spec reset_pass(pos_integer())->{ok,string()} | {error,term()}.
@@ -345,12 +368,80 @@ delete_user_roles(Userid)->
 		mnesia:activity(transaction,F).
 
 
+
+
+%% @doc for adding sites
+-spec add_site(string(),string(),pos_integer())-> ok | {error,inst_none_exist}  |  term() .
+add_site(Short_name,Long_name,Instid)->
+		F = fun() ->
+		
+			case mnesia:read({usermod_inst, Instid}) =:= [] of
+				true ->
+					{error,inst_none_exist};
+				false ->		
+					mnesia:write(#usermod_sites{id=get_set_auto(usermod_sites),site_short_name=Short_name,
+											site_long_name=Long_name,inst_id=Instid})
+			end
+		end,
+		mnesia:activity(transaction,F).
+
+
+%%% @doc get sites
+-spec get_sites() -> [usermod_sites()] | [] | term().
+get_sites() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S <- mnesia:table(usermod_sites)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+
+%%@doc for getting a site name
+-spec get_site_name(pos_integer())->string(). 
+get_site_name(Siteid) ->
+		
+	    F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S=#usermod_sites{id=Site_table_id} <- mnesia:table(usermod_sites),
+	             Site_table_id =:= Siteid
+	            ]))         
+	    end,
+	    case mnesia:activity(transaction, F) of
+			[#usermod_sites{site_long_name=Long_name}]->Long_name;
+			 _-> ""
+		end. 
+
+
+%% @doc for adding instutions
+-spec add_inst(string(),string())-> ok | term() .
+add_inst(Short_name,Long_name)->
+		F = fun() ->
+				mnesia:write(#usermod_inst{id=get_set_auto(usermod_inst),inst_short_name=Short_name,inst_long_name=Long_name})
+		end,
+		mnesia:activity(transaction,F).
+
+
+%%% @doc for getting institutions
+-spec get_inst() -> [usermod_inst()] | [] | term().
+get_inst() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S <- mnesia:table(usermod_inst)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+
 %%% @doc get_users for terminal
 -spec get_users_terminal() -> [string()] | [] | term().
 get_users_terminal() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Pwd} ||
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),Lock_stat,Pwd} ||
 	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,password=Pwd,
 								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
@@ -363,7 +454,7 @@ get_users_terminal() ->
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat)} ||
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat),get_site_name(Site_id)} ||
 	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
 								  lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users)
 	            ]))
@@ -389,7 +480,7 @@ get_user_id(Id) ->
 get_users_filter(UserDet) ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat)}||
+	            [{Id,Email,Fname,Lname,Site_id,format_lock_counter(Lock_stat),status_url_form(Lock_stat),lock_class_form(Lock_stat),lock_label_form(Lock_stat),get_site_name(Site_id)}||
 	             #usermod_users{id=Id,user_email=Email,fname=Fname,site_id=Site_id,
 							    lname=Lname,lock_status=Lock_stat} <- mnesia:table(usermod_users),
 				Email =:= UserDet orelse Fname =:= UserDet orelse Lname =:= UserDet				  

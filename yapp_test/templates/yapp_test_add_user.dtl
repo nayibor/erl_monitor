@@ -36,9 +36,32 @@
 
                     <input type="email" class="ca" required name="email" id="email" value="{{ email|default:"" }}"" />      
                 </li>
-
-
             </ul>
+             <ul class='tableActions'>
+                    <li>
+                        <label>  Site </label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="site" id="site">
+                            <option></option>
+                            {% for iterator in sites_sys %}
+									<option value="{{iterator.id}}"
+                                {% if id and iterator.id ==id %}    
+                                      selected="selected" 
+                                {% endif %}      
+								>
+                                {{iterator.site_long_name}}
+                                </option>
+							{% endfor %}
+			
+                        </select>
+                    </li>
+                </ul>
+            
+            
+            
             <ul class='tableActions'>
                 <li>
                     <label>  </label> 

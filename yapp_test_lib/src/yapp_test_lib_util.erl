@@ -56,7 +56,8 @@ compile_temp_dir(Indir,Outdir) ->
 				[
 					{out_dir,Outdir},{record_info,
 										[
-											{usermod_roles, record_info(fields, usermod_roles)}
+											{usermod_roles, record_info(fields, usermod_roles)},
+										    {usermod_sites, record_info(fields, usermod_sites)}
 										]
 									 }
 				])  

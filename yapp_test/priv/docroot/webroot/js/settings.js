@@ -316,13 +316,10 @@ var settings={
                 settings.show_message("Saving...")
             },
             success: function(Data){
-                
-	                _this.show_message(Data); 
-	                $(_this.get_role_diag).dialog('close');	                   
-	                setTimeout(function() {
-					_this.close_message_diag();
-				}, 2000);
-             
+				$(_this.get_role_diag).dialog('close');	                   
+                _this.show_message(Data); 
+                settings.enable_okbutt_mgdialg();
+
             },
             error:function(Data){
                 settings.show_message(Data.responseText);
