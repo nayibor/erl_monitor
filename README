@@ -1,10 +1,6 @@
 This sample application and libraries is used for showing how web applications can be created using the erlang programming language 
-and the yaws web server .
-This application will also demonstrate how to 
-create web sockets using yaws,
-create tcp servers 
-parsing iso8583 messages
-when its finally done .
+and the yaws web server among other things
+and a load of othe other interesting stuff when done
 in progress .....
 
 
@@ -16,3 +12,4 @@ will demonstrate the below when done .
 *templating with erlydtl
 *working with mnesia(which is a kv store bundled with erlang)
 *working with external databases using sumodb
+*other very nice stuff with erlang 
