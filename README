@@ -1,8 +1,16 @@
 This sample application and libraries is used for showing how web applications can be created using the erlang programming language 
 and the yaws web server .
+This application will also demonstrate how to 
+create web sockets using yaws,
+create tcp servers 
+parsing iso8583 messages
+when its finally done .
+in progress .....
+
+
 the yapp_test_lib contains libraries for the application . 
 the yapp_test is the web application
-will demonstrate the below when done .in progess...
+will demonstrate the below when done .
 *session management using yaws
 *yaws ehtml features
 *templating with erlydtl
