@@ -7,13 +7,13 @@
 				<div class="tableHeader">
 						<ul class="tableActions">
 							<li>
-								<a name="add_user" id="add_user" title="Add New User" href="" class="inlineIcon iconAdvertiserAdd">Add New Staff</a>
+								<a name="add_link" id="add_link" title="Add New Link" href="#" class="inlineIcon iconAdvertiserAdd">Add New Link</a>
 							</li>
 					        <li>
-					             <input type="text" name="search_user" id="search_user" placeholder="Search By Name or Email">
+					             <input type="text" name="search_link" id="search_link" placeholder="Search By Name">
 					        </li>
 					     	<li>
-					             <input type="button" name="search_butt" id="search_butt" value="Search">
+					             <input type="button" name="search_link_butt" id="search_link_butt" value="Search">
 					        </li>
 					    </ul>
 					        <div class="clear"></div>
@@ -22,7 +22,7 @@
 				</div>
 				<div id="table_info" name ="table_info">
 					{% block content %}
-						{% include "yapp_test_user_search.dtl"   %}
+						{%  include "yapp_test_link_search.dtl"  %}
 					{% endblock %}					
 				</div>			
 		</div>

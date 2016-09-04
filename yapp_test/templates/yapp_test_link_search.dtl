@@ -1,0 +1,47 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th class="sortup" >Controller</th>
+								<th class="sortup" >Action</th>
+								<th>Allow_Status</th>
+								<th>Category</th>
+								<th>Type</th>
+								<th></th>
+								<th class="last alignRight"></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for iterator in data %}
+								<tr id="{{iterator.id}}">
+									<td>{{iterator.link_name}}</td>
+									<td>{{iterator.link_controller}}</td>
+									<td>{{iterator.link_action}}</td>
+									<td>{{iterator.link_allow}}</td>
+									<td>{{iterator.link_category}}</td>
+									<td>{{iterator.link_type}}</td>
+									<td>
+										<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"links/get_edit_link/"|add:iterator.id}}" class="inlineIcon preferences edit_link">Edit</a>
+		</li>
+										</ul>
+									</td>
+									<td></td>
+									<td>
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

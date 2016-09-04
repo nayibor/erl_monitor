@@ -57,9 +57,13 @@ compile_temp_dir(Indir,Outdir) ->
 					{out_dir,Outdir},{record_info,
 										[
 											{usermod_roles, record_info(fields, usermod_roles)},
-										    {usermod_sites, record_info(fields, usermod_sites)}
+										    {usermod_sites, record_info(fields, usermod_sites)},
+										    {usermod_links, record_info(fields, usermod_links)},
+											{usermod_categories, record_info(fields, usermod_categories)}
+ 
+										    
 										]
-									 }
+									 },{verbose,verbose},{debug_info,debug_info}
 				])  
 				end,Directlist).
 	  

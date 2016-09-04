@@ -1,0 +1,134 @@
+{# This is another comment #}
+
+<form name="add_link_form" id="add_link_form" class="cmxform">
+    <div class='tableWrapper'>
+        <div class='tableHeader' style="border: 0px !important;">
+            <ul class='tableActions'>
+                <li>
+                    <label>  Name </label>       
+                </li> 
+                <li>
+					{% if type_user_tran == "add_link" %}
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% elif type_user_tran == "edit_link" %}
+                    <input type="hidden" required name="id" id="id"   value="{{ data.id }}" /> 
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% endif %}
+{# This is a commentttt #}
+                    <input type="text" class="ca" required name="link_name" id="link_name" value="{{ data.link_name|default:"" }}" />      
+                </li>
+            </ul>  
+            <ul class='tableActions'>
+                <li>
+                    <label>    Controller </label> 
+                </li>
+                <li>
+                    <input type="text" class="ca" required name="link_controller" id="link_controller" value="{{ data.link_controller|default:"" }}" />      
+                </li>
+            </ul>
+            <ul class='tableActions'>
+                <li>
+                    <label>  Action </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+
+                    <input type="text" class="ca" required name="link_action" id="link_action" value="{{ data.link_action|default:"" }}"/>      
+                </li>
+            </ul>
+            
+             <ul class='tableActions'>
+                <li>
+                    <label>  Allowance </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+				<select name = "link_allow" id ="link_allow"  class="ca" required >
+				<option value =""></option>
+				 <option value="true"
+					{%  if data.link_allow == "true"  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                     Allow
+	            </option>
+				 <option value="false"
+					{%  if data.link_allow == "false"  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                     Deny
+	            </option>
+				</select>
+                </li>
+            </ul>
+            
+              <ul class='tableActions'>
+                <li>
+                    <label>Type</label> 
+                </li>
+                <li>
+                </li>
+                <li>
+				<select name = "link_type" id ="link_type"  class="ca" required >
+				<option value =""></option>
+				 <option value="ajax"
+					{%  if data.link_type == "ajax"  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                     Ajax
+	            </option>
+				 <option value="sidebar"
+					{%  if data.link_type == "sidebar"  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                     Sidebar
+	            </option>
+				</select>
+                </li>
+            </ul>
+              <ul class='tableActions'>
+                    <li>
+                        <label>  Category </label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="category" id="category">
+                            <option value =""></option>
+                            {% for iterator in cats %}
+									<option value="{{iterator.id}}"
+                                {% if  iterator.id == data.link_category %}    
+                                      selected="selected" 
+                                {% endif %}      
+								>{{iterator.category}}</option>
+							{% endfor %}
+			
+                        </select>
+                    </li>
+                </ul>
+            
+            
+            
+            <ul class='tableActions'>
+                <li>
+                    <label>  </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+                </li>
+            </ul>
+            <div class='clear'></div>
+            <div class='corner left'></div>
+            <div class='corner right'></div>
+        </div>
+
+    </div>
+</form>
+
+

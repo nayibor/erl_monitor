@@ -24,9 +24,13 @@
 -export([add_role_link/2,
 		 add_role/2,
 		 add_link/6,
+		 edit_link/7,
 		 get_roles/0,
 		 get_role_links/1,
 		 get_user_links/1,
+		 get_links/0,
+		 get_links_id/1,
+		 get_links_filter/1,
 		 find_link_details/1]).
 		 
 %%% for user stuff		 
@@ -34,7 +38,6 @@
 		 add_user/4,
 		 add_user_roles/2,
 		 get_users/0,
-		 get_links/0,
 		 verify_user/2,
 		 get_users_filter/1,
 		 edit_user/5,
@@ -52,7 +55,8 @@
 -export([
 		add_site/3,
 		get_sites/0,
-		get_site_name/1
+		get_site_name/1,
+		update_site/4
 		]).
  
  
@@ -64,7 +68,12 @@
  
 		]).
  
- 
+  %%for category stuff
+-export([
+		add_cat/1 ,
+		get_cats/0,
+		get_catname/1
+		]).
  
  
  
@@ -77,6 +86,7 @@
 -type usermod_role_links() :: #usermod_role_links{}.
 -type usermod_sites() :: #usermod_sites{}.
 -type usermod_inst() :: #usermod_inst{}.
+-type usermod_cat() :: #usermod_categories{}.
 
 
 %%-type auto_inc() :: #auto_inc{}.
@@ -130,9 +140,9 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(usermod_inst,
-							[{attributes, record_info(fields, usermod_inst)},
-							 {index, [#usermod_inst.inst_short_name]},
+		mnesia:create_table(usermod_categories,
+							[{attributes, record_info(fields, usermod_categories)},
+							 {index, [#usermod_categories.category]},
 							 {disc_copies, Nodes}]).
 
 %%% for adding records to autoincrement table
@@ -303,6 +313,26 @@ add_link(Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
 		end,
 		mnesia:activity(transaction,F).
 	
+	
+%%edit_link	 
+-spec edit_link(pos_integer(),string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
+edit_link(Id,Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
+	Fout = fun () -> 
+				F = fun()->
+						mnesia:read(usermod_links,Id)
+				end, 
+			    case mnesia:activity(transaction,F) of 
+					[S] ->	
+						mnesia:write(S#usermod_links{id=Id,link_controller=Controller,link_allow=Link_allow,link_type=Link_type,
+											link_action=Link_action,link_category=Link_category,link_name=Link_name});
+					_ ->
+						{error,link_doesnt_exist}
+				end
+	end,
+	mnesia:activity(transaction,Fout).
+	
+	
+	
 
 %%% @doc add role_link
 -spec add_role_link(pos_integer(),pos_integer()) -> ok | {error,check_role_link} | term() .
@@ -386,6 +416,57 @@ add_site(Short_name,Long_name,Instid)->
 		mnesia:activity(transaction,F).
 
 
+%% @doc for updating  sites--temp measure
+-spec update_site(pos_integer(),binary(),binary(),pos_integer())-> ok | {error,inst_none_exist}  |  term() .
+update_site(Id,Short_name,Long_name,Instid)->
+		F = fun() ->
+		
+			case mnesia:read({usermod_inst, Instid}) =:= [] of
+				true ->
+					{error,inst_none_exist};
+				false ->		
+					mnesia:write(#usermod_sites{id=Id,site_short_name=Short_name,
+											site_long_name=Long_name,inst_id=Instid})
+			end
+		end,
+		mnesia:activity(transaction,F).
+
+
+
+%% @doc for adding categories
+-spec add_cat(binary())-> ok | term() .
+add_cat(Category)->
+		F = fun() ->
+				mnesia:write(#usermod_categories{id=get_set_auto(usermod_categories),category=Category})
+		end,
+		mnesia:activity(transaction,F). 
+
+%% @doc for adding categories
+-spec get_cats()-> [usermod_cat()] | [] | term().
+get_cats()->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S <- mnesia:table(usermod_categories)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+
+
+%% @doc for adding categories
+-spec get_catname(pos_integer())-> binary().
+get_catname(Id)->
+		F = fun()->
+					mnesia:read(usermod_categories,Id)
+			end,
+	    case mnesia:activity(transaction, F) of
+			[#usermod_categories{category=Cat}]->Cat;
+			 _-> <<>>
+		end.
+
+
+
 %%% @doc get sites
 -spec get_sites() -> [usermod_sites()] | [] | term().
 get_sites() ->
@@ -399,7 +480,7 @@ get_sites() ->
 
 
 %%@doc for getting a site name
--spec get_site_name(pos_integer())->string(). 
+-spec get_site_name(pos_integer())->binary(). 
 get_site_name(Siteid) ->
 		
 	    F = fun() ->
@@ -411,7 +492,7 @@ get_site_name(Siteid) ->
 	    end,
 	    case mnesia:activity(transaction, F) of
 			[#usermod_sites{site_long_name=Long_name}]->Long_name;
-			 _-> ""
+			 _-> <<>>
 		end. 
 
 
@@ -490,24 +571,6 @@ get_users_filter(UserDet) ->
 
 
 
-
-%%% @doc get_roles old version
--spec get_roles_old() -> [usermod_roles()] | [] | term().
-get_roles_old() ->
-		F = fun() ->
-			Qh=	qlc:eval(qlc:q(
-	            [{Id,Long_name} ||
-	             #usermod_roles{id=Id,role_long_name=Long_name} <- mnesia:table(usermod_roles)
-	            ])),
-	            qlc:fold(fun({Id,Long_name}, Dict) ->
-						dict:store(Id,Long_name, Dict)
-						end,
-						dict:new(),
-						Qh)
-		end,
-		
-	    mnesia:activity(transaction, F).
-	
 	
 	
 %%% @doc get roles
@@ -527,11 +590,50 @@ get_roles() ->
 get_links() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [S ||
-	             S <- mnesia:table(usermod_links)
+	            [S#usermod_links{link_category=get_catname(Link_category)} ||
+	             S=#usermod_links{link_category=Link_category} <- mnesia:table(usermod_links)
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
+
+%%% @doc get links
+-spec get_links_id(pos_integer()) -> [usermod_links()] | [] | term().
+get_links_id(LinkId) ->
+		F=fun()->
+			mnesia:read(usermod_links,LinkId)
+		end,
+		case mnesia:activity(transaction,F) of 
+			[S] ->
+				{ok,S};
+			_ ->
+				{error,link_non_exists}
+		end.
+
+
+
+
+%%%% @doc get link but now a filter is involved 
+-spec get_links_filter(string()) -> [usermod_links()] | [] | term().
+get_links_filter(Filter) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [
+					S#usermod_links{link_category=get_catname(Link_category)}||
+					S=#usermod_links{link_allow=Link_allow,
+							  link_controller=Link_controller,link_action=Link_action,
+							  link_category=Link_category,link_name=Link_name,link_type=Link_type}
+							  <-  mnesia:table(usermod_links),
+								Filter =:= Link_allow orelse Filter =:= Link_controller orelse Filter =:= Link_action 
+								orelse Filter =:= Link_category orelse Filter =:= Link_name orelse Filter =:= Link_type  
+								orelse list_to_atom(Filter) =:= Link_type orelse list_to_atom(Filter) =:= Link_allow
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).		
+
+
+
+
+
 
 %%% @doc verify_user
 %%hash will have to be done of password before password is put into system
@@ -598,8 +700,10 @@ get_user_links(UserId)->
 						#usermod_users_roles{user_id=Rc_ur_uid,role_id=Rc_ur_rid} <- mnesia:table(usermod_users_roles),
 						#usermod_role_links{role_id=Rc_rl_rid,link_id=Rc_rl_lid} <- mnesia:table(usermod_role_links),
 						Rc_ur_rid =:=Rc_rl_rid andalso UserId =:= Rc_ur_uid]),
-				qlc:fold(fun({Controller,Action,Category,Label,Link_Type}, Dict) ->
-						dict:update(Category,fun(X) -> [{Controller,Action,Label,Link_Type}|X] end,[{Controller,Action,Label,Link_Type}|[]], Dict)
+				qlc:fold(fun({Controller,Action,Category,Label,Link_Type,Link_allow}, Dict) when Link_allow =:= true ->
+								dict:update(Category,fun(X) -> [{Controller,Action,Label,Link_Type}|X] end,[{Controller,Action,Label,Link_Type}|[]], Dict);
+							(_,Dict) ->
+								Dict
 						end,
 						dict:new(),
 						QH)         
@@ -650,7 +754,7 @@ check_email(Email,Type,Id)->
 find_link_details(Linkid)->
 		F = fun() ->
 				qlc:eval(qlc:q( 
-							  [{Link_controller,Link_action,Link_category,Link_name,Link_type} ||
+							  [{Link_controller,Link_action,get_catname(Link_category),Link_name,Link_type,Link_allow} ||
 							  #usermod_links{id=RcLinkid,link_allow=Link_allow,
 							  link_controller=Link_controller,link_action=Link_action,
 							  link_category=Link_category,link_name=Link_name,link_type=Link_type
@@ -679,3 +783,4 @@ gen_weak_char(Base) ->
  
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
  %% @TODO change the hash type
+ %% @TODO optimize how the link categories are retrieved 

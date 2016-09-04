@@ -63,23 +63,23 @@ out(Arg,error) ->
 		Password = proplists:get_value("password",Post_data),
 		%%io:format(" Username is ~p~n Password is ~p~n Path is ~n~p~n",[Username,Password,yapp:prepath(Arg)]),		
 		case Username=:=undefined  orelse Password=:=undefined orelse Username=:="" orelse Password=:=""  of
-        true ->
-				%%io:format("<h1>username/password is empty or not validated auth data received </h1>"),
-				{page,yapp:prepath(Arg)++?INDEX_PAGE};	
-		_ ->
-				%%io:format("correct data received"),
-				case yapp_test_lib_usermod:verify_user(Username,Password) of
-					{ok,Id,Fname,Site_id,Inst_id} ->
-						User_Links = yapp_test_lib_usermod:get_user_links(Id),						
-						Cookie = yapp_test_lib_sess:setup_session(Id,Fname,Site_id,Inst_id,?SESSION_MAX_TIME,User_Links),
-						Data = {redirect_local, yapp:prepath(Arg)++?PG_DASHBOARD},
-						%%io:format("new link for dashboard ~p",[yapp:prepath(Arg)++?PG_DASHBOARD]),
-						CO = yaws_api:set_cookie(?COOKIE_VARIABLE,Cookie,[{path,yapp:prepath(Arg)}]),
-						[Data, CO];
-					_  ->
-						{page,yapp:prepath(Arg)++?INDEX_PAGE}
-				end		
-		
+	        true ->
+					%%io:format("<h1>username/password is empty or not validated auth data received </h1>"),
+					{page,yapp:prepath(Arg)++?INDEX_PAGE};	
+			_ ->
+					%%io:format("correct data received"),
+					case yapp_test_lib_usermod:verify_user(Username,Password) of
+						{ok,Id,Fname,Site_id,Inst_id} ->
+							User_Links = yapp_test_lib_usermod:get_user_links(Id),						
+							Cookie = yapp_test_lib_sess:setup_session(Id,Fname,Site_id,Inst_id,?SESSION_MAX_TIME,User_Links),
+							Data = {redirect_local, yapp:prepath(Arg)++?PG_DASHBOARD},
+							%%io:format("new link for dashboard ~p",[yapp:prepath(Arg)++?PG_DASHBOARD]),
+							CO = yaws_api:set_cookie(?COOKIE_VARIABLE,Cookie,[{path,yapp:prepath(Arg)}]),
+							[Data, CO];
+						_  ->
+							{page,yapp:prepath(Arg)++?INDEX_PAGE}
+					end		
+			
 		
 		end;
 

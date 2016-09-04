@@ -51,9 +51,7 @@
                                 {% if id and iterator.id ==id %}    
                                       selected="selected" 
                                 {% endif %}      
-								>
-                                {{iterator.site_long_name}}
-                                </option>
+								>{{iterator.site_long_name}}</option>
 							{% endfor %}
 			
                         </select>

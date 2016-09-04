@@ -9,8 +9,36 @@ var settings={
     confirm_diag:("#setting_dialog-confirm"),
     add_edit_diag:("#add_edit_user"),
     get_role_diag:("#get_role_div"),
+    get_add_edit_link:("#add_edit_link"),
     save_role_id:"",
     
+    
+    
+    
+    configure_links:function(){
+		_this=this;
+        var diag = $(_this.get_add_edit_link);
+        
+        diag.dialog({
+			width: 500,
+			height: 300,
+			position:"center",
+			modal:false,
+            buttons: {
+				Cancel:function(){
+				    $( this ).dialog( "close" );	
+				},
+				Save: function() {
+				_this.check_fields_links();				
+				
+                }
+               
+            }
+        });
+    
+        diag.dialog('close');	
+	}
+    ,
     
     configure_add:function(){
 		_this=this;
@@ -34,10 +62,7 @@ var settings={
             }
         });
     
-        diag.dialog('close');
-		
-		
-		
+        diag.dialog('close');	
 	},
 	configure_roles:function(){
 		_this=this;
@@ -71,9 +96,7 @@ var settings={
 	
 	checkfields:function(){
 	_this=this;	
-	var link=$("#save_add_user_url").val();
-	
-        
+	var link=$("#save_add_user_url").val(); 
 	var counter=0;
 	$(".ca").each(function(){
 		if(!(document.getElementById($(this).attr("id")).checkValidity())){
@@ -97,7 +120,35 @@ var settings={
 		
 		
 	}, 
-     
+	
+	
+	check_fields_links:function(){
+		
+	_this=this;	
+	var link=$("#save_links_url").val(); 
+	var counter=0;
+	$(".ca").each(function(){
+		if(!(document.getElementById($(this).attr("id")).checkValidity())){
+			$(this).css("border","solid #F44 2px"); 
+			counter++;
+		}else
+		{
+			$(this).css("border","solid grey 1px");       
+
+		}
+	});
+		  
+	if(counter==0)
+	{
+		_this.save_data_link(link);
+	}
+	else{
+
+		settings.show_message("Please Enter All Fields In Correct Format");
+	}
+	},
+	
+ 
     configure_message_dialog:function(){
         _this=this;
         var diag = $(_this.message_diag);
@@ -207,6 +258,8 @@ var settings={
         _this.configure_confirmation();
         _this.configure_add();
         _this.configure_roles();
+        _this.configure_links();
+
 
        
         //for loggin out a user 
@@ -293,7 +346,103 @@ var settings={
 	
 		});
 		
+		
+		    //searching for a link when the search button is clicked
+          $("#search_link_butt").live('click',function(e) {
+            e.preventDefault();
+            var link = $("#search_links_url").val();
+              _this.load_search_data(link); 
+		}); 
+        
+        //for searching for a link when the enter button is presed
+        $("#search_link").live('keyup',function(e) {
+            e.preventDefault();
+            var link = $("#search_links_url").val();
+            if(e.which==13){
+              _this.load_search_data(link); 
+            }
+        }); 
+		
+		//for adding a link to the system 
+		
+		 $("#add_link").live('click',function(e) {
+		  e.preventDefault();
+		  var link =$("#get_add_link_url").val();
+		  _this.load_add_link(link);
+	
+		});
+		
+		//for adding a link to the system 
+		
+		 $(".edit_link").live('click',function(e) {
+		  e.preventDefault();
+		 var link=$(this).attr('href');
+		  _this.load_add_link(link);
+	
+		});
+		
+			
 		},
+		
+		
+		//for loading the add link functionality
+	
+	    load_add_link:function(link){
+		_this=this;
+		$.ajax({
+            url: link,
+            type:"GET",
+            dataType:'html',
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+              // _this.disable_okbutt_mgdialg() ;
+              // _this.show_message("Retrieving Add Modal...");    
+            },
+            success:function(Data) {
+               _this.close_message_diag();
+               $("#add_edit_link").html(Data);
+               $(_this.get_add_edit_link).dialog('open');
+       
+            },
+            error:function(Data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+        	
+		},
+		
+		
+		//for saving a link
+		   save_data_link:function(link){
+		_this=this;
+		var formdata=$("#add_link_form.cmxform").serialize();
+		$.ajax({
+            url: link,
+            data : formdata,
+            type:"POST",
+            dataType:'html',
+            //data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+               _this.disable_okbutt_mgdialg() ;
+               _this.show_message("Saving Link...");    
+            },
+            success:function(Data) {
+                _this.show_message(Data);
+	                setTimeout(function() {
+					$(_this.get_add_edit_link).dialog('close');	                   
+					_this.load_search_data($("#search_links_url").val());
+				}, 2000);	
+       
+            },
+            error:function(Data){
+                settings.show_message(Data.responseText);
+                settings.enable_okbutt_mgdialg();      
+            }
+        }); 	
+        	
+		},
+		
 		
 		
 		//for updating a users roles
@@ -514,6 +663,35 @@ var settings={
         }); 	
 		},	
 		
+		//for loading the link list when a search is made
+		load_search_data:function(link){
+		_this=this;
+		var val=$("#search_link").val();
+		 $.ajax({
+            url: link,
+            type:"GET",
+            dataType:'html',
+            data:(val!="") ? "filter="+val : "",
+            beforeSend:function(){
+               _this.disable_okbutt_mgdialg() ;
+               _this.show_message("Retrieving Links...");    
+            },
+            success:function(Data) {
+               _this.close_message_diag();
+               _this.enable_okbutt_mgdialg();
+               $("#table_info").html(Data);
+                      
+            },
+            error:function(data){
+               _this.enable_okbutt_mgdialg();
+               _this.show_message("Error<br>"+"Please Try Again");      
+            }
+        }); 	
+		}
+		
+		
+		
+		,
 		
 	//for loading the content from the side links into the main viewing divs	
 	load_content:function(users_url){

@@ -39,4 +39,10 @@
 %%% record for storing the institution information
 -record(usermod_inst,{id,inst_short_name,inst_long_name}).
 
+%%% record for categories
+
+-record(usermod_categories,{id,category}).
+
+
+
 

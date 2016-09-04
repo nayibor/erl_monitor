@@ -54,13 +54,93 @@ out(Arg,ok,ok) ->
 		outa(Arg,Method,Path).
 		
 		
+%% @doc	this is for the index page of the links 
+outa(Arg,'GET',["yapp_test","links","get_links"])->
+		Title_Page = "Links",
+		Links = yapp_test_lib_usermod:get_links(),
+		{ok,UiData} = yapp_test_links_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links}]),
+		{html,UiData};		
 		
-		
-		
-		
-		
+				
+%% @doc	this is for searching for a link		
+outa(Arg,'GET',["yapp_test","links","search_links"])->
+		%%io:format("query string is ~n~p ",[Search_query]),
+		%%io:format("get data is ~p,~n",[yaws_api:parse_query(Arg)]),
+		case  yaws_api:queryvar(Arg,"filter") of
+		   {ok,Filter} ->
+				Links = yapp_test_lib_usermod:get_links_filter(Filter),
+				{ok,UiData} = yapp_test_link_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Links}]),		
+				{ehtml,UiData}; 
+			undefined ->
+				Links = yapp_test_lib_usermod:get_links(),
+				{ok,UiData} = yapp_test_link_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Links}]),		
+				{ehtml,UiData}
+		end;			
+	
+	
+	
+%% @doc for adding a new link
+%% 		retrieving user interface partt
+%% 		returns an erlydtl html page
+outa(_Arg,'GET',["yapp_test","links","get_add_link"])->
+		Categories = yapp_test_lib_usermod:get_cats(), 
+		{ok,UiData} = yapp_test_add_link:render([{cats,Categories},{type_user_tran,"add_link"}]),
+		{html,UiData};	
+	
 
-
+%% @doc this is used for getting for getting user info/perhaps for editing
+%%		query string part of url may have to be further parsed
+%% 		retrieving user interface part 
+outa(_Arg,'GET',["yapp_test","links","get_edit_link",Linkid])->
+		case yapp_test_lib_usermod:get_links_id(list_to_integer(Linkid)) of 
+			{ok,S} ->
+				Cats = yapp_test_lib_usermod:get_cats(), 
+				{ok,UiData} = yapp_test_add_link:render([{type_user_tran,"edit_link"},{data,S},{cats,Cats}]),
+				{html,UiData};
+			_ ->
+				yapp_test_lib_util:message_client(500,"Link Does Not Exist")
+		end;	
+	
+	
+	
+	
+%% @doc for inserting a new user/updating a new user .
+%%		insertion part
+%% 		returns a messagpack object showing status 
+%%  	validation has not been done here but will be done later 
+outa(Arg,'POST',["yapp_test","links","save_link"])->
+		
+		case  yaws_api:postvar(Arg,"id") of
+		   {ok,Edit_id_val} ->
+				{ok,Link_name} = yaws_api:postvar(Arg, "link_name"),
+		        {ok,Controller} = yaws_api:postvar(Arg, "link_controller"),
+		        {ok,Link_action} = yaws_api:postvar(Arg, "link_action"),
+		        {ok,Link_allow} = yaws_api:postvar(Arg, "link_allow"),
+				{ok,Link_type} = yaws_api:postvar(Arg, "link_type"),
+		        {ok,Link_category} = yaws_api:postvar(Arg, "category"),
+		        case yapp_test_lib_usermod:edit_link(list_to_integer(Edit_id_val),Controller,Link_action,list_to_atom(Link_allow),list_to_integer(Link_category),Link_name,list_to_atom(Link_type)) of 
+					ok ->
+						yapp_test_lib_util:message_client(200,list_to_binary("Link edited successfully"));
+					{error,Reason} ->
+						yapp_test_lib_util:message_client(500,atom_to_binary(Reason,utf8))
+				end;
+		   undefined ->
+		        {ok,Link_name} = yaws_api:postvar(Arg, "link_name"),
+		        {ok,Controller} = yaws_api:postvar(Arg, "link_controller"),
+		        {ok,Link_action} = yaws_api:postvar(Arg, "link_action"),
+		        {ok,Link_allow} = yaws_api:postvar(Arg, "link_allow"),
+				{ok,Link_type} = yaws_api:postvar(Arg, "link_type"),
+		        {ok,Link_category} = yaws_api:postvar(Arg, "category"),
+		        case yapp_test_lib_usermod:add_link(Controller,Link_action,list_to_atom(Link_allow),list_to_integer(Link_category),Link_name,list_to_atom(Link_type)) of 
+					ok ->
+						yapp_test_lib_util:message_client(200,"Link added successfully");
+					{error,Reason} ->
+						yapp_test_lib_util:message_client(500,atom_to_binary(Reason,utf8))
+				end				
+		end;	
+	
+	
+			
 	
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
