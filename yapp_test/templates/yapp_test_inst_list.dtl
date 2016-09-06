@@ -1,0 +1,30 @@
+{% extends "yapp_test_content_header.dtl" %}
+
+	{% block yapp_test_content_header %}{{title}}{% endblock %}
+	
+	{% block yapp_test_content_inner %}
+		<div class="tableWrapper">
+				<div class="tableHeader">
+						<ul class="tableActions">
+							<li>
+								<a name="add_inst" id="add_inst" title="Add New Inst" href="#" class="inlineIcon iconAdvertiserAdd">Add New Inst</a>
+							</li>
+					        <li>
+					             <input type="text" name="search_inst" id="search_inst" placeholder="Search By Name">
+					        </li>
+					     	<li>
+					             <input type="button" name="search_inst_butt" id="search_inst_butt" value="Search">
+					        </li>
+					    </ul>
+					        <div class="clear"></div>
+					        <div class="corner left"></div>
+					        <div class="corner right"></div>
+				</div>
+				<div id="table_info" name ="table_info">
+					{% block content %}
+						{% include "yapp_test_inst_search.dtl"  %}
+					{% endblock %}					
+				</div>			
+		</div>
+	{% endblock %} 
+	

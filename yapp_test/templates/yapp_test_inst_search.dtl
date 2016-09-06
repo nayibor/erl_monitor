@@ -1,0 +1,33 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th class="sortup" >Short Name</th>
+								<th class="sortup" > Long Name</th>
+								<th>Ident</th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for iterator in data %}
+								<tr id="{{iterator.id}}">
+									<td>{{iterator.inst_short_name}}</td>
+									<td>{{iterator.inst_long_name}}</td>
+									<td>{{iterator.inst_ident}}</td>
+									<td>
+										<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"inst/get_edit_inst/"|add:iterator.id}}" class="inlineIcon preferences edit_inst">Edit</a>
+		</li>
+		
+										</ul>
+									</td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

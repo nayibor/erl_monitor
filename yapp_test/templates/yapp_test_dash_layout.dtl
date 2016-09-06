@@ -26,6 +26,8 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/roles.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/sites.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/inst.js"}}"></script>
+
 
         <style>
 
@@ -49,6 +51,9 @@
 	<input type="hidden" name="search_site_url" id="search_site_url" value="{{yapp_prepath|add:"sites/search_sites"}}">
 	<input type="hidden" name="get_add_site" id="get_add_site" value="{{yapp_prepath|add:"sites/get_add_site"}}">
 	<input type="hidden" name="save_add_site" id="save_add_site" value="{{yapp_prepath|add:"sites/save_add_site"}}">
+	<input type="hidden" name="search_inst_url" id="search_inst_url" value="{{yapp_prepath|add:"inst/search_inst"}}">
+	<input type="hidden" name="get_add_inst" id="get_add_inst" value="{{yapp_prepath|add:"inst/get_add_inst"}}">
+	<input type="hidden" name="save_add_inst" id="save_add_inst" value="{{yapp_prepath|add:"inst/save_add_inst"}}">
 
 
         <div id="oaHeader">

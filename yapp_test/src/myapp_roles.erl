@@ -145,7 +145,6 @@ outa(Arg,'POST',["yapp_test","roles","save_role_links"])->
 					true ->
 						yapp_test_lib_util:message_client(500,"Required Field is Empty");
 					false ->
-						io:format("~ndata sent is ~p ",[yaws_api:parse_post(Arg)]),
 						Data = lists:map(fun({Postkey,Postval})-> {Postkey,lists:map(fun(Pv)->list_to_integer(Pv)end,string:tokens(Postval,","))}  end ,yaws_api:parse_post(Arg)),
 						[Id] = proplists:get_value("roleid",Data),
 						Links_save = proplists:get_value("new_links",Data),

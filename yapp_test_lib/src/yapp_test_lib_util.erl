@@ -71,7 +71,7 @@ compile_temp_dir(Indir,Outdir) ->
  
 %%%sends a response with  a code and a reason for why what happened happend
 %%%put here so that all messages sent back to the client can have one format and if possile encoded using one messaging pattern
-%%% message pack will be added soon for the encoding :):) . you like that huh 
+%%% message pack will be added soon for the encoding :):) . you like that huh :)
 -spec message_client(pos_integer(),string())-> [tuple()].
 message_client(Code,Reason)->
 		[{status, Code},

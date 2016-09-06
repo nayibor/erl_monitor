@@ -84,23 +84,25 @@ outa(_Arg,'GET',["yapp_test","sites","get_add_site"])->
 		Inst = yapp_test_lib_usermod:get_inst(),
 		{ok,UiData} = yapp_test_add_site:render([{inst,Inst},{type_user_tran,"add_site"}]),
 		{html,UiData};	
-		
+
+
+%%% @doc this is for getting a site so it can be edited		
 outa(_Arg,'GET',["yapp_test","sites","get_edit_site",Siteid])->
 
 		Inst = yapp_test_lib_usermod:get_inst(),
 		case yapp_test_lib_usermod:get_site_id(list_to_integer(Siteid)) of 
 			{ok,S} ->	
-					io:format("~p",[S]),
+				%%	io:format("~p",[S]),
 				{ok,UiData} = yapp_test_add_site:render([{inst,Inst},{data,S},{type_user_tran,"edit_site"}]),
 				{html,UiData};
 			_ ->
-				yapp_test_lib_util:message_client(500,"Role Does Not Exist")
+				yapp_test_lib_util:message_client(500,"Site does Not exist")
 		end;	
 				
 
+%%% @doc this is for saving a site
 outa(Arg,'POST',["yapp_test","sites","save_add_site"])->
 		
-		io:format("~ndata sent is ~p ",[yaws_api:parse_post(Arg)]),	
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->
 				{ok,Sname} = yaws_api:postvar(Arg, "sname"),
@@ -108,7 +110,7 @@ outa(Arg,'POST',["yapp_test","sites","save_add_site"])->
 		        {ok,Inst} = yaws_api:postvar(Arg, "inst"),
 		        case yapp_test_lib_usermod:update_site(list_to_integer(Edit_id_val),list_to_binary(Sname),list_to_binary(Lname),list_to_integer(Inst)) of 
 					ok ->
-						yapp_test_lib_util:message_client(200,"Role edited successfully");
+						yapp_test_lib_util:message_client(200,"Site edited successfully");
 					{error,Reason} ->
 						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 				end;

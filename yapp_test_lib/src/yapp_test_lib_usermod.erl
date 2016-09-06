@@ -75,7 +75,9 @@
 -export([
 		add_inst/3,
 		get_inst/0,
-		edit_inst/4
+		edit_inst/4,
+		get_inst_filter/1,
+		get_inst_id/1
  
 		]).
  
@@ -629,18 +631,39 @@ get_inst_name(Std) ->
 -spec add_inst(binary(),binary(),binary())-> ok | term() .
 add_inst(Short_name,Long_name,Ident)->
 		F = fun() ->
-				mnesia:write(#usermod_inst{id=get_set_auto(usermod_inst),inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident})
+				case check_ident(Ident,add_inst,0) of 
+					ok ->
+						mnesia:write(#usermod_inst{id=get_set_auto(usermod_inst),inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident});
+					exists ->
+						{error,ident_exists_diff_user}
+				end
 		end,
 		mnesia:activity(transaction,F).
 
 %% @doc for edint instutions
 -spec edit_inst(pos_integer(),binary(),binary(),binary())-> ok | term() .
 edit_inst(Id,Short_name,Long_name,Ident)->
-		F = fun() ->
-				mnesia:write(#usermod_inst{id=Id,inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident})
-		end,
-		mnesia:activity(transaction,F).
 		
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_inst,Id)
+			end, 
+			%%mnesia:activity(transaction,fun()->mnesia:read(usermod_users,5)		
+		    case mnesia:activity(transaction,F) of 
+				[S] ->
+						case check_ident(Ident,edit_inst,Id) of 
+							ok ->
+								Edit_tran = fun()-> mnesia:write(S#usermod_inst{inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident}) end,
+								ok=mnesia:activity(transaction,Edit_tran);
+							_ ->
+								{error,ident_exists_diff_user}
+						end;
+				_	->
+					{error,inst_non_exists}
+			end	
+		end,
+		mnesia:activity(transaction,Fout).
+
 
 %%% @doc for getting institutions
 -spec get_inst() -> [usermod_inst()] | [] | term().
@@ -652,6 +675,36 @@ get_inst() ->
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
+
+
+%%% @doc for getting institutions using a filter 
+-spec get_inst_filter(binary()) -> [usermod_inst()] | [] | term().
+get_inst_filter(Filter) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S=#usermod_inst{id=Id,inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident} <- mnesia:table(usermod_inst),
+	             binary:match(Short_name,Filter) =/= nomatch orelse binary:match(Long_name,Filter) =/= nomatch 
+	             orelse binary:match(Ident,Filter) =/= nomatch
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+%% @doc get inst by id
+-spec get_inst_id(pos_integer()) -> usermod_inst() | {error,site_non_exists} .
+get_inst_id(Id) ->
+			F = fun()->
+					mnesia:read(usermod_inst,Id)
+			end,
+		    case mnesia:activity(transaction,F) of 
+				[S] ->
+				    S;
+				_ ->
+				   {error,inst_non_exists}
+		    end.
+
+
+
 
 
 %%% @doc get_users for terminal
@@ -912,7 +965,7 @@ format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "A
 %% @private for checking whether an email exists or not 
 %% first condition is for checking whether email exists for a new user 
 %% second condition is for making sure a seperate user does not have email address when trying to edit
--spec check_email(atom(),atom(),pos_integer()) -> ok | exists . 
+-spec check_email(string(),atom(),pos_integer()) -> ok | exists . 
 check_email(Email,Type,Id)->
 		F = fun() ->
 				qlc:eval(qlc:q(
@@ -925,6 +978,26 @@ check_email(Email,Type,Id)->
 	        [] ->  ok;
 	        _  ->  exists
 	    end.
+	    
+	    
+%% @private for checking whether an ident  exists for a seperate institution  
+%% first condition is for checking whether ident exists when creating a new user 
+%% second condition is for making sure a seperate inst does not exist for seperate user when trying to edit
+-spec check_ident(binary(),atom(),pos_integer()) -> ok | exists . 
+check_ident(Ident,Type,Id)->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Ident_rc} ||
+	            #usermod_inst{id=Id_old,inst_ident=Ident_rc} <- mnesia:table(usermod_inst),
+	             Ident =:= Ident_rc andalso Type =:= add_inst 
+	             orelse Ident =:= Ident_rc andalso Type =:=  edit_inst andalso Id =/= Id_old]))
+			end,
+	    case mnesia:activity(transaction, F) of
+	        [] ->  ok;
+	        _  ->  exists
+	    end.
+
+	    
     
 %% @private returns link details of a particular linkk
 -spec find_link_details(pos_integer()) -> link_det() | undefined . 

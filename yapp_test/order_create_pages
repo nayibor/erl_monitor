@@ -1,0 +1,17 @@
+
+create controller code for gettig the page 
+add link for get_page
+create and edit the list(main layout template) and search(template for searching for content)
+change the content of the two above layouts so that they work with your site
+create the page.js file so you can attach the handlers
+
+create filter controller and filter in models
+add search page to links database and create role whom can have access to search page 
+modify js file so the inst page can be seen when the search is made 
+add inst.js file to the layout so it can be referenced 
+
+configure adding of inst in controller
+add add inst link to the linkdb 
+crete div for adding inst on the master layout file and in js file
+work on js for peforming the stuff into the page 
+ 

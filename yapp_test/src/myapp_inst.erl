@@ -1,6 +1,6 @@
 %%%
 %%% @doc myapp_inst module.
-%%%<br>contains module for working with istitutions</br>
+%%%<br>contains code for working with istitutions</br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 
@@ -17,10 +17,7 @@
 		 out/1
 		 ]).
 		 
-
-
-
-		 
+	 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").
 -include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
@@ -56,8 +53,83 @@ out(Arg,ok,ok) ->
 		Method = (Arg#arg.req)#http_request.method,
 		outa(Arg,Method,Path).
 		
+		
+		
+%% @doc	this is for the getting institutions
+outa(Arg,'GET',["yapp_test","inst","get_inst"])->
+		Title_Page = "Institutions",
+		Inst = yapp_test_lib_usermod:get_inst(),
+		{ok,UiData} = yapp_test_inst_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),
+		{html,UiData};	
+				
+	
+%% @doc this is for getting the sites but using a filter
+outa(Arg,'GET',["yapp_test","inst","search_inst"])->
+		%%io:format("query string is ~n~p ",[Search_query]),
+		case  yaws_api:queryvar(Arg,"filter") of
+		   {ok,Filter} ->
+				
+				Inst = yapp_test_lib_usermod:get_inst_filter(list_to_binary(Filter)),
+				{ok,UiData} = yapp_test_inst_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),		
+				{html,UiData}; 
+			undefined ->
+				Inst = yapp_test_lib_usermod:get_inst(),
+				{ok,UiData} = yapp_test_inst_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),		
+				{html,UiData}
+		end;
+	
+
+%% @doc this is used for adding a new insittution 
+%%		returns an erlydtl html page afer filter and query		
+outa(_Arg,'GET',["yapp_test","inst","get_add_inst"])->
+
+		{ok,UiData} = yapp_test_add_inst:render([{type_user_tran,"add_inst"}]),
+		{html,UiData};	
+	
 
 
+%% @doc this is used for adding a new insittution 
+%%		returns an erlydtl html page afer filter and query		
+outa(_Arg,'GET',["yapp_test","inst","get_edit_inst",Instid])->
+		
+		Stid=list_to_integer(Instid),
+		case yapp_test_lib_usermod:get_inst_id(Stid) of 
+			{error,inst_non_exists} ->
+				yapp_test_lib_util:message_client(500,"Inst Does Not Exist");		
+			S ->
+				{ok,UiData} = yapp_test_add_inst:render([{type_user_tran,"edit_inst"},{data,S}]),
+				{html,UiData}
+		end;
+		
+	
+	%% @doc this is used for adding a new insittution 
+%%		returns an erlydtl html page afer filter and query		
+outa(Arg,'POST',["yapp_test","inst","save_add_inst"])->
+		
+		case  yaws_api:postvar(Arg,"id") of
+		   {ok,Edit_id_val} ->
+				{ok,Sname} = yaws_api:postvar(Arg, "sname"),
+		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
+				{ok,Ident} = yaws_api:postvar(Arg, "ident"),
+				case yapp_test_lib_usermod:edit_inst(list_to_integer(Edit_id_val),list_to_binary(Sname),list_to_binary(Lname),list_to_binary(Ident)) of
+					ok ->
+						yapp_test_lib_util:message_client(200,"Inst edited successfully");
+					{error,Reason} ->
+						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
+				end;
+		   undefined ->
+		        {ok,Sname} = yaws_api:postvar(Arg, "sname"),
+		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
+				{ok,Ident} = yaws_api:postvar(Arg, "ident"),
+				case yapp_test_lib_usermod:add_inst(list_to_binary(Sname),list_to_binary(Lname),list_to_binary(Ident)) of
+					ok ->
+						yapp_test_lib_util:message_client(200,"Institution Added successfully");
+					{error,Reason} ->
+						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
+				end
+		end;	
+		
+		
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
 outa(Arg,_Method,_)->
