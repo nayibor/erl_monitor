@@ -24,7 +24,9 @@
         
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-ui-timepicker-addon.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
-        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/chosen.jquery.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/roles.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/sites.js"}}"></script>
+
         <style>
 
         </style>
@@ -40,6 +42,13 @@
 	<input type="hidden" name="search_links_url" id="search_links_url" value="{{yapp_prepath|add:"links/search_links"}}">
 	<input type="hidden" name="get_add_link_url" id="get_add_link_url" value="{{yapp_prepath|add:"links/get_add_link"}}">
 	<input type="hidden" name="save_links_url" id="save_links_url" value="{{yapp_prepath|add:"links/save_link"}}">
+	<input type="hidden" name="search_roles" id="search_roles" value="{{yapp_prepath|add:"roles/search_roles"}}">
+	<input type="hidden" name="get_add_role" id="get_add_role" value="{{yapp_prepath|add:"roles/get_add_role"}}">
+	<input type="hidden" name="save_add_role" id="save_add_role" value="{{yapp_prepath|add:"roles/save_add_role"}}">
+	<input type="hidden" name="save_role_links" id="save_role_links" value="{{yapp_prepath|add:"roles/save_role_links"}}">
+	<input type="hidden" name="search_site_url" id="search_site_url" value="{{yapp_prepath|add:"sites/search_sites"}}">
+	<input type="hidden" name="get_add_site" id="get_add_site" value="{{yapp_prepath|add:"sites/get_add_site"}}">
+	<input type="hidden" name="save_add_site" id="save_add_site" value="{{yapp_prepath|add:"sites/save_add_site"}}">
 
 
         <div id="oaHeader">
@@ -102,4 +111,10 @@
 <div name="add_edit_user" id="add_edit_user" title="Message"></div>
 <div name="get_role_div" id="get_role_div" title="Message"></div>
 <div name="add_edit_link" id="add_edit_link" title="Message"></div>
+<div name="role_div" id="role_div" title="Message"></div>
+<div name="edit_role_div" id="edit_role_div" title="Message"></div>
+<div name="edit_site_div" id="edit_site_div" title="Message"></div>
+<div name="edit_inst_div" id="edit_inst_div" title="Message"></div>
+
+
 

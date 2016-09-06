@@ -1,63 +1,51 @@
 {# This is another comment #}
 
-<form name="add_user_form" id="add_user_form" class="cmxform">
+<form name="add_site_form" id="add_site_form" class="cmxform">
     <div class='tableWrapper'>
         <div class='tableHeader' style="border: 0px !important;">
             <ul class='tableActions'>
                 <li>
-                    <label> First Name </label>       
+                    <label> Short Name </label>       
                 </li> 
                 <li>
-					{% if type_user_tran == "add_user" %}
+					{% if type_user_tran == "add_site" %}
                     <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
-					{% elif type_user_tran == "edit_user" %}
-                    <input type="hidden" required name="id" id="id"   value="{{ id }}" /> 
+					{% elif type_user_tran == "edit_site" %}
+                    <input type="hidden" required name="id" id="id"   value="{{ data.id }}" /> 
                     <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
 					{% endif %}
 {# This is a commentttt #}
-                    <input type="text" class="ca" required name="fname" id="fname" value="{{ fname|default:"" }}" />      
+                    <input type="text" class="ca" required name="sname" id="sname" value="{{ data.site_short_name|default:""}}" />      
                 </li>
             </ul>  
             <ul class='tableActions'>
                 <li>
-                    <label>  Last  Name </label> 
+                    <label>  Long   Name </label> 
                 </li>
                 <li>
-                    <input type="text" class="ca" required name="lname" id="lname" value="{{ lname|default:"" }}" />      
-                </li>
-            </ul>
-            <ul class='tableActions'>
-                <li>
-                    <label>  Email </label> 
-                </li>
-                <li>
-                </li>
-                <li>
-
-                    <input type="email" class="ca" required name="email" id="email" value="{{ email|default:"" }}"" />      
+                    <input type="text" class="ca" required name="lname" id="lname" value="{{ data.site_long_name|default:"" }}" />      
                 </li>
             </ul>
              <ul class='tableActions'>
                     <li>
-                        <label>  Site </label> 
+                        <label>  Institution </label> 
                     </li>
                     <li>
                     </li>
                     <li>
-                        <select class="ca" required name="site" id="site">
-                            <option></option>
-                            {% for iterator in sites_sys %}
+                        <select class="ca" required name="inst" id="inst">
+                            {% for iterator in inst %}
 									<option value="{{iterator.id}}"
-										{% if siteid and iterator.id ==siteid %}    
+										{% if iterator.id == data.inst_id %}    
 											selected="selected" 
 										{% endif %}      
-									>{{iterator.site_long_name}}</option>
+									>{{iterator.inst_long_name}}</option>
 							{% endfor %}
 			
                         </select>
                     </li>
                 </ul>
-            
+           
             
             
             <ul class='tableActions'>

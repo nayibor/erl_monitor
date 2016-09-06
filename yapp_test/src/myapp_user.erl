@@ -54,7 +54,10 @@ out(Arg,ok,ok) ->
 %% @doc	this is for the index_dashboard action get method
 outa(Arg,'GET',["yapp_test","user","get_users"])->
 		Title_Page = "Users",
+		
+		
 		Users = yapp_test_lib_usermod:get_users(),
+		%%io:format("User List is ~p",[Users]),
 		{ok,UiData} = yapp_test_users_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Users}]),
 		{html,UiData};
 
@@ -89,10 +92,11 @@ outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part 
 outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
-		case yapp_test_lib_usermod:get_user_id(list_to_integer(UserId)) of 
-			{Id,Email,Fname,Lname} ->
+		Intid=list_to_integer(UserId),
+		case yapp_test_lib_usermod:get_user_id(Intid) of 
+			{Id,Email,Fname,Lname,Siteid} ->
 				Sites = yapp_test_lib_usermod:get_sites(), 
-				{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{type_user_tran,"edit_user"},{id,Id},{email,Email},{fname,Fname},{lname,Lname}]),
+				{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{siteid,Siteid},{type_user_tran,"edit_user"},{id,Intid},{email,Email},{fname,Fname},{lname,Lname}]),
 				{html,UiData};
 			_ ->
 				yapp_test_lib_util:message_client(500,"User Does Not Exist")
@@ -152,8 +156,7 @@ outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
 %% 		returns a messagpack object showing status 
 outa(Arg,'POST',["yapp_test","user","save_roles_user"])->
 		
-		case  yaws_api:postvar(Arg,"roles") =:= {ok,[]} orelse
-		      yaws_api:postvar(Arg,"roles") =:= undefined orelse
+		case  yaws_api:postvar(Arg,"roles") =:= undefined orelse
 		      yaws_api:postvar(Arg,"id") =:= {ok,[]} orelse 
 		      yaws_api:postvar(Arg,"id") =:= undefined of
 					true ->
@@ -224,3 +227,5 @@ outa(Arg,_Method,_)->
  %% @TODO return error return code when an error occurs
  %% @TODO seperate error checking code from normal code
  %% @TODO move the code for generating the complex links for the userlist to the myapp_user module  
+ 
+ 

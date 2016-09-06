@@ -1,0 +1,48 @@
+{# This is another comment #}
+
+<form name="add_role_form" id="add_role_form" class="cmxform">
+    <div class='tableWrapper'>
+        <div class='tableHeader' style="border: 0px !important;">
+            <ul class='tableActions'>
+                <li>
+                    <label> Short Name </label>       
+                </li> 
+                <li>
+					{% if type_user_tran == "add_role" %}
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{type_user_tran}}" /> 
+					{% elif type_user_tran == "edit_role" %}
+                    <input type="hidden" required name="id" id="id"   value="{{ data.id }}" /> 
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{type_user_tran}}" /> 
+					{% endif %}
+{# This is a commentttt #}
+                    <input type="text" class="ca" required name="sname" id="sname" value="{{data.role_short_name|default:""}}" />      
+                </li>
+            </ul>  
+            <ul class='tableActions'>
+                <li>
+                    <label>  Long   Name </label> 
+                </li>
+                <li>
+                    <input type="text" class="ca" required name="lname" id="lname" value="{{data.role_long_name|default:""}}" />      
+                </li>
+            </ul>
+            
+            
+            <ul class='tableActions'>
+                <li>
+                    <label>  </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+                </li>
+            </ul>
+            <div class='clear'></div>
+            <div class='corner left'></div>
+            <div class='corner right'></div>
+        </div>
+
+    </div>
+</form>
+
+

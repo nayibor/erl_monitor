@@ -37,7 +37,7 @@
 -record(usermod_sites,{id,site_short_name,site_long_name,inst_id}).
 
 %%% record for storing the institution information
--record(usermod_inst,{id,inst_short_name,inst_long_name}).
+-record(usermod_inst,{id,inst_short_name,inst_long_name,inst_ident}).
 
 %%% record for categories
 

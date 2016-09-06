@@ -722,10 +722,10 @@ var settings={
         }); 
 		
 		}	
-}
+};
 
 $(document).ready(function(){
     
     settings.init();  
 
-})
+});

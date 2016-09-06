@@ -1,0 +1,33 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th class="sortup" >Short Name</th>
+								<th class="sortup" >Long Name</th>
+								<th class="last alignRight"></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for iterator in data %}
+								<tr id="{{iterator.id}}">
+									<td>{{iterator.role_short_name}}</td>
+									<td>{{iterator.role_long_name}}</td>
+									<td>
+										<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"roles/get_edit_roles/"|add:iterator.id}}" class="inlineIcon preferences edit_role">Edit</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"roles/get_role_links/"|add:iterator.id}}" class="inlineIcon preferences iconAdvertiser get_role_links">Role Links</a>
+		</li>
+										</ul>
+									</td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

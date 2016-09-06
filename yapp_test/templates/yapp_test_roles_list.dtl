@@ -1,0 +1,30 @@
+{% extends "yapp_test_content_header.dtl" %}
+
+	{% block yapp_test_content_header %}{{title}}{% endblock %}
+	
+	{% block yapp_test_content_inner %}
+		<div class="tableWrapper">
+				<div class="tableHeader">
+						<ul class="tableActions">
+							<li>
+								<a name="add_role" id="add_role" title="Add New Role" href="#" class="inlineIcon iconAdvertiserAdd">Add New Role</a>
+							</li>
+					        <li>
+					             <input type="text" name="search_role" id="search_role" placeholder="Search By Name">
+					        </li>
+					     	<li>
+					             <input type="button" name="search_role_butt" id="search_role_butt" value="Search">
+					        </li>
+					    </ul>
+					        <div class="clear"></div>
+					        <div class="corner left"></div>
+					        <div class="corner right"></div>
+				</div>
+				<div id="table_info" name ="table_info">
+					{% block content %}
+						{% include "yapp_test_roles_search.dtl"  %}
+					{% endblock %}					
+				</div>			
+		</div>
+	{% endblock %} 
+	

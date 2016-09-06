@@ -23,16 +23,22 @@
 %%% for role stuff
 -export([add_role_link/2,
 		 add_role/2,
+		 add_role_link_list/2,
 		 add_link/6,
 		 edit_link/7,
+		 edit_role/3,
 		 get_roles/0,
+		 get_roles_id/1,
+		 get_roles_filter/1,
+		 get_role_links_setup/1,
 		 get_role_links/1,
 		 get_user_links/1,
+		 get_links_for_roles/0,
 		 get_links/0,
 		 get_links_id/1,
 		 get_links_filter/1,
 		 find_link_details/1]).
-		 
+		  
 %%% for user stuff		 
 -export([get_user_roles/1,
 		 add_user/4,
@@ -48,7 +54,9 @@
 		 unlock_account/1,
 		 get_users_terminal/0,
 		 add_user_role_list/2,
-		 delete_user_roles/1
+		 delete_user_roles/1,
+		 check_list_roles/1,
+		 check_list_links/1
 		 ]).
 
  %%for site stuff
@@ -56,15 +64,18 @@
 		add_site/3,
 		get_sites/0,
 		get_site_name/1,
-		update_site/4
+		get_site_id/1,
+		update_site/4,
+		get_filter_site/1
 		]).
  
  
  
  %%for inst stuff
 -export([
-		add_inst/2,
-		get_inst/0
+		add_inst/3,
+		get_inst/0,
+		edit_inst/4
  
 		]).
  
@@ -140,9 +151,9 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(usermod_categories,
-							[{attributes, record_info(fields, usermod_categories)},
-							 {index, [#usermod_categories.category]},
+		mnesia:create_table(usermod_inst,
+							[{attributes, record_info(fields, usermod_inst)},
+							 {index, [#usermod_inst.inst_ident]},
 							 {disc_copies, Nodes}]).
 
 %%% for adding records to autoincrement table
@@ -294,7 +305,7 @@ edit_user(Id,Email,Fname,Lname,Siteid)->
 		mnesia:activity(transaction,Fout).
 		
 %%% @doc this is for testing purposes,in the real world an id would have been created in the db without the need for an id 
--spec add_role(string(),string()) -> ok | term() .
+-spec add_role(binary(),binary()) -> ok | term() .
 add_role(Role_short_name,Role_long_name) -> 
 
 		F = fun() ->
@@ -302,6 +313,47 @@ add_role(Role_short_name,Role_long_name) ->
 										role_long_name=Role_long_name})
 		end,
 		mnesia:activity(transaction,F).
+		
+%%for editing roles/temp				
+-spec edit_role(pos_integer(),binary(),binary()) -> ok | term() .
+edit_role(Id,Role_short_name,Role_long_name) -> 
+
+		F = fun() ->
+				mnesia:write(#usermod_roles{id=Id,role_short_name=Role_short_name,
+										role_long_name=Role_long_name})
+		end,
+		mnesia:activity(transaction,F).	
+	
+	
+	
+%%% @doc get roles by id 
+-spec get_roles_id(pos_integer()) -> [usermod_roles()] | [] | term().
+get_roles_id(Roleid) ->
+		F=fun()->
+			mnesia:read(usermod_roles,Roleid)
+		end,
+		case mnesia:activity(transaction,F) of 
+			[S] ->
+				{ok,S};
+			_ ->
+				{error,role_non_exists}
+		end.	
+	
+	
+	
+%%% @doc get sites by id 
+-spec get_site_id(pos_integer()) -> [usermod_sites()] | [] | term().
+get_site_id(Siteid) ->
+		F=fun()->
+			mnesia:read(usermod_sites,Siteid)
+		end,
+		case mnesia:activity(transaction,F) of 
+			[S] ->
+				{ok,S};
+			_ ->
+				{error,role_non_exists}
+		end.		
+	
 			
 
 %%% @doc add link
@@ -371,7 +423,8 @@ add_user_role_list(Userid,RoleListId)->
 		
 		F = fun() ->
 		
-				case mnesia:read({usermod_users, Userid}) =:= [] of
+				case mnesia:read({usermod_users, Userid}) =:= [] orelse
+					 check_list_roles(RoleListId) =:= true of
 					true ->
 						{error,check_user_role};
 					false ->
@@ -389,7 +442,6 @@ add_user_role_list(Userid,RoleListId)->
 		mnesia:activity(transaction,F).
 
 		
-		
 %% @doc for deleting a users role
 -spec delete_user_roles(pos_integer()) -> ok | term().		
 delete_user_roles(Userid)->	
@@ -398,10 +450,56 @@ delete_user_roles(Userid)->
 		mnesia:activity(transaction,F).
 
 
+		
+		
+		
+%%for  setting up the links that a role is allowed access to 	
+-spec add_role_link_list(pos_integer(),[pos_integer()])-> ok | {error,check_role_exist} | term().	
+add_role_link_list(Roleid,Linklist) ->
+
+		F = fun() ->
+		
+				case mnesia:read({usermod_roles, Roleid}) =:= [] orelse
+					check_list_links(Linklist) =:= true of
+					true ->
+						{error,check_role_exist};
+					false ->
+						ok = delete_role_links(Roleid),
+						Res=lists:map(fun(Link)->add_role_link(Roleid,Link)end,Linklist),
+						case lists:member({error,check_role_link},Res) of
+							true ->
+								exit(error);
+							false  -> 
+								ok
+						end
+				end
+				
+		end ,		
+		mnesia:activity(transaction,F).
+
+
+%%for deleting role links
+-spec delete_role_links(pos_integer()) -> ok | term().		
+delete_role_links(Roleid)->	
+		F = fun()->
+				mnesia:delete({usermod_role_links,Roleid}) end , 
+		mnesia:activity(transaction,F).
+
+
+
+%%for checking for the existance of roles in a a list of roles
+
+check_list_roles(Roles)->
+
+	lists:member([],mnesia:activity(transaction,fun()->lists:map(fun(Roleid)->mnesia:read({usermod_roles, Roleid})end ,Roles) end)). 
+
+%% for checking for the existance of links in a list of links
+check_list_links(Links)->
+	lists:member([],mnesia:activity(transaction,fun()->lists:map(fun(Linkid)->mnesia:read({usermod_links, Linkid})end ,Links)end)). 
 
 
 %% @doc for adding sites
--spec add_site(string(),string(),pos_integer())-> ok | {error,inst_none_exist}  |  term() .
+-spec add_site(binary(),binary(),pos_integer())-> ok | {error,inst_none_exist}  |  term() .
 add_site(Short_name,Long_name,Instid)->
 		F = fun() ->
 		
@@ -472,8 +570,21 @@ get_catname(Id)->
 get_sites() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
-	            [S ||
-	             S <- mnesia:table(usermod_sites)
+	            [{Id,Site_s,Site_l,get_inst_name(Inst)} ||
+	             S=#usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+
+
+%% @doc for searching for a site  
+-spec get_filter_site(binary())-> [usermod_sites()] | [] | term().
+get_filter_site(Filter) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Id,Site_s,Site_l,get_inst_name(Inst)} ||
+	             S=#usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites),
+	             binary:match(Site_l,Filter) =/= nomatch orelse binary:match(Site_s,Filter) =/= nomatch
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
@@ -495,15 +606,41 @@ get_site_name(Siteid) ->
 			 _-> <<>>
 		end. 
 
+%%@doc for getting an institutions name
+-spec get_inst_name(pos_integer())->binary(). 
+get_inst_name(Std) ->
+		
+	    F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S=#usermod_inst{id=Instid} <- mnesia:table(usermod_inst),
+	             Std =:= Instid
+	            ]))         
+	    end,
+	    case mnesia:activity(transaction, F) of
+			[#usermod_inst{inst_long_name=Long_name}]->Long_name;
+			 _-> <<>>
+		end. 
+
+
+
 
 %% @doc for adding instutions
--spec add_inst(string(),string())-> ok | term() .
-add_inst(Short_name,Long_name)->
+-spec add_inst(binary(),binary(),binary())-> ok | term() .
+add_inst(Short_name,Long_name,Ident)->
 		F = fun() ->
-				mnesia:write(#usermod_inst{id=get_set_auto(usermod_inst),inst_short_name=Short_name,inst_long_name=Long_name})
+				mnesia:write(#usermod_inst{id=get_set_auto(usermod_inst),inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident})
 		end,
 		mnesia:activity(transaction,F).
 
+%% @doc for edint instutions
+-spec edit_inst(pos_integer(),binary(),binary(),binary())-> ok | term() .
+edit_inst(Id,Short_name,Long_name,Ident)->
+		F = fun() ->
+				mnesia:write(#usermod_inst{id=Id,inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident})
+		end,
+		mnesia:activity(transaction,F).
+		
 
 %%% @doc for getting institutions
 -spec get_inst() -> [usermod_inst()] | [] | term().
@@ -549,8 +686,8 @@ get_user_id(Id) ->
 					mnesia:read(usermod_users,Id)
 			end,
 		    case mnesia:activity(transaction,F) of 
-				[#usermod_users{id=Id,user_email=Email,fname=Fname,lname=Lname}] ->
-				    {Id,Email,Fname,Lname};
+				[#usermod_users{id=Id,user_email=Email,fname=Fname,lname=Lname,site_id=Siteid}] ->
+				    {Id,Email,Fname,Lname,Siteid};
 				_ ->
 				   {error,user_non_exists}
 		    end.
@@ -579,10 +716,23 @@ get_roles() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [S ||
-	             S <- mnesia:table(usermod_roles)
+	           S<- mnesia:table(usermod_roles)
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
+	
+%%@doc for getting roles with the added twist of a filter
+-spec get_roles_filter(binary()) -> [usermod_roles()] | [] | term().
+get_roles_filter(Filter) ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	            S=#usermod_roles{role_short_name=Rsn,role_long_name=Rln} <- mnesia:table(usermod_roles),
+	           binary:match(Rsn,Filter) =/= nomatch orelse binary:match(Rln,Filter) =/= nomatch
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).	
+	
 	
 	
 %%% @doc get links
@@ -595,6 +745,18 @@ get_links() ->
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
+	    
+%%% @doc get links for using to create rolelinks
+-spec get_links_for_roles() -> [usermod_links()] | [] | term().
+get_links_for_roles() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Id,Lname,atom_to_binary(Ltype,utf8)} ||
+	             #usermod_links{link_category=Link_category,id=Id,link_name=Lname,link_type=Ltype} <- mnesia:table(usermod_links)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).	    
+	    
 
 %%% @doc get links
 -spec get_links_id(pos_integer()) -> [usermod_links()] | [] | term().
@@ -675,6 +837,21 @@ get_role_links(RoleId) ->
 			mnesia:read(usermod_role_links,RoleId)
 		end,
 		mnesia:activity(transaction,F).
+	    
+	    
+%%% @doc get_role_links for link setup
+-spec get_role_links_setup(pos_integer()) -> [integer()] |[] .
+get_role_links_setup(RoleId) ->
+		F=fun()->
+			mnesia:read(usermod_role_links,RoleId)
+		end,
+		case mnesia:activity(transaction,F) of
+			[] ->
+				[];
+			S ->
+				lists:map(fun(#usermod_role_links{role_id=Role_id,link_id=Link_id})->Link_id end,S)
+		end.
+	
 	    
 %%get_user_roles 
 -spec get_user_roles(pos_integer()) -> [usermod_users_roles()] | [] | term() .
@@ -784,3 +961,4 @@ gen_weak_char(Base) ->
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
  %% @TODO change the hash type
  %% @TODO optimize how the link categories are retrieved 
+ %% @TODO encrypt user passwords with bcrypt when creating ,editing,verifying user passwords
