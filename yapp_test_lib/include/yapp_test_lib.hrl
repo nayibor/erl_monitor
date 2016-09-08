@@ -40,9 +40,23 @@
 -record(usermod_inst,{id,inst_short_name,inst_long_name,inst_ident}).
 
 %%% record for categories
-
 -record(usermod_categories,{id,category}).
 
+
+
+%% record definition for templates
+-record(tempmod_temp,{id,ident,temp_fun,description,category_temp}).
+
+%% record definition for rules
+-record(tempmod_rules,{id,templateid,inst_id,rule_fun,rule_options,description,category_rule}).
+
+
+%%record definition for template categories
+-record(tempmod_temp_cat,{id,description}).
+
+
+%%record definitions for rule categories
+-record(tempmod_rule_cat,{id,description}).
 
 
 

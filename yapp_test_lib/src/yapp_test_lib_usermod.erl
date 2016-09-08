@@ -16,6 +16,7 @@
 %%% for installing the basic tables needed for role based functionality/creating temp tables in case neede
 -export([install/1,
 		 temp_create/1,
+		 temp_del/0,
 		 add_auto_table/1,
 		 get_auto_all/0,
 		 get_set_auto/1]).
@@ -153,10 +154,15 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(usermod_inst,
-							[{attributes, record_info(fields, usermod_inst)},
-							 {index, [#usermod_inst.inst_ident]},
+		mnesia:create_table(tempmod_rules,
+							[{attributes, record_info(fields, tempmod_rules)},
+							 {index, []},
 							 {disc_copies, Nodes}]).
+							 
+							 
+temp_del()->
+
+		mnesia:delete_table(tempmod_rules).
 
 %%% for adding records to autoincrement table
 add_auto_table(Tablename) ->

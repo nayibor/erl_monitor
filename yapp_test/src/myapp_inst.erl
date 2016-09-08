@@ -123,7 +123,7 @@ outa(Arg,'POST',["yapp_test","inst","save_add_inst"])->
 				{ok,Ident} = yaws_api:postvar(Arg, "ident"),
 				case yapp_test_lib_usermod:add_inst(list_to_binary(Sname),list_to_binary(Lname),list_to_binary(Ident)) of
 					ok ->
-						yapp_test_lib_util:message_client(200,"Institution Added successfully");
+						yapp_test_lib_util:message_client(200,"Inst Added successfully");
 					{error,Reason} ->
 						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 				end
