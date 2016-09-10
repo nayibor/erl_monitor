@@ -21,12 +21,12 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery.ui.widget.min.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-picklist.min.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/datepicker.js"}}"></script>
-        
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-ui-timepicker-addon.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/roles.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/sites.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/inst.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/temp.js"}}"></script>
 
 
         <style>
@@ -54,6 +54,9 @@
 	<input type="hidden" name="search_inst_url" id="search_inst_url" value="{{yapp_prepath|add:"inst/search_inst"}}">
 	<input type="hidden" name="get_add_inst" id="get_add_inst" value="{{yapp_prepath|add:"inst/get_add_inst"}}">
 	<input type="hidden" name="save_add_inst" id="save_add_inst" value="{{yapp_prepath|add:"inst/save_add_inst"}}">
+	<input type="hidden" name="search_temp_url" id="search_temp_url" value="{{yapp_prepath|add:"temp/search_temp"}}">
+	<input type="hidden" name="get_add_temp" id="get_add_temp" value="{{yapp_prepath|add:"temp/get_add_temp"}}">
+	<input type="hidden" name="save_add_temp" id="save_add_temp" value="{{yapp_prepath|add:"temp/save_add_temp"}}">
 
 
         <div id="oaHeader">
@@ -120,6 +123,7 @@
 <div name="edit_role_div" id="edit_role_div" title="Message"></div>
 <div name="edit_site_div" id="edit_site_div" title="Message"></div>
 <div name="edit_inst_div" id="edit_inst_div" title="Message"></div>
+<div name="edit_temp_div" id="edit_temp_div" title="Message"></div>
 
 
 

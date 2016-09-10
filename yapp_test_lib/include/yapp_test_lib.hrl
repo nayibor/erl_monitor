@@ -43,12 +43,11 @@
 -record(usermod_categories,{id,category}).
 
 
-
 %% record definition for templates
 -record(tempmod_temp,{id,ident,temp_fun,description,category_temp}).
 
 %% record definition for rules
--record(tempmod_rules,{id,templateid,inst_id,rule_fun,rule_options,description,category_rule}).
+-record(tempmod_rules,{id,inst_id,template_id,rule_fun,rule_options,description,category_rule}).
 
 
 %%record definition for template categories

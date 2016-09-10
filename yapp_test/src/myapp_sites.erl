@@ -76,7 +76,7 @@ outa(Arg,'GET',["yapp_test","sites","search_sites"])->
 				{html,UiData}
 		end;
 
-%% @doc this is used for adding a new role 
+%% @doc this is used for adding a new site 
 %% 		should returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query		
 outa(_Arg,'GET',["yapp_test","sites","get_add_site"])->

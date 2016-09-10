@@ -19,7 +19,9 @@
 		 temp_del/0,
 		 add_auto_table/1,
 		 get_auto_all/0,
-		 get_set_auto/1]).
+		 get_set_auto/1,
+		 read_table_all/1
+		 ]).
 
 %%% for role stuff
 -export([add_role_link/2,
@@ -198,6 +200,20 @@ get_set_auto(TableName)->
 		end,	
 		mnesia:activity(transaction,Ofun).
 		
+		
+%%this is used for reading the contents of a random table 
+%%table name is supplied as an arguement		
+read_table_all(Table_name)->
+				F = fun() ->
+				qlc:eval(qlc:q(
+	            [S ||
+	             S <- mnesia:table(Table_name)
+	            ]))
+	    end,
+	    mnesia:activity(transaction, F).
+		
+		
+		
 	
 %%  reset autoincremet value for table
 %%reset_table_auto(TableName)
@@ -224,8 +240,8 @@ add_user(Email,Fname,Lname,Siteid) ->
 										   password=gen_pass(),fname=Fname,
 										   lname=Lname,site_id=Siteid
 										   })
-						end,
-						mnesia:activity(transaction, Fun_add)
+							end,
+							mnesia:activity(transaction, Fun_add)
 				end
 		end,	
 		mnesia:activity(transaction,F).

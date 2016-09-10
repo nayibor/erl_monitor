@@ -1,0 +1,33 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th class="sortup" > Template ident</th>
+								<th class="sortup" > Description</th>
+								<th>Category</th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for iterator in data %}
+								<tr id="{{iterator.id}}">
+									<td>{{iterator.ident}}</td>
+									<td>{{iterator.description}}</td>
+									<td>{{iterator.category_temp}}</td>
+									<td>
+										<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"temp/get_edit_temp/"|add:iterator.id}}" class="inlineIcon preferences edit_temp">Edit</a>
+		</li>
+		
+										</ul>
+									</td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

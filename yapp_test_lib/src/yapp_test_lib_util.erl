@@ -60,9 +60,11 @@ compile_temp_dir(Indir,Outdir) ->
 										    {usermod_sites, record_info(fields, usermod_sites)},
 										    {usermod_links, record_info(fields, usermod_links)},
 											{usermod_categories, record_info(fields, usermod_categories)},
-											{usermod_inst, record_info(fields, usermod_inst)}
-
-										    
+											{usermod_inst, record_info(fields, usermod_inst)},
+											{tempmod_temp, record_info(fields, tempmod_temp)},
+											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)}
+	    
+	    
 										]
 									 },{verbose,verbose},{debug_info,debug_info}
 				])  

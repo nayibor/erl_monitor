@@ -5,7 +5,7 @@
   {env, [
          {yapp_appmods,[
          {"auth",myapp_auth},{"dashboard",myapp_dashboard},{"user",myapp_user},{"links",myapp_links},
-          {"roles",myapp_roles},{"sites",myapp_sites},{"inst",myapp_inst}
+          {"roles",myapp_roles},{"sites",myapp_sites},{"inst",myapp_inst},{"temp",myapp_temp}
 					   ]
 		}
         ]
