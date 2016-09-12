@@ -25,7 +25,10 @@
 			<a href="{{yapp_prepath|add:"rules/get_edit_rule/"|add:iterator.id}}" class="inlineIcon preferences edit_rule">Edit</a>
 		</li>
 		<li>
-			<a href="{{yapp_prepath|add:"rules/get_rule_members/"|add:iterator.id}}" class="inlineIcon preferences get_members">Users</a>
+			<a href="{{yapp_prepath|add:"rules/get_rule_members/"|add:iterator.id}}" class="inlineIcon preferences iconAdvertiser get_members">Users</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"rules/delete_rule/"|add:iterator.id}}" class="inlineIcon iconDelete del_rule">Delete Rule </a>
 		</li>
 		
 										</ul>

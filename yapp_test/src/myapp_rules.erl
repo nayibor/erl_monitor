@@ -160,7 +160,7 @@ outa(_Arg,'GET',["yapp_test","rules","get_rule_members",Ruleid])->
 
 outa(Arg,'POST',["yapp_test","rules","save_rule_members"])->
 
-		io:format("Rules including members/non members are ~n~p",[yaws_api:parse_post(Arg)]),
+		%%io:format("Rules including members/non members are ~n~p",[yaws_api:parse_post(Arg)]),
 		Data = lists:map(fun({Postkey,Postval})-> {Postkey,lists:map(fun(Pv)->list_to_integer(Pv)end,string:tokens(Postval,","))}  end ,yaws_api:parse_post(Arg)),
 		[Id] = proplists:get_value("id",Data),
 		Rules_save = proplists:get_value("rules",Data),
@@ -170,6 +170,14 @@ outa(Arg,'POST',["yapp_test","rules","save_rule_members"])->
 			{errror,Reason} ->
 				yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 		end;
+
+
+%% @doc this is used for deleting rules 
+outa(_Arg,'DELETE',["yapp_test","rules","delete_rule",Ruleid])->
+
+		%%io:format("Rule for deletion is  ~n~p",[list_to_integer(Ruleid)]),
+		yapp_test_lib_rules:del_rule(list_to_integer(Ruleid)),
+		yapp_test_lib_util:message_client(200,"Rule Deletion Successful");
 
 						
 %% @doc for unknown pages which may be specialized for this layout/controller

@@ -110,7 +110,7 @@ var rules ={
 		save_rule_members(link){
 					
 					var ruleid = $("#ruleid").val();
-					var rules = $.map( $('#user_roles option:selected'),
+					var rules = $.map( $('#user_roles_rules option:selected'),
 					function(e) {
 						return $(e).val();
 					});
@@ -127,16 +127,18 @@ var rules ={
 				            },
 				            success:function(Data) {
 				                settings.show_message(Data);
-				                $(rules.edit_rulelist_div).dialog('close');
+				                setTimeout(function() {
+								$(rules.edit_rulelist_div).dialog('close');	                   
+				                settings.close_message_diag();
+							}, 2000);
+				   
 				            },
 				            error:function(Data){
 				               settings.enable_okbutt_mgdialg();
 				               settings.show_message(Data.responseText);      
 				            }
 				        }); 
-					
-					
-					
+			
 			
 			},
 		
@@ -167,21 +169,59 @@ var rules ={
 			            rules.load_addrule(link); 
 			        }); 
 			        
-			        
+			        //for editing a rule
 			         $(".edit_rule").live('click',function(e) {
 			            e.preventDefault();
 			            var link =  $(this).attr( "href");
 			            rules.load_addrule(link); 
-			        }); 
-			           $(".get_members").live('click',function(e) {
+			        });
+			        
+			        //for getting membrs of a rule 
+			        $(".get_members").live('click',function(e) {
 			            e.preventDefault();
 			            var link =  $(this).attr( "href");
 			            rules.load_rule_members(link); 
+			        });
+			        
+			        //for deleting a rule
+			        $(".del_rule").live('click',function(e) {
+			            e.preventDefault();
+			            var link =  $(this).attr( "href");
+			            settings.confirmation_action=function(){
+							rules.del_rule(link);
+							}
+			            settings.show_confirmation("Are You Sure You Want To Delete Rule ??");
+			            
 			        }); 
 			        
 		
 		},
 		
+		del_rule:function(link){
+					$.ajax({
+			            url: link,
+			            type:"DELETE",
+			            dataType:'html',
+			            beforeSend:function(){
+			               settings.disable_okbutt_mgdialg() ;
+			               settings.show_message("Deleting Rule...");    
+			            },
+			            success:function(Data) {
+							settings.show_message(Data); 
+							settings.confirmation_action=function(){};
+				                setTimeout(function() {
+								rules.load_rule($("#search_rules_url").val()); 
+							}, 2000);
+			       
+			            },
+			            error:function(Data){
+							settings.enable_okbutt_mgdialg();
+							settings.show_message(Data.responseText);      
+				                  
+			            }
+			        });
+			
+		},
 		
 		load_rule_members:function(link){
 			
@@ -198,7 +238,7 @@ var rules ={
 			               settings.close_message_diag();
 			               $("#edit_rulelist_div").html(Data);
 			               $(rules.edit_rulelist_div).dialog('open');
-			               $("#user_roles").pickList({});
+			               $("#user_roles_rules").pickList({});
 
 			       
 			            },

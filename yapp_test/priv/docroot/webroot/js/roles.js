@@ -58,7 +58,7 @@ var roles={
 		
 		var link=$("#save_role_links").val(); 
 		var role_id=roles.id;
-		 var links_role = $.map( $('#user_roles option:selected'),
+		 var links_role = $.map( $('#user_roles_links option:selected'),
             function(e) {
                 return $(e).val();
             } );
@@ -219,7 +219,7 @@ var roles={
 	               settings.close_message_diag();
 	               $("#role_div").html(Data);
 	               $(roles.get_role_sys_diag).dialog('open');
-					$("#user_roles").pickList({});
+					$("#user_roles_links").pickList({});
 	            },
 	            error:function(data){
 	               settings.enable_okbutt_mgdialg();

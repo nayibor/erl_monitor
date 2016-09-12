@@ -25,7 +25,8 @@
 		 get_rule_cats/0,
 		 get_rule_id/1,
 		 get_rule_members/1,
-		 save_member_rules/2
+		 save_member_rules/2,
+		 del_rule/1
 		 ]).
 		  
 		 
@@ -106,7 +107,7 @@ get_rule_members(Id) ->
 %% @doc for adding users to a rule 
 -spec save_member_rules(pos_integer(),[pos_integer()])->ok|{error,term()}.
 save_member_rules(Ruleid,Members)->
-					F = fun()->
+			F = fun()->
 					mnesia:read(tempmod_rules_temp,Ruleid)
 			end,
 		    case mnesia:activity(transaction,F) of 
@@ -149,8 +150,17 @@ get_rule_cats() ->
 		    		    
 		    
 
-%%% for getting the template for a rule		
-		
+%%%for deleting rules 
+
+del_rule(Ruleid)->
+		F = fun()->
+				mnesia:delete({tempmod_rules_temp,Ruleid}) 
+		end , 
+		mnesia:activity(transaction,F).
+
+
+
+
 		
 %%-record(tempmod_rules_temp,{id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}).	
 %% @doc this is used for temp additon of rules . not real rule trigger
@@ -162,7 +172,7 @@ add_rule(Siteid,Template,Rule_options,Description,Category,Status)->
 				case  mnesia:read({usermod_sites, Siteid}) =:= []  orelse 
 					  mnesia:read({tempmod_temp, Template}) =:= [] orelse
 					  mnesia:read({tempmod_rule_cat, Category}) =:= [] orelse 
-					  check_rule_exists(Siteid,Template) =:= exists of
+					  check_rule_exists(Siteid,Template,add,0) =:= exists of
 					  true ->
 						{error,rule_already_exists_or_data_wrong};
 					  false ->
@@ -191,12 +201,14 @@ edit_rule(Ruleid,Siteid,Template,Rule_options,Description,Category,Status)->
 					[S] ->
 						case  mnesia:read({usermod_sites, Siteid}) =:= []  orelse 
 							  mnesia:read({tempmod_temp, Template}) =:= [] orelse
-							  mnesia:read({tempmod_rule_cat, Category}) =:= [] of
-							  true ->
+							  mnesia:read({tempmod_rule_cat, Category}) =:= [] orelse
+							  check_rule_exists(Siteid,Template,edit,Ruleid) =:= exists of
+								true ->
 									{error,rule_already_exists_or_data_wrong};
-							  false ->
+								false ->
 									Fun_add = fun()->
 									mnesia:write(S#tempmod_rules_temp{rule_status=Status,
+									site_id=Siteid,template_id=Template,
 									rule_options=Rule_options,
 									description=Description,category_rule=Category})
 									end,
@@ -232,13 +244,14 @@ setup_rule_fun(Temp_id,Rule_options)->
  
 %% @doc check if template already exists .
 %% this will prevent you from creating rules for ones already done for a site
--spec check_rule_exists(Site::pos_integer(),Tempid::pos_integer())->ok|exists.
-check_rule_exists(Site,Tempid) ->	
+-spec check_rule_exists(Site::pos_integer(),Tempid::pos_integer(),Type::add|edit,Id::pos_integer())->ok|exists.
+check_rule_exists(Site,Tempid,Type,Cid) ->	
 			F = fun() ->
 				qlc:eval(qlc:q(
 	            [S ||
-	             S=#tempmod_rules_temp{site_id=Site_old,template_id=Temp_old} <- mnesia:table(tempmod_rules_temp),
-	             Temp_old =:= Tempid andalso Site_old =:= Site
+	             S=#tempmod_rules_temp{site_id=Site_old,template_id=Temp_old,id=Oid} <- mnesia:table(tempmod_rules_temp),
+	             Temp_old =:= Tempid andalso Site_old =:= Site andalso  Type =:= add
+	             orelse Temp_old =:= Tempid andalso Site_old =:= Site andalso  Type =:= edit andalso Cid =/= Oid  
 	             ]))
 			end,
 	    case mnesia:activity(transaction, F) of
