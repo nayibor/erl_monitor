@@ -47,7 +47,7 @@
 -record(tempmod_temp,{id,ident,temp_fun,description,category_temp}).
 
 %% record definition for rules
--record(tempmod_rules,{id,inst_id,template_id,rule_fun,rule_options,description,category_rule}).
+-record(tempmod_rules_temp,{id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}).
 
 
 %%record definition for template categories
@@ -56,6 +56,9 @@
 
 %%record definitions for rule categories
 -record(tempmod_rule_cat,{id,description}).
+
+%%%  usermod_rules_users for rules for users .type bag
+-record(usermod_rules_users,{ruleid,userid}).
 
 
 

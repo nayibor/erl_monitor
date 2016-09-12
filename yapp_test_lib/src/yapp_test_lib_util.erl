@@ -62,9 +62,12 @@ compile_temp_dir(Indir,Outdir) ->
 											{usermod_categories, record_info(fields, usermod_categories)},
 											{usermod_inst, record_info(fields, usermod_inst)},
 											{tempmod_temp, record_info(fields, tempmod_temp)},
-											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)}
-	    
-	    
+											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
+											{tempmod_rules_temp, record_info(fields, tempmod_rules_temp)},
+											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
+											{tempmod_rule_cat, record_info(fields, tempmod_rule_cat)}
+											
+
 										]
 									 },{verbose,verbose},{debug_info,debug_info}
 				])  

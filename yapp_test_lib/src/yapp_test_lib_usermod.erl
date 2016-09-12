@@ -16,11 +16,11 @@
 %%% for installing the basic tables needed for role based functionality/creating temp tables in case neede
 -export([install/1,
 		 temp_create/1,
-		 temp_del/0,
 		 add_auto_table/1,
 		 get_auto_all/0,
 		 get_set_auto/1,
-		 read_table_all/1
+		 read_table_all/1,
+		 transform_table_check/0
 		 ]).
 
 %%% for role stuff
@@ -59,7 +59,8 @@
 		 add_user_role_list/2,
 		 delete_user_roles/1,
 		 check_list_roles/1,
-		 check_list_links/1
+		 check_list_links/1,
+		 get_users_for_rules/0
 		 ]).
 
  %%for site stuff
@@ -156,15 +157,25 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(tempmod_rules,
-							[{attributes, record_info(fields, tempmod_rules)},
+		mnesia:create_table(usermod_rules_users,
+							[{attributes, record_info(fields, usermod_rules_users)},
 							 {index, []},
-							 {disc_copies, Nodes}]).
+							 {disc_copies, Nodes}, {type, bag}]).
 							 
 							 
 temp_del()->
 
-		mnesia:delete_table(tempmod_rules).
+		mnesia:delete_table(tempmod_rules_temp).
+		
+transform_table_check()->
+
+mnesia:transform_table(
+ tempmod_rules_temp, 
+ fun({id,inst_id,template_id,template_ident,rule_fun,rule_options,description,category_rule,rule_status,rule_users}) ->
+      {id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}
+ end,
+ record_info(fields, tempmod_rules_temp)).	
+		
 
 %%% for adding records to autoincrement table
 add_auto_table(Tablename) ->
@@ -618,17 +629,14 @@ get_filter_site(Filter) ->
 -spec get_site_name(pos_integer())->binary(). 
 get_site_name(Siteid) ->
 		
-	    F = fun() ->
-				qlc:eval(qlc:q(
-	            [S ||
-	             S=#usermod_sites{id=Site_table_id} <- mnesia:table(usermod_sites),
-	             Site_table_id =:= Siteid
-	            ]))         
-	    end,
+		F = fun()->
+				mnesia:read(usermod_sites,Siteid)
+			end,
 	    case mnesia:activity(transaction, F) of
-			[#usermod_sites{site_long_name=Long_name}]->Long_name;
+			[#usermod_sites{site_long_name=Site_name}]->Site_name;
 			 _-> <<>>
-		end. 
+		end.
+		
 
 %%@doc for getting an institutions name
 -spec get_inst_name(pos_integer())->binary(). 
@@ -743,7 +751,7 @@ get_users_terminal() ->
 
 
 %%% @doc get_users
--spec get_users() -> [string()] | [] | term().
+-spec get_users() -> [tuple()] | [] | term().
 get_users() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
@@ -753,6 +761,20 @@ get_users() ->
 	            ]))
 		end,
 	    mnesia:activity(transaction, F).
+	    
+	
+%%% @doc get_users
+-spec get_users_for_rules() -> [tuple()] | [] | term().
+get_users_for_rules() ->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Id,Fname,Lname} ||
+	             #usermod_users{id=Id,fname=Fname,lname=Lname} <- mnesia:table(usermod_users)
+	            ]))
+		end,
+	    mnesia:activity(transaction, F).	
+	    
+	    
 
 %% @doc get users by id
 -spec get_user_id(pos_integer()) -> tuple().
@@ -1003,7 +1025,7 @@ check_email(Email,Type,Id)->
 	    
 	    
 %% @private for checking whether an ident  exists for a seperate institution  
-%% first condition is for checking whether ident exists when creating a new user 
+%% first condition is for checking whether ident exists when creating a new ident 
 %% second condition is for making sure a seperate inst does not exist for seperate user when trying to edit
 -spec check_ident(binary(),atom(),pos_integer()) -> ok | exists . 
 check_ident(Ident,Type,Id)->

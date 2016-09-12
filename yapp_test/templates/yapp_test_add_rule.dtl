@@ -1,0 +1,127 @@
+{# This is another comment #}
+
+
+<form name="add_rule_form" id="add_rule_form" class="cmxform">
+    <div class='tableWrapper'>
+        <div class='tableHeader' style="border: 0px !important;">
+            <ul class='tableActions'>
+                <li>
+                    <label> Name ** </label>       
+                </li> 
+                <li>
+					{% if type_user_tran == "add_rules" %}
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% elif type_user_tran == "edit_rules" %}
+                    <input type="hidden" required name="id" id="id"   value="{{ data.id }}" /> 
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{ type_user_tran }}" /> 
+					{% endif %}
+                    <input type="text" class="ca" required name="description" id="description" value="{{ data.description|default:""}}" />      
+                </li>
+            </ul>  
+		
+             <ul class='tableActions'>
+                    <li>
+                        <label>Site</label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="siteid" id="siteid">
+                            {% for id,site_s,site_l,inst_name in sites %}
+									<option value="{{id}}"
+										{% if data.site_id and  id == data.site_id %}    
+											selected="selected" 
+										{% endif %}      
+									>{{site_s}}</option>
+							{% endfor %}
+			
+                        </select>
+                    </li>
+                </ul>
+
+                <ul class='tableActions'>
+                    <li>
+                        <label>Template</label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="templateid" id="templateid">
+                            {% for iterator in templates %}
+									<option value="{{iterator.id}}"
+										{% if data.template_id and  iterator.id == data.template_id %}    
+											selected="selected" 
+										{% endif %}      
+									>{{iterator.description}}</option>
+							{% endfor %}
+			
+                        </select>
+                    </li>
+                </ul>
+                       
+             <ul class='tableActions'>
+                    <li>
+                        <label>  Category </label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="category" id="category">
+                            {% for iterator in cats %}
+									<option value="{{iterator.id}}"
+										{% if data.category_rule and  iterator.id == data.category_rule %}    
+											selected="selected" 
+										{% endif %}      
+									>{{iterator.description}}</option>
+							{% endfor %}
+			
+                        </select>
+                    </li>
+                </ul>
+                
+                 <ul class='tableActions'>
+                    <li>
+                        <label>  Status </label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+                        <select class="ca" required name="status" id="status">
+							<option value =""></option>
+							<option value ="enabled"
+								{%  if data.rule_status == "enabled"  %}
+									selected="selected"
+								{%	endif	%}
+							>Enable</option>
+							<option value ="disabled"
+							{%  if data.rule_status == "disabled"  %}
+									selected="selected"
+								{%	endif	%}
+							
+							>Disable</option>
+							
+                        </select>
+                    </li>
+                </ul>
+                
+                
+                 {% comment %}  
+			{% endcomment %}            
+		<ul class='tableActions'>
+                <li>
+                    <label>  </label> 
+                </li>
+                <li>
+                </li>
+                <li>
+                </li>
+            </ul>
+            <div class='clear'></div>
+            <div class='corner left'></div>
+            <div class='corner right'></div>
+        </div>
+
+    </div>
+</form>
+
+

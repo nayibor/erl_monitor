@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />        
-        <title>INVENTORY SYS</title>
+        <title>ERL-MONITOR</title>
         <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/login.css"}}" />
         <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/form.css"}}" />
         <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/main.css"}}"/>
@@ -27,6 +27,7 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/sites.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/inst.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/temp.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/rules.js"}}"></script>
 
 
         <style>
@@ -57,6 +58,10 @@
 	<input type="hidden" name="search_temp_url" id="search_temp_url" value="{{yapp_prepath|add:"temp/search_temp"}}">
 	<input type="hidden" name="get_add_temp" id="get_add_temp" value="{{yapp_prepath|add:"temp/get_add_temp"}}">
 	<input type="hidden" name="save_add_temp" id="save_add_temp" value="{{yapp_prepath|add:"temp/save_add_temp"}}">
+	<input type="hidden" name="search_rules_url" id="search_rules_url" value="{{yapp_prepath|add:"rules/search_rules"}}">
+	<input type="hidden" name="get_add_rule" id="get_add_rule" value="{{yapp_prepath|add:"rules/get_add_rule"}}">
+	<input type="hidden" name="save_add_rule" id="save_add_rule" value="{{yapp_prepath|add:"rules/save_add_rule"}}">
+	<input type="hidden" name="save_members_url" id="save_members_url" value="{{yapp_prepath|add:"rules/save_rule_members"}}">
 
 
         <div id="oaHeader">
@@ -124,6 +129,8 @@
 <div name="edit_site_div" id="edit_site_div" title="Message"></div>
 <div name="edit_inst_div" id="edit_inst_div" title="Message"></div>
 <div name="edit_temp_div" id="edit_temp_div" title="Message"></div>
+<div name="edit_rule_div" id="edit_rule_div" title="Message"></div>
+<div name="edit_rulelist_div" id="edit_rulelist_div" title="Message"></div>
 
 
 

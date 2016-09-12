@@ -25,7 +25,9 @@
 		 setup_rule/4,
 		 process_template/3,
 		 process_message/2,
-		 check_template/3
+		 check_template/3,
+		 setup_template/1,
+		 get_template_desc/1
 		]).
 
 
@@ -34,7 +36,8 @@
 
 
 
-%%this is used for adding a template 
+%%this is used for adding a template more testing
+ 
 -spec add_template(Template_ident::binary(),Description::binary(),Category::pos_integer())-> ok | {error,binary()}.
 add_template(Template_ident,Description,CategoryId)->
 	    F = fun()->
@@ -43,8 +46,8 @@ add_template(Template_ident,Description,CategoryId)->
 						true ->
 							{error,check_template_category};
 						false->
-								Fun_add = fun() ->
-											mnesia:write(#tempmod_temp{ident=Template_ident,temp_fun=setup_template(Template_ident),
+								Fun_add = fun() ->  
+											mnesia:write(#tempmod_temp{ident=Template_ident,
 											id=yapp_test_lib_usermod:get_set_auto(tempmod_temp),
 											category_temp=CategoryId,description=Description
 												   })
@@ -110,6 +113,21 @@ get_template_cat(Id) ->
 		    end.	
 	
 	
+%% @doc get name by id
+-spec get_template_desc(pos_integer()) -> binary() .
+get_template_desc(Id) ->
+			F = fun()->
+					mnesia:read(tempmod_temp,Id)
+			end,
+		    case mnesia:activity(transaction,F) of 
+				[#tempmod_temp{description=Desc}] ->
+				    Desc;
+				_ ->
+				   <<>>
+		    end.	
+	
+	
+	
 %% @doc this is for getting categories
 %%
 -spec get_templates_cats() -> [term()] | [] | term().
@@ -123,9 +141,6 @@ get_templates_cats() ->
 	    mnesia:activity(transaction, F).
 
 	
-	
-	
-		
 %%template must be recompiled again and so also must all rules compiled with this template 
 %%order of operation does not matter its latest persons tempate ident which will be used for everything 
 edit_template(_Id,_Template_ident,_Description,_CategoryId)->
@@ -152,7 +167,7 @@ check_template(Template_ident,Type,Id)  ->
 %%this will later be used to generate rules for each individual which will then be passed into  
 %%data is saved in database for later use by others
 %%%% THIS GUY right here is the master function in the whole programme !!!
-%%%% very important but function is a person  of few words :)
+%%%% very important but function is a person  of few words :)testing
 -spec setup_template(Template_ident::binary())->Fun_processors::fun((...) -> fun()).
 setup_template(Template_ident)->
 		fun(Prop_options_user)->
@@ -185,7 +200,8 @@ process_message(Fun_rule,Message)->
 get_template(Tempid)->
 			ok.
 
-
+%%this is actually used for processing the template
+%%user data as well data from the message are extracted and compared 
 -spec process_template(Template_type::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
 process_template(<<"inst_test">>,Options_creator,Isomessage)->
 		Inst = proplists:get_value(name,Options_creator),
@@ -195,8 +211,36 @@ process_template(<<"inst_test">>,Options_creator,Isomessage)->
 				true;
 			false ->
 				false
-		end.
+		end;
 			
-		 
+	 
+	 
+%%this is actually used for processing the template
+%%user data as well data from the message are extracted and compared 
+process_template(<<"test_temp">>,Options_creator,Isomessage)->
+		Inst = proplists:get_value(name,Options_creator),
+		Inst_iso = proplists:get_value(name,Isomessage),
+		case  Inst =:= Inst_iso of 
+			true ->
+				true;
+			false ->
+				false
+		end;
+		
+%%this is actually used for processing the template
+%%user data as well data from the message are extracted and compared 
+process_template(<<"fake">>,Options_creator,Isomessage)->
+		Inst = proplists:get_value(name,Options_creator),
+		Inst_iso = proplists:get_value(name,Isomessage),
+		case  Inst =:= Inst_iso of 
+			true ->
+				true;
+			false ->
+				false
+		end.		
+					 
+		
+		
+		
 		
 		

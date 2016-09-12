@@ -1,0 +1,39 @@
+
+					<table cellspacing="0">
+						<thead>
+							<tr>
+								<th class="sortup">Description</th>
+								<th>Site</th>
+								<th>Template</th>
+								<th>Category</th>
+								<th>Status</th>
+								<th></th>
+								<th><th></th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for iterator in data %}
+								<tr id="{{iterator.id}}">
+									<td>{{iterator.description}}</td>
+									<td>{{iterator.site_id}}</td>
+									<td>{{iterator.template_id}}</td>
+									<td>{{iterator.category_rule}}</td>
+									<td>{{iterator.rule_status}}</td>
+									<td>
+										<ul class="rowActions">
+		<li>
+			<a href="{{yapp_prepath|add:"rules/get_edit_rule/"|add:iterator.id}}" class="inlineIcon preferences edit_rule">Edit</a>
+		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"rules/get_rule_members/"|add:iterator.id}}" class="inlineIcon preferences get_members">Users</a>
+		</li>
+		
+										</ul>
+									</td>
+									<td></td>
+									<td></td>
+								</tr>	
+							{% endfor %}
+						</tbody>		
+					</table>				
+

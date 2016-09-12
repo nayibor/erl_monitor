@@ -93,7 +93,9 @@ outa(Arg,'POST',["yapp_test","temp","save_add_temp"])->
 		case  
 		      yaws_api:postvar(Arg,"ident") =:= undefined orelse
 		      yaws_api:postvar(Arg,"description") =:= undefined orelse
-		      yaws_api:postvar(Arg,"category") =:= undefined of
+		      yaws_api:postvar(Arg,"category") =:= undefined orelse
+		      yaws_api:postvar(Arg,"ident") =:= {ok,""} orelse
+		      yaws_api:postvar(Arg,"category") =:= {ok,""} of
 				true ->
 					yapp_test_lib_util:message_client(500,"Required Field is Empty");
 				_  ->	
