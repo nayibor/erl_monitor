@@ -9,13 +9,13 @@
                 </li> 
                 <li>
 					{% if type_user_tran == "add_role" %}
-                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{type_user_tran}}" /> 
+                    <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{type_user_tran}}"  /> 
 					{% elif type_user_tran == "edit_role" %}
                     <input type="hidden" required name="id" id="id"   value="{{ data.id }}" /> 
                     <input type="hidden" required name="type_user_tran" id="type_user_tran"   value="{{type_user_tran}}" /> 
 					{% endif %}
 {# This is a commentttt #}
-                    <input type="text" class="ca" required name="sname" id="sname" value="{{data.role_short_name|default:""}}" />      
+                    <input type="text" class="ca" required name="sname" id="sname" value="{{data.role_short_name|default:""}} " />      
                 </li>
             </ul>  
             <ul class='tableActions'>

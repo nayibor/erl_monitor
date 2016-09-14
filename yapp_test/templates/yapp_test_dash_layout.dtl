@@ -23,6 +23,8 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/datepicker.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-ui-timepicker-addon.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/users.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/links.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/roles.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/sites.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/inst.js"}}"></script>
@@ -80,7 +82,7 @@
                         </a>
                         <ul id="UL_120">                  
                             <li id="LI_127" class="buttonLogout  footer">
-                                <a href="/yapp_test/auth/logout" id="A_128">
+                                <a href="{{yapp_prepath|add:"auth/logout"}}" id="A_128">
                                     <i id="I_129"></i>Logout</a>
                             </li>
                         </ul>
