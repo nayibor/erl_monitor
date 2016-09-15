@@ -32,7 +32,7 @@
 										{% if data.site_id and  id == data.site_id %}    
 											selected="selected" 
 										{% endif %}      
-									>{{site_s}}</option>
+									>{{site_l}}</option>
 							{% endfor %}
 			
                         </select>

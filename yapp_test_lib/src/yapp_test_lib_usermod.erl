@@ -157,24 +157,27 @@ install(Nodes)->
 %%% @doc temp table for creating adhoc tables
 -spec temp_create([atom()]|[])->ok.
 temp_create(Nodes) ->
-		mnesia:create_table(usermod_rules_users,
-							[{attributes, record_info(fields, usermod_rules_users)},
+		mnesia:create_table(test_transform,
+							[{attributes, record_info(fields, test_transform)},
 							 {index, []},
-							 {disc_copies, Nodes}, {type, bag}]).
+							 {disc_copies, Nodes}, {type, set}]).
 							 
 							 
 temp_del()->
 
 		mnesia:delete_table(tempmod_rules_temp).
-		
+	
+%% @doc for transforming tables		
 transform_table_check()->
 
-mnesia:transform_table(
- tempmod_rules_temp, 
- fun({id,inst_id,template_id,template_ident,rule_fun,rule_options,description,category_rule,rule_status,rule_users}) ->
-      {id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}
- end,
- record_info(fields, tempmod_rules_temp)).	
+Transformer =
+		fun(X) when record(X, test_transform) ->
+				#test_transform_new{id = X#test_transform.id,
+									name = X#test_transform.name,
+									extra = newme}
+		end,
+		{atomic, ok} = mnesia:transform_table(test_transform, Transformer,record_info(fields, test_transform_new),test_transform_new).
+
 		
 
 %%% for adding records to autoincrement table
@@ -538,11 +541,11 @@ check_list_links(Links)->
 add_site(Short_name,Long_name,Instid)->
 		F = fun() ->
 		
-			case mnesia:read({usermod_inst, Instid}) =:= [] of
-				true ->
-					{error,inst_none_exist};
-				false ->		
-					mnesia:write(#usermod_sites{id=get_set_auto(usermod_sites),site_short_name=Short_name,
+			case mnesia:read({usermod_inst, Instid}) =:= [] orelse check_site(Short_name,add_site,0) =:= exists of
+					true ->
+						{error,inst_none_exist_check_site_ident};
+					false ->		
+						mnesia:write(#usermod_sites{id=get_set_auto(usermod_sites),site_short_name=Short_name,
 											site_long_name=Long_name,inst_id=Instid})
 			end
 		end,
@@ -554,11 +557,11 @@ add_site(Short_name,Long_name,Instid)->
 update_site(Id,Short_name,Long_name,Instid)->
 		F = fun() ->
 		
-			case mnesia:read({usermod_inst, Instid}) =:= [] of
-				true ->
-					{error,inst_none_exist};
-				false ->		
-					mnesia:write(#usermod_sites{id=Id,site_short_name=Short_name,
+			case mnesia:read({usermod_inst, Instid}) =:= [] orelse check_site(Short_name,edit_site,Id) =:= exists  of
+					true ->
+						{error,inst_none_exist_check_site_ident};
+					false ->		
+						mnesia:write(#usermod_sites{id=Id,site_short_name=Short_name,
 											site_long_name=Long_name,inst_id=Instid})
 			end
 		end,
@@ -1022,6 +1025,25 @@ check_email(Email,Type,Id)->
 	        [] ->  ok;
 	        _  ->  exists
 	    end.
+	    
+	     
+%% @private for checking whether an ident exists for a site or  not 
+%% first condition is for checking whether site ident exists for a new user 
+%% second condition is for making sure a seperate site does not have email address when trying to edit
+-spec check_site(binary(),atom(),pos_integer()) -> ok | exists . 
+check_site(Ident,Type,Id)->
+		F = fun() ->
+				qlc:eval(qlc:q(
+	            [{Short_name} ||
+	             #usermod_sites{site_short_name=Short_name,id=Id_old} <- mnesia:table(usermod_sites),
+	             Ident =:= Short_name andalso Type =:= add_site 
+	             orelse Ident =:= Short_name andalso Type =:=  edit_site andalso Id =/= Id_old]))
+			end,
+	    case mnesia:activity(transaction, F) of
+	        [] ->  ok;
+	        _  ->  exists
+	    end.
+	    	     
 	    
 	    
 %% @private for checking whether an ident  exists for a seperate institution  

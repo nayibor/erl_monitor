@@ -5,7 +5,7 @@
         <div class='tableHeader' style="border: 0px !important;">
             <ul class='tableActions'>
                 <li>
-                    <label> Short Name </label>       
+                    <label> Ident*** </label>       
                 </li> 
                 <li>
 					{% if type_user_tran == "add_site" %}

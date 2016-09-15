@@ -2,7 +2,7 @@
 					<table cellspacing="0">
 						<thead>
 							<tr>
-								<th class="sortup" >Short Name</th>
+								<th class="sortup" >Ident</th>
 								<th class="sortup" > Long Name</th>
 								<th>Institution</th>
 								<th></th>
