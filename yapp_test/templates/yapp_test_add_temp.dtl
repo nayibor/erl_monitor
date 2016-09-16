@@ -36,7 +36,7 @@
                         <select class="ca" required name="category" id="category">
                             {% for iterator in cats %}
 									<option value="{{iterator.id}}"
-										{% if data.ident and  iterator.id == data.ident %}    
+										{% if data.category_temp and  iterator.id == data.category_temp %}    
 											selected="selected" 
 										{% endif %}      
 									>{{iterator.description}}</option>

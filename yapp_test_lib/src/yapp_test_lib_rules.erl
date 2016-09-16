@@ -150,8 +150,8 @@ get_rule_cats() ->
 		    		    
 		    
 
-%%%for deleting rules 
-
+%%% @doc for deleting rules 
+-spec del_rule(pos_integer())->ok|term().
 del_rule(Ruleid)->
 		F = fun()->
 				mnesia:delete({tempmod_rules_temp,Ruleid}) 
@@ -222,9 +222,6 @@ edit_rule(Ruleid,Siteid,Template,Rule_options,Description,Category,Status)->
 		mnesia:activity(transaction,F).
 		
 		
-		
-		
-							
 				
 %% @doc this is used for setting up the rules for the template							
 -spec setup_rule_fun(pos_integer(),[tuple()]|[])->Fun_processors::fun((...) -> fun())| term().						

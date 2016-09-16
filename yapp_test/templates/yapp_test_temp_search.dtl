@@ -21,6 +21,9 @@
 		<li>
 			<a href="{{yapp_prepath|add:"temp/get_edit_temp/"|add:iterator.id}}" class="inlineIcon preferences edit_temp">Edit</a>
 		</li>
+		<li>
+			<a href="{{yapp_prepath|add:"temp/del_temp/"|add:iterator.id}}" class="inlineIcon iconDelete del_temp">Delete Templ</a>
+		</li>
 		
 										</ul>
 									</td>

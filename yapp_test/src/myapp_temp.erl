@@ -62,6 +62,7 @@ outa(Arg,'GET',["yapp_test","temp","get_temp"])->
 		{ok,UiData} = yapp_test_temp_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Temps}]),
 		{html,UiData};	
 
+
 %% @doc this is for getting the sites but using a filter
 outa(Arg,'GET',["yapp_test","temp","search_temp"])->
 		
@@ -84,6 +85,20 @@ outa(_Arg,'GET',["yapp_test","temp","get_add_temp"])->
 		Cats = yapp_test_lib_isoproc:get_templates_cats(),
 		{ok,UiData} = yapp_test_add_temp:render([{cats,Cats},{type_user_tran,"add_temp"}]),
 		{html,UiData};			
+				
+		
+%% @doc this is used for editing a template
+outa(_Arg,'GET',["yapp_test","temp","get_edit_temp",TempId])->
+
+		case yapp_test_lib_isoproc:get_template_id(list_to_integer(TempId)) of 
+			{ok,S} -> 
+				Cats = yapp_test_lib_isoproc:get_templates_cats(),
+				{ok,UiData} = yapp_test_add_temp:render([{data,S},{cats,Cats},{type_user_tran,"edit_temp"}]),
+				{html,UiData};
+			{error,Reason} ->
+				yapp_test_lib_util:message_client(500,atom_to_list(Reason))
+		end;
+
 		
 	
 %% @doc this is used for adding a new template 
@@ -101,7 +116,15 @@ outa(Arg,'POST',["yapp_test","temp","save_add_temp"])->
 				_  ->	
 					case  yaws_api:postvar(Arg,"id") of
 					   {ok,Edit_id_val} ->
-							yapp_test_lib_util:message_client(500,"Not yet implemented.Stub");
+							{ok,Ident}=yaws_api:postvar(Arg, "ident"),
+							{ok,Description}=yaws_api:postvar(Arg, "description"),
+							{ok,Cat}=yaws_api:postvar(Arg, "category"),
+							case yapp_test_lib_isoproc:edit_template(list_to_integer(Edit_id_val),list_to_binary(Ident),list_to_binary(Description),list_to_integer(Cat)) of
+								ok ->
+									yapp_test_lib_util:message_client(200,"Template Edited Successfully");
+								{error,Reason} ->
+									yapp_test_lib_util:message_client(500,atom_to_list(Reason))
+							end;
 					   _ ->
 							{ok,Ident}=yaws_api:postvar(Arg, "ident"),
 							{ok,Description}=yaws_api:postvar(Arg, "description"),
@@ -114,7 +137,17 @@ outa(Arg,'POST',["yapp_test","temp","save_add_temp"])->
 							end
 					end
 		end;
-				
+		
+		
+
+	
+%% @doc this is used for deleting templates and associated rules
+%%		should be used carefully
+outa(_Arg,'DELETE',["yapp_test","temp","del_temp",TempId])->
+		yapp_test_lib_isoproc:delete_template(list_to_integer(TempId)),
+		yapp_test_lib_util:message_client(200,"Template And Template Rules Deleted");
+		
+		
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
 outa(Arg,_Method,_)->

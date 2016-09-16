@@ -1,8 +1,11 @@
 
 var temp = {
 	
+//for add_temp/edit_temp div
 edit_temp_div:("#edit_temp_div"),
 
+
+//fo configuring the temp div
 configure_temp_div:function(){
 		
 					  var diag = $(temp.edit_temp_div);
@@ -27,6 +30,8 @@ configure_temp_div:function(){
         
 		},
 		
+		
+//for validation form fields before template is sent to the server 		
 checkfields:function(){
 	
 					_this=this;	
@@ -54,6 +59,7 @@ checkfields:function(){
 		},		
 		
 		
+//for saving the template
 saveTemp:function(link){
 		
 					var formdata=$("#add_temp_form.cmxform").serialize(); 
@@ -84,10 +90,10 @@ saveTemp:function(link){
 				            }
 				        }); 
 		
-		}		
-		
-		,
+		},
 
+
+//initializes various events for elements 
 init:function(){
 	
 	
@@ -109,7 +115,15 @@ init:function(){
 			            temp.load_addtemp(link); 
 			        }); 
 			        
+			        //for editing templates
+			        $(".edit_temp").live('click',function(e) {
+			            e.preventDefault();
+			            var link = $(this).attr("href");
+			            temp.load_addtemp(link); 
+			        }); 
 			        
+			        
+			           
 			         //for searching for a link when the enter button is presed
 			        $("#search_template").live('keyup',function(e) {
 			            e.preventDefault();
@@ -119,9 +133,52 @@ init:function(){
 			            }
 			        });	
 			        
+			        
+			          //for deleting a template and rules associated with the template
+			        $(".del_temp").live('click',function(e) {
+			            e.preventDefault();
+			            var link =  $(this).attr( "href");
+			            settings.confirmation_action=function(){
+							temp.del_temp(link);
+							}
+			            settings.show_confirmation("Are You Sure You Want To Delete Template ?<br>"+
+									"Deleting Templates Deletes All Rules Associated With Template");
+			            
+			        });
+			        
+			        
 				},
+			
 				
+//for deleting templates				
+del_temp:function(link){
+					$.ajax({
+			            url: link,
+			            type:"DELETE",
+			            dataType:'html',
+			            beforeSend:function(){
+			               settings.disable_okbutt_mgdialg() ;
+			               settings.show_message("Deleting Template...");    
+			            },
+			            success:function(Data) {
+							settings.show_message(Data); 
+							settings.confirmation_action=function(){};
+				                setTimeout(function() {
+								temp.load_temp($("#search_temp_url").val()); 
+							}, 2000);
+			       
+			            },
+			            error:function(Data){
+							settings.enable_okbutt_mgdialg();
+							settings.show_message(Data.responseText);      
+				                  
+			            }
+			        });
+			
+		},
+		
 				
+//for loading the div for adding templates				
 load_addtemp:function(link){
 		
 					$.ajax({
@@ -147,6 +204,7 @@ load_addtemp:function(link){
 				},
 					
         
+ //for loading the div when a seach is made for a template        
 load_temp:function(link){
 		
 					 val = $("#search_template").val();

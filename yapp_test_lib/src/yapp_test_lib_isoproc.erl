@@ -22,7 +22,8 @@
 		 get_templates_cats/0,
 		 add_template/3,
 		 edit_template/4,
-		 get_template_desc/1
+		 get_template_desc/1,
+		 delete_template/1
 		]).
 
 
@@ -31,8 +32,7 @@
 
 
 
-%%this is used for adding a template more testing
- 
+%% @doc this is used for adding a template  
 -spec add_template(Template_ident::binary(),Description::binary(),Category::pos_integer())-> ok | {error,binary()}.
 add_template(Template_ident,Description,CategoryId)->
 	    F = fun()->
@@ -53,6 +53,53 @@ add_template(Template_ident,Description,CategoryId)->
 		mnesia:activity(transaction,F).
 
 
+
+%% @doc this is used for editing a template
+-spec edit_template(Id::pos_integer(),Template_ident::binary(),Description::binary(),Category::pos_integer())-> ok | {error,atom()} | {error|term()}.
+edit_template(Tempid,Template_ident,Description,CategoryId)->
+		
+		F = fun()->
+				Rcheck = fun()->
+					mnesia:read(tempmod_temp,Tempid)
+			    end,
+				case mnesia:activity(transaction,Rcheck) of
+					[S] ->
+						case  check_template(Template_ident,edit_temp,Tempid) =:= exists orelse 
+							  mnesia:read({tempmod_temp_cat, CategoryId}) =:= [] of
+								true ->
+									{error,check_template_category};
+								false->
+										Fun_add = fun() ->  
+													mnesia:write(S#tempmod_temp{ident=Template_ident,
+													category_temp=CategoryId,description=Description
+														   })
+										end,
+										mnesia:activity(transaction, Fun_add)
+						end;
+					_ ->
+						{error,temp_non_exists}
+				end
+		end,
+		mnesia:activity(transaction,F).
+	
+	
+%% @doc this is for deleting templates along with all rules for that template
+%%to be used with utmost care as this removes all rules for a template along with the template from the system 	
+-spec delete_template(pos_integer())->ok|term().
+delete_template(Tid)->
+		F = fun()->
+				Rules_Ret =	mnesia:index_read(tempmod_rules_temp,Tid,#tempmod_rules_temp.template_id),
+				case Rules_Ret of 
+					[]->
+						mnesia:delete({tempmod_temp,Tid});
+					RuleList-> 
+						mnesia:delete({tempmod_temp,Tid}),
+						lists:map(fun(#tempmod_rules_temp{id=Id})-> yapp_test_lib_rules:del_rule(Id)  end,RuleList)
+				end
+		end,
+		mnesia:activity(transaction,F).
+	
+		
 
 %% @doc this is for getting templates
 %% description of temp for descripton purposes has been changed to show category of temp in view
@@ -88,7 +135,7 @@ get_template_id(Id) ->
 			end,
 		    case mnesia:activity(transaction,F) of 
 				[S] ->
-				    S;
+				    {ok,S};
 				_ ->
 				   {error,temp_non_exists}
 		    end.
@@ -135,14 +182,8 @@ get_templates_cats() ->
 	    end,
 	    mnesia:activity(transaction, F).
 
-	
-%%template must be recompiled again and so also must all rules compiled with this template 
-%%order of operation does not matter its latest persons tempate ident which will be used for everything 
-edit_template(_Id,_Template_ident,_Description,_CategoryId)->
-		ok.
-
-	
 		
+%% @doc this is for checking whether a the ident you are using for a template exists with another template 
 -spec check_template(Template_ident::binary(),add_temp|edit_temp,pos_integer())-> ok | exists .
 check_template(Template_ident,Type,Id)  ->
 			F = fun() ->
