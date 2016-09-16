@@ -40,17 +40,18 @@
 -record(usermod_sites,{id,site_short_name,site_long_name,inst_id}).
 
 
-%%% record for storing the institution information
+%%%record for storing the institution information
 -record(usermod_inst,{id,inst_short_name,inst_long_name,inst_ident}).
 
-%%% record for categories
+%%%record for categories
 -record(usermod_categories,{id,category}).
 
 
-%% record definition for templates
+%%record definition for templates
 -record(tempmod_temp,{id,ident,temp_fun,description,category_temp}).
 
-%% record definition for rules
+
+%%record definition for rules
 -record(tempmod_rules_temp,{id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}).
 
 
@@ -61,8 +62,10 @@
 %%record definitions for rule categories
 -record(tempmod_rule_cat,{id,description}).
 
-%%%  usermod_rules_users for rules for users .type bag
+
+%%%usermod_rules_users for rules for users .type bag
 -record(usermod_rules_users,{ruleid,userid}).
+
 
 -record(test_transform,{id,name}).
 -record(test_transform_new,{id,lname,name,extra}).

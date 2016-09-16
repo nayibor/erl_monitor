@@ -104,7 +104,7 @@ outa(_Arg,'GET',["yapp_test","rules","get_edit_rule",RuleId])->
 %% @doc this is used for adding a new template 
 %%		returns an erlydtl html page afer filter and query		
 outa(Arg,'POST',["yapp_test","rules","save_add_rule"])->
-		io:format("~ntesting addition of rule~p",[yaws_api:parse_post(Arg)]),
+		%%io:format("~ntesting addition of rule~p",[yaws_api:parse_post(Arg)]),
 		case  
 		      yaws_api:postvar(Arg,"siteid") =:= undefined orelse
 		      yaws_api:postvar(Arg,"templateid") =:= undefined orelse

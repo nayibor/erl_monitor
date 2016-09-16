@@ -1,6 +1,6 @@
 %%%
 %%% @doc yapp_test_lib_usermod module.
-%%%<br>contains basic functions for performing CRUD functionality for users,roles</br>
+%%%<br>contains basic functions for performing CRUD functionality for users,roles,links</br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 
@@ -20,7 +20,8 @@
 		 get_auto_all/0,
 		 get_set_auto/1,
 		 read_table_all/1,
-		 transform_table_check/0
+		 transform_table_check/0,
+		 temp_del/0
 		 ]).
 
 %%% for role stuff
@@ -96,7 +97,7 @@
  
 
 %%type definitions fore the above records
--type usermod_users() :: #usermod_users{}.
+%%-type usermod_users() :: #usermod_users{}.
 -type usermod_roles() :: #usermod_roles{}.
 -type usermod_links() :: #usermod_links{}.
 -type usermod_users_roles() :: #usermod_users_roles{}.
@@ -171,7 +172,7 @@ temp_del()->
 transform_table_check()->
 
 Transformer =
-		fun(X) when record(X, test_transform) ->
+		fun(X) when is_record(X, test_transform) ->
 				#test_transform_new{id = X#test_transform.id,
 									name = X#test_transform.name,
 									extra = newme}
@@ -392,7 +393,9 @@ get_site_id(Siteid) ->
 				{error,role_non_exists}
 		end.		
 	
-			
+	
+
+
 
 %%% @doc add link
 -spec add_link(string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
@@ -609,7 +612,7 @@ get_sites() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [{Id,Site_s,Site_l,get_inst_name(Inst)} ||
-	             S=#usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites)
+	             #usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites)
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).
@@ -621,7 +624,7 @@ get_filter_site(Filter) ->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [{Id,Site_s,Site_l,get_inst_name(Inst)} ||
-	             S=#usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites),
+	             #usermod_sites{id=Id,site_long_name=Site_l,site_short_name=Site_s,inst_id=Inst} <- mnesia:table(usermod_sites),
 	             binary:match(Site_l,Filter) =/= nomatch orelse binary:match(Site_s,Filter) =/= nomatch
 	            ]))
 	    end,
@@ -716,7 +719,7 @@ get_inst_filter(Filter) ->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [S ||
-	             S=#usermod_inst{id=Id,inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident} <- mnesia:table(usermod_inst),
+	             S=#usermod_inst{inst_short_name=Short_name,inst_long_name=Long_name,inst_ident=Ident} <- mnesia:table(usermod_inst),
 	             binary:match(Short_name,Filter) =/= nomatch orelse binary:match(Long_name,Filter) =/= nomatch 
 	             orelse binary:match(Ident,Filter) =/= nomatch
 	            ]))
@@ -852,7 +855,7 @@ get_links_for_roles() ->
 		F = fun() ->
 				qlc:eval(qlc:q(
 	            [{Id,Lname,atom_to_binary(Ltype,utf8)} ||
-	             #usermod_links{link_category=Link_category,id=Id,link_name=Lname,link_type=Ltype} <- mnesia:table(usermod_links)
+	             #usermod_links{id=Id,link_name=Lname,link_type=Ltype} <- mnesia:table(usermod_links)
 	            ]))
 	    end,
 	    mnesia:activity(transaction, F).	    
@@ -949,7 +952,7 @@ get_role_links_setup(RoleId) ->
 			[] ->
 				[];
 			S ->
-				lists:map(fun(#usermod_role_links{role_id=Role_id,link_id=Link_id})->Link_id end,S)
+				lists:map(fun(#usermod_role_links{role_id=_Role_id,link_id=Link_id})->Link_id end,S)
 		end.
 	
 	    
