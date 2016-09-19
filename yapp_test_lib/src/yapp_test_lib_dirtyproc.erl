@@ -78,10 +78,10 @@ get_site_message(Message)->
 %%% @doc get sites by index 
 -spec validate_site_index(Filter::binary()) -> tuple().	
 validate_site_index(Filter) ->
-		F = fun()-> 
-				mnesia:index_read(usermod_sites,Filter,#usermod_sites.site_short_name)
-			end,
-			case mnesia:activity(transaction,F) of 
+		%F = fun()-> 
+		%		mnesia:index_read(usermod_sites,Filter,#usermod_sites.site_short_name)
+		%	end,
+			case mnesia:dirty_index_read(usermod_sites,Filter,#usermod_sites.site_short_name) of 
 				[#usermod_sites{id=Id}]->
 					{ok,Id};
 				_->
@@ -92,10 +92,10 @@ validate_site_index(Filter) ->
 %% @doc for getting rules which have a particular index
 -spec get_rules_index(pos_integer())-> {ok,[term()]}|{error,binary()}.
 get_rules_index(Siteid) ->
-		F = fun()-> 
-				mnesia:index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id)
-			end,
-			case mnesia:activity(transaction,F) of 
+		%F = fun()-> 
+		%		mnesia:index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id)
+		%	end,
+			case mnesia:dirty_index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id) of 
 				[]->
 					{error,<<"No Rule">>};
 				S-> 
@@ -106,10 +106,10 @@ get_rules_index(Siteid) ->
 %% @doc for getting the template iden for a specific ident
 -spec get_template_ident(pos_integer())->binary().
 get_template_ident(Id)->
-		F = fun()->
-				mnesia:read(tempmod_temp,Id)
-			end,
-		    case mnesia:activity(transaction,F) of 
+		%F = fun()->
+		%		mnesia:read(tempmod_temp,Id)
+		%	end,
+		    case mnesia:dirty_read(tempmod_temp,Id) of 
 				[#tempmod_temp{ident=Ident}] ->
 				    Ident;
 				_ ->
@@ -138,18 +138,11 @@ process_rules(Rules,Siteident,Message)->
 %%user data as well data from the message are extracted and compared 
 -spec process_rule_inst(Template_type::binary(),Site_Rule::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
 process_rule_inst(<<"site_temp">>,Site_rule,_Options_creator,Isomessage)->
-		%%Inst_iso = proplists:get_value(<<"site">>,Isomessage),
-		%%case  Inst_iso =:= Site_rule of 
-		%%	true ->
-		%%		true;
-		%%	false ->
-		%%		false
-		%%end;
 		true;
 		
 %%this is actually used for processing the template
 %%user data as well data from the message are extracted and compared 
-process_rule_inst(<<"twist">>,Site_rule,_Options_creator,Isomessage)->
+process_rule_inst(<<"nt">>,Site_rule,_Options_creator,Isomessage)->
 		Inst_iso = proplists:get_value(<<"site">>,Isomessage),
 		case  Inst_iso =:= Site_rule of 
 			true ->
