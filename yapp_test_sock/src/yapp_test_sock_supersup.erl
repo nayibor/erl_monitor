@@ -8,9 +8,9 @@ start_link(Name, Limit) ->
 
 %%%c@doc this where the test server,the socket serrver counter server  as well as the socket server itself may be startedd  
 init({Name, Limit}) ->
-	    MaxRestart = 1,
+	    MaxRestart = 100,
 	    MaxTime = 3600,
-	    {ok, {{one_for_all, MaxRestart, MaxTime},
+	    {ok, {{one_for_one, MaxRestart, MaxTime},
 	          [{serv,
 	             {yapp_test_ppool_serv, start_link, [Name, Limit, self()]},
 	             permanent,

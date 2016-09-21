@@ -22,8 +22,6 @@
 start(normal, []) ->
     %%mnesia:wait_for_tables([usermod_users,usermod_roles,usermod_links,usermod_users_roles,usermod_users_links], 20000),
     %%these three variables will have to be declared by static means or in the app file as an env variable ***
-    Name =sock_srv,
-    Limit = 50,
     {ok, Name} = application:get_env(name),
     {ok, Limit} = application:get_env(limit),    
     yapp_test_sock_supersup:start_link(Name, Limit).

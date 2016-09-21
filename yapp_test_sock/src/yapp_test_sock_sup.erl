@@ -31,7 +31,7 @@ init([]) ->
 		%% Set the socket into {active_once} mode.
 		%% See sockserv_serv comments for more details
 		io:format("#########starting the socket Server supervisor###########"),
-		{ok, ListenSocket} = gen_tcp:listen(Port, [{active,once}, {packet,line}]),
+		{ok, ListenSocket} = gen_tcp:listen(Port, [list, {packet, 0}, {active, true}]),
 		{ok, {{simple_one_for_one, 60, 3600},
         [{socket,
          {yapp_test_sock_serv, start_link, [ListenSocket]}, % pass the socket!

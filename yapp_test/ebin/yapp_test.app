@@ -12,4 +12,4 @@
         ]
   },
   {registered, []},
-  {applications,[kernel, stdlib, yaws, yapp,yapp_test_lib,yapp_test_sock]}]}.
+  {applications,[kernel, stdlib, yaws, yapp,yapp_test_lib,yapp_test_sock,erl8583]}]}.
