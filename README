@@ -1,12 +1,15 @@
-This sample application and libraries is used for showing how web applications can be created using the erlang programming language 
-and the yaws web server among other things
-and a load of othe other interesting stuff when done
-in progress .....
-
+This application is for an opensource transaction monitoring system .
+This system receives iso 8583 messages from diverse sources on  a tcp-ip connection 
+and forwards it to a websocket server for distrubition to users whom are authorized to view those messages .
+there is also a backend web application/mis system for 
+creating,reading,updating users
+performing access management for users
+for creating rules which represent a filter for messages
+for adding and removing users from the rules 
 
 the yapp_test_lib contains libraries for the application . 
 the yapp_test is the web application
-will demonstrate the below when done .
+the yapp_test_sock is currently the tcp server for receiving the messages
 *session management using yaws
 *yaws ehtml features
 *templating with erlydtl

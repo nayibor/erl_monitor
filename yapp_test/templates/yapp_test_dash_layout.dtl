@@ -30,15 +30,12 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/inst.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/temp.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/rules.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/ws_page.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
 
-
-        <style>
-
-        </style>
     </head>
-
-
-
+    
     <body class="hasInterface hasGradient hasSidebar">   
     <input type="hidden" name="search_user_url" id="search_user_url" value="{{yapp_prepath|add:"user/search_user"}}">
 	<input type="hidden" name="get_add_user_url" id="get_add_user_url" value="{{yapp_prepath|add:"user/get_add_user"}}">

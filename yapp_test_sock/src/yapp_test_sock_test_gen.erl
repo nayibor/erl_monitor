@@ -42,8 +42,7 @@ init([]) ->
     
     
     
-   create_message()->
-
+create_message()->
 		% Create a message.
 	Msg1 = erl8583_message:new(),
 	Msg2 = erl8583_message:set(0, "0200", Msg1),
@@ -67,6 +66,18 @@ handle_call(send_iso, _From,S = #state{socket=Socket,state_test=State_test}) ->
 			_ ->
 				{reply,not_ready,S}
 		end;	
+    
+    %%for testing for sending messages  to the websocket   
+handle_call(send_websocket, _From,S = #state{socket=Socket,state_test=State_test}) ->
+
+		case State_test of 
+			good ->
+				create_message(),
+				%%send(Socket,),
+				{reply,message_sent,S};
+			_ ->
+				{reply,not_ready,S}
+		end;    
     
     
 %%for testing for health

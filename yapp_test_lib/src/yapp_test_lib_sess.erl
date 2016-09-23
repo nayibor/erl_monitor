@@ -17,7 +17,8 @@
 		 check_perm_page/2,
 		 kill_session/2,
 		 setup_session/6,
-		 get_user_data/2
+		 get_user_data/2,
+		 get_user_websocket/2
 		 ]).
 
 
@@ -97,6 +98,22 @@ get_user_data(Arg,Cookie)->
 						error
 				end
 		end.
+
+%% @doc this is used for getting information which will be passed to the websocket session
+get_user_websocket(Arg,Cookie)->
+		H = Arg#arg.headers,
+		case yaws_api:find_cookie_val(Cookie, H#headers.cookie) of
+			[] ->
+				error;
+			Cookie_Unique ->
+				case yaws_api:cookieval_to_opaque(Cookie_Unique) of
+					{ok, _OP=#session_data{id=Id,fname=Name}} ->						
+						[{user_name,Name},{id,Id}]; 
+					{error, no_session} ->
+						error
+				end
+		end.
+
 
 
 %%% @doc for obtaining permissible links for a user from mnesia/external data store 
