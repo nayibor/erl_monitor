@@ -1,18 +1,25 @@
 This application is for an opensource transaction monitoring system .
-This system receives iso 8583 messages from diverse sources on  a tcp-ip connection 
-and forwards it to a websocket server for distrubition to users whom are authorized to view those messages .
+This system receives iso 8583 messages from diverse sources on  a tcp-ip server 
+and forwards it to a websocket server for distrubition to user browsers whom are authorized to view those messages .
+main purpose of this application is to receive realtime feedback on status of transactions so that quick actions
+can be taken as opposed to polling of the database or other non real time means of monitoring .
+monitoring system will give visual and audio cues in case of important events and may support basic analytics 
+
+
 there is also a backend web application/mis system for 
 creating,reading,updating users
 performing access management for users
 for creating rules which represent a filter for messages
 for adding and removing users from the rules 
 
-the yapp_test_lib contains libraries for the application . 
+web application and tcp server built on erlang stack(yaws,mnesia,erlydtl),
+yaws is erlang web server
+mnesia is database management system packaged with erlang
+erlydtl is django templating done using erlang  
+messagepack,djnago templates for message format,templating
+
+the yapp_test_lib contains libraries for the application 
 the yapp_test is the web application
-the yapp_test_sock is currently the tcp server for receiving the messages
-*session management using yaws
-*yaws ehtml features
-*templating with erlydtl
-*working with mnesia(which is a kv store bundled with erlang)
-*working with external databases using sumodb
-*other very nice stuff with erlang 
+the yapp_test_sock is for now the tcp server
+
+

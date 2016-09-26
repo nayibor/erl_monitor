@@ -12,6 +12,7 @@ $(document).ready(function(){
     webs.onMessage=function(data){
 		console.log(data);
 		console.log("decoded message is ");
+		//message pack
 		var message = msgpack.decode(new Uint8Array(data.data));
 		console.log(message);
 

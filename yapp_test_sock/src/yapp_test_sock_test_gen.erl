@@ -15,9 +15,8 @@
    
 -record(state, {iso_message=[],socket,port,state_test}). % the current socket containing the iso message  
 -define(SOCK(Msg), {tcp, _Port, Msg}).
--define(BH,4).
-  
-   
+-define(BH,2).
+     
  
 test_client(Name) ->
     gen_server:call(Name, test_client).
@@ -40,21 +39,11 @@ init([]) ->
 		gen_server:cast(self(), start_tester),
 		{ok, #state{port=Port,state_test=bad}}.
     
-    
+   
     
 create_message()->
 		% Create a message.
-	Msg1 = erl8583_message:new(),
-	Msg2 = erl8583_message:set(0, "0200", Msg1),
-	Msg3 = erl8583_message:set(2, "5234567890123456", Msg1),	
-	%%AsciiMessage="02004000000000000000165234567890123456" = erl8583_marshaller:marshal(Msg3, ?MARSHALLER_ASCII).
-	AsciiMessage =erl8583_marshaller_ascii:marshal(Msg3),
-
-	io:format("Sending:~n~p", [Msg3]).
-	
-	%LengthHeader = erl8583_convert:integer_to_string(length(AsciiMessage), 4),
-	%Final_message =LengthHeader ++ AsciiMessage.
-	 
+	 ok.	 
     %%for testing for sending messages    
 handle_call(send_iso, _From,S = #state{socket=Socket,state_test=State_test}) ->
 

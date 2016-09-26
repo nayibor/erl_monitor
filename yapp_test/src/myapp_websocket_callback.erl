@@ -14,13 +14,13 @@
 
 
 %% Export for websocket callbacks
--export([init/1,terminate/2,handle_open/2,handle_message/2,say_hi/1,handle_info/2]).
+-export([init/1,terminate/2,handle_open/2,handle_message/2,handle_info/2]).
 
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").
 
--record(user_state, {state_user,iso_message=[],state_test=bad}). % the current socket containing the iso message  
+-record(user_state, {state_user,iso_message=[],state_test= <<"bad">> ,reg= <<"false">> }). % the current socket containing the iso message  
 
 
 init( [_ReqArg,InitialState])->
@@ -28,21 +28,13 @@ init( [_ReqArg,InitialState])->
 		{ok, #user_state{state_user=InitialState}}.
 
 handle_open(WSState, State) ->
-	io:format("connection upgraded"),
-    {ok, State#user_state{state_test=good}}.
+	Userid=proplists:get_value(id,State#user_state.state_user),
+	try register_process(Userid) of 
+	Val -> {ok, State#user_state{state_test= <<"good">> ,reg= <<"true">> }}
+	catch 
+	_:_ -> {ok, State#user_state{state_test= <<"good">> }}
+	end.
 
-handle_message({text, <<"bye">>},State) ->
-		io:format("User said bye.~n", []),
-		{close, normal,State};
-
-handle_message({text, <<"something">>},State) ->
-		io:format("Some action without a reply~n", []),
-		{noreply,State};
-
-handle_message({text, <<"say hi later">>},State) ->
-		io:format("saying hi in 3s.~n", []),
-		timer:apply_after(3000, ?MODULE, say_hi, [self()]),
-		{reply, {text, <<"I'll say hi in a bit...">>},State};
 
 handle_message({text, Message},State) ->
 		io:format("basic echo handler got ~p~n", [Message]),
@@ -53,9 +45,10 @@ handle_message({binary, Message},State) ->
 		Updata = msgpack:unpack(Message), 
 		io:format("~nunpacked data is ~p~n",[Updata]),
 		NewData  = maps:from_list(lists:map(fun(X)->{X,X}end,lists:seq(1,10))),
-		M = #{<<"a">> => 100, <<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
+		M = #{<<"bs">>=>"testing",<<"a">> => 100, <<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
 		Sample_message = msgpack:pack(M),
 		{reply,{binary,Sample_message},State};
+
 
 handle_message({close, Status, _Reason},State) ->
 		{close, Status,State}.
@@ -66,17 +59,18 @@ handle_info(close, State) ->
 		{close, <<"testing">>,{text, <<"see you in a bit">>},State};   
      
 handle_info(Message, State) ->
-		io:format("message received is ~p~n",[Message]),
-		Frwder = list_to_binary(Message),
-		{reply, {text, <<Frwder/binary>>},State}.
-	
+		M = #{<<"transaction">> =>Message},
+		io:format("message received is ~p~n",[M]),
+		Msg_out = msgpack:pack(M),
+		{reply,{binary,Msg_out},State}.
+
      
 terminate(Reason, State) -> 
 		io:format("terminate ~p: ~p (state:~p)~n", [self(), Reason, State]),
 		ok.
 
-          
-say_hi(Pid) ->
-		io:format("asynchronous greeting~n", []),
-		yaws_api:websocket_send(Pid, {text, <<"hi there!">>}).
+		
+register_process(Userid)->
+		gproc:reg({n, l, Userid}, ignored).
+
 

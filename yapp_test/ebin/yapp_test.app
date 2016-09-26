@@ -13,4 +13,4 @@
         ]
   },
   {registered, []},
-  {applications,[kernel, stdlib, yaws, yapp,yapp_test_lib,yapp_test_sock,erl8583,msgpack]}]}.
+  {applications,[kernel, stdlib, yaws, yapp,yapp_test_lib,yapp_test_sock,msgpack,gproc]}]}.

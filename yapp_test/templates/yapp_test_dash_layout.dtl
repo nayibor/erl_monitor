@@ -33,7 +33,9 @@
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/ws_page.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jem.js"}}"></script>
 
+	
     </head>
     
     <body class="hasInterface hasGradient hasSidebar">   

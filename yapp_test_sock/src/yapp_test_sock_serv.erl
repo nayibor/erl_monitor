@@ -47,24 +47,30 @@ handle_cast(_, S) ->
 
 handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 		State_new=Isom++Str,
+		%%io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),
 		case length(State_new) of 
-			Size when Size < 4 -> 
+			Size when Size < 2 -> 
+				%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
 				{noreply, S#state{iso_message=State_new}};
 			_  ->
-				{LenStr, Rest} = lists:split(4, State_new),
-				Len = list_to_integer(LenStr) + 4,
+				{LenStr, Rest} = lists:split(2, State_new),
+				%%io:format("clength is ~p~n~w~n~s~n",[length(LenStr),LenStr,Rest]),
+				Len = lists:nth(2,LenStr) + 2,
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->
-						io:format("Received:~n~s~n", [Rest]),
-						Response = erl8583_marshaller_ascii:unmarshal(Rest),
+					io:format("~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
+					io:format("~nrequest_mti:~s",[lists:sublist(Rest,4)]),
+					io:format("~nin progress primary bitmap is ~p ",[lists:sublist(Rest,5,16)]),
+					io:format("~nprimary is ~p ",[lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,5,8))]),
+					io:format("~nflattend primary bitmap in binary  is ~p ",[lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,5,8)))]),
+					io:format("~nfirst value is ~p and first binary bitmap:~p and hex value is ~p",[lists:nth(5,Rest),string:right(integer_to_list(lists:nth(5,Rest),2),8,$0),integer_to_list(lists:nth(5,Rest),16)]),
 						% Display the MTI from the response.
-						io:format("~nMTI: ~s~n", [erl8583_message:get(0, Response)]),
 						{noreply, S#state{iso_message=[]}};
 					SizeafterHead when Len < SizeafterHead ->
 						{noreply, S#state{iso_message=State_new}}
 				end
 		end;
-				
+	 		 	
  
     
 handle_info({tcp_closed, _Socket}, S) ->
