@@ -25,7 +25,7 @@
 %%      all pages have access to this page/layout
 show_dashboard(Arg) ->
 		%%outnew(Arg,"Dashboard",[]).
-		out(Arg,"Welcome to Dashboard").
+		out(Arg,"Welcome to Monitor").
 		
 out(Arg,Title_Page) ->
 		[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),

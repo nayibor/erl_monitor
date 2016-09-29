@@ -24,23 +24,16 @@
 %% @doc for testing and bringing out statistics		
 test_message(Message)->
 		statistics(wall_clock),
-		get_site(Message),
+		process_message(Message),
 		{_,Timeduration}=statistics(wall_clock),
 		io:format(" Time_duration~p~n",[Timeduration/1000]).
 		
-		
-
-%%this is used for processing the message and giving you the list of users whom the message can be sent to
--spec process_message(map())-> [pos_integer()] | []. 
-process_message(Message)->
-		get_site(Message).
-
 			
 %% @doc this is used for getting the site for a message
 %%for testing purpose the Message will be a proplist containing the instid as a key 
 %%but in production this will represent how the issue id would be extracted
--spec get_site(map())-> {ok,binary()} | {error,binary()}.
-get_site(Message) ->
+-spec process_message(map())-> [pos_integer()] | {error,binary()}.
+process_message(Message) ->
 		 case get_site_message(Message) of
 				undefined ->
 					{error,<<"Index Not Found">>};
@@ -72,14 +65,16 @@ get_site(Message) ->
 %%this part will replace the iso extraction part till ready	
 -spec get_site_message(map())->binary() | undefined.
 get_site_message(Message)->
-		Site_ident = maps:get(val_list_form,maps:get("_32",Message,<<"fuck">>),<<"double_fuck!!">>),
-		case Site_ident of 
-			Site_Wrong when Site_Wrong =:= <<"fuck">> orelse Site_Wrong =:= <<"double_fuck!!">> ->
-				undefined ;
-			Site_Correct ->
-				erlang:list_to_binary(Site_Correct)
-		end.
-	
+
+		case maps:get("_32",Message,<<"fuck">>) of
+			<<"fuck">> ->
+				undefined;
+			 Site ->
+				 Site_ident =  maps:get(val_list_form,Site),
+				 erlang:list_to_binary(Site_ident)
+		end. 
+		
+			
 %%% @doc get sites by index 
 -spec validate_site_index(Filter::binary()) -> tuple().	
 validate_site_index(Filter) ->

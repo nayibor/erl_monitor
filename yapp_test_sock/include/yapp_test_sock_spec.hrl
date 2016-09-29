@@ -49,7 +49,7 @@
 				34	->{ns,28,vl,2,<<"Pan Extended">>};
 				35	->{ns,37,vl,2,<<"Track 2 Data">>};
 				36	->{ns,104,vl,2,<<"Track 3 Data">>};
-				37	->{anp,12,fx,0,<<"Ritrieval Reference Number">>};
+				37	->{anp,12,fx,0,<<"Retrieval Reference Number">>};
 				38	->{anp,6,fx,0,<<"Approval Code">>};
 				39	->{n,3,fx,0,<<"Response Code">>};
 				40	->{n,3,fx,0,<<"Service Code">>};
@@ -76,7 +76,70 @@
 				61	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
 				62	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
 				63	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
-				64	->{hex,8,fx,0,<<"Mac Data">>}
+				64	->{hex,8,fx,0,<<"Mac Data">>};
+				65	->{t,8,fx,0,<<"Reserved for Iso Use">>};
+				66	->{ans,204,vl,2,<<"Amount Original Fees">>};	
+				67	->{n,2,fx,0,<<"Extended Payment Data">>};				
+				68	->{n,3,fx,0,<<"Country Code,Receiving Institution">>};				
+				69	->{n,3,fx,0,<<"Country Code,Settlement Institution">>};				
+				70	->{n,3,fx,0,<<"Country Code,Authorizing Agent  Institution">>};				
+				71	->{n,8,fx,0,<<"Message Number">>};				
+				72	->{ans,255,vl,2,<<"Data Record">>};				
+				73	->{n,6,fx,0,<<"Date Action YYMMDD">>};				
+				74	->{n,10,fx,0,<<"Credits Number">>};
+				75	->{n,10,fx,0,<<"Credits Reversal Number">>};				
+				76	->{n,10,fx,0,<<"Debits Number">>};				
+				77	->{n,10,fx,0,<<"Debits Reversal Number">>};				
+				78	->{n,10,fx,0,<<"Transfer Number">>};				
+				79	->{n,10,fx,0,<<"Transfer Reversal Number">>};				
+				80	->{n,10,fx,0,<<"Enquiries Number">>};				
+				81	->{n,10,fx,0,<<"Authorizations Number">>};				
+				82	->{n,10,fx,0,<<"Enquiries Reversal Number">>};				
+				83	->{n,10,fx,0,<<"Payments Number">>};				
+				84	->{n,10,fx,0,<<"Payments Reversal Number">>};				
+				85	->{n,10,fx,0,<<"Fee Collection Number">>};				
+				86	->{n,16,fx,0,<<"Credits Amount">>};				
+				87	->{n,16,fx,0,<<"Credits Reversal Amount">>};				
+				88	->{n,16,fx,0,<<"Debits Amount">>};				
+				89	->{n,16,fx,0,<<"Debits Reversal Amount">>};				
+				90	->{n,10,fx,0,<<"Authrization Reversal Number">>};				
+				91	->{n,3,fx,0,<<"Country Code.Transaction Destination Institution">>};				
+				92	->{n,3,fx,0,<<"Country Code.Transaction Originator Institution">>};				
+				93	->{n,11,vl,2,<<"Transaction Destination Institution Id Code">>};				
+				94	->{n,11,vl,2,<<"Transaction Originator Institution Id Code">>};				
+				95	->{ans,99,vl,2,<<"Transaction Originator Institution Id Code">>};				
+				96	->{b,255,vl,2,<<"Key Management Data">>};				
+				97	->{n,16,fx,2,<<"Amount Net Reconciliation">>};				
+				98	->{ans,25,fx,0,<<"Third Party Information">>};				
+				99	->{an,11,vl,2,<<"Settlement Instituition Id">>};				
+				100	->{n,11,vl,2,<<"Receiving Instituition Id">>};				
+				101	->{ans,17,vl,2,<<"File Name">>};				
+				102	->{ans,28,vl,2,<<"Account Number">>};				
+				103	->{ans,28,vl,2,<<"Account Number 2">>};				
+				104	->{ans,100,vl,2,<<"Transaction Description">>};				
+				105	->{n,16,fx,0,<<"Credits ChargeBack Amount">>};				
+				106	->{n,16,fx,0,<<"Debits ChargeBack Amount">>};				
+				107	->{n,10,fx,0,<<"Credits Chargeback Number">>};				
+				108	->{n,10,fx,0,<<"Debits Chargeback Number">>};				
+				109	->{ans,84,vl,2,<<"Credits Fee Amount">>};				
+				110	->{ans,84,vl,2,<<"Debits Fee Amount">>};				
+				111	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				112	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				113	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				114	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				115	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				116	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				117	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				118	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				119	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				120	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				121	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				122	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				123	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				124	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				125	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				126	->{ans,255,vl,3,<<"Reserved For Iso Use">>}				
+							
 			end 
 		). 
 

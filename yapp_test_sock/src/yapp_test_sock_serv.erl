@@ -9,7 +9,7 @@
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).
-
+ 
 -include_lib("yapp_test_sock/include/yapp_test_sock_spec.hrl").
 
 
@@ -63,30 +63,31 @@ handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->
 					Mti_size = 4,
-					io:format("~n~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
-					io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),
-					io:format("~n~nfirst twelve integer values are:~p",[lists:sublist(Rest,1,12)]),
-					io:format("~n~nin progress primary bitmap are:~p",[lists:sublist(Rest,Mti_size+1,8)]),
+					Primary_Bitmap_size = 8,
+					%io:format("~n~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
+					%io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),
+					%io:format("~n~nfirst twelve integer values are:~p",[lists:sublist(Rest,1,12)]),
+					%io:format("~n~nin progress primary bitmap are:~p",[lists:sublist(Rest,Mti_size+1,8)]),
 					%%gets whether the  first character of the bitmap is 1/0(48,49)cuz of string and then uses this to calculate size of bitmap 
 					Bitmap_size = case lists:nth(1,string:right(integer_to_list(lists:nth(5,Rest),2),8,$0)) of
 									48 -> 8;
 									49 -> 16
 									end,
-					io:format("~n~nbitmap size is:~p",[Bitmap_size]),
-					io:format("~n~nbitmap(pri/sec) is :~p",[lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))]),
-					io:format("~n~nflattend bitmap(pri/sec) in binary is:~p",[lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size)))]),
+					%io:format("~n~nbitmap size is:~p",[Bitmap_size]),
+					%io:format("~n~nbitmap(pri/sec) is :~p",[lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))]),
+					%io:format("~n~nflattend bitmap(pri/sec) in binary is:~p",[lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size)))]),
 					%%io:format("~nfirst value is ~p and first binary bitmap:~p and hex value is ~p",[lists:nth(5,Rest),string:right(integer_to_list(lists:nth(5,Rest),2),8,$0),integer_to_list(lists:nth(5,Rest),16)]),
-					
 					Bitmap_transaction = lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))),
-					io:format("~nraw values ~w int value to use  ~p asci value code is:~p",[lists:sublist(Rest,68,8),list_to_integer(lists:sublist(Rest,68,2)),lists:sublist(Rest,68,8)]),
+					%io:format("~nraw values ~w int value to use  ~p asci value code is:~p",[lists:sublist(Rest,68,8),list_to_integer(lists:sublist(Rest,68,2)),lists:sublist(Rest,68,8)]),
 					
-					%%next line creates new map and also adds the mti to the map 
-					%%this map will be used as input to the foldr which gets the data elements
-					%%field 1 will be added later after i do some checks . also means the start position will have to go back so the bitmap can be checked
-					%%has to be added when i go into fields which go past 64 data elements which i will have to do soon  
-					Mti_Data_Element= maps:from_list([{ftype,n},{fld_no,0},{name,<<"Mti">>},{val_list_form,lists:sublist(Rest,Mti_size)}]),
-					Map_Data_Element =  maps:put(0,Mti_Data_Element,maps:new()), 
-					Start_index = Mti_size+Bitmap_size+1,
+					%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
+					Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,list_to_binary(lists:sublist(Rest,Mti_size))},{val_list_form,lists:sublist(Rest,Mti_size)}]),
+					Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,0},{name,<<"Bitmap">>},{val_binary_form,list_to_binary(Bitmap_transaction)},{val_list_form,Bitmap_transaction}]),
+					Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
+					Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),
+					
+					
+					Start_index = Mti_size+Primary_Bitmap_size+1,
 					%%Bitmap_transaction_test = lists:sublist(Bitmap_transaction,5),
 					OutData =lists:foldl(fun(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
 											    {Ftype,Flength,Fx_var_fixed,Fx_header_length,DataElemName}=?SPEC(Current_index_in),

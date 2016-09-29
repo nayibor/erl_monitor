@@ -1,5 +1,5 @@
 
-1 month
+1 month 
 
 simple proof of concept ??????
 nothing complicated ?????
@@ -14,31 +14,21 @@ bug with add roles validation .generally errors in validation
 
 now but important
 ########todo#####
-check on how to create responses based on messages sent 
+create code for marshalling messages 
 check for all possible error conditions and put exceptons around those fuckers
-add bcrypt functionality to the system --very key 
-think about validation 
-  
+docuementation/test cases 
+add bcrypt functionality to the system 
+validation of all input into the system
+increas in version of jquery used
 have to write type specs for all the record types in the system otherwise one day i wont be able to understand it myself one day:)
 have to change the site table so it stores the rules in it .so only one lookup operation needs to be perfomed to process transactions 
 
 
-
-
-work on gproc additions -- basic done 
-ask about erl8583 questions and other stuff ---done
-ask about new features of yaws
-work on cv
-check out other functional programming jobs
-send to worldfirst/others
-https://uk.linkedin.com/in/rvangraan
-
 later but important
 ########
 work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
-change controller code so it does not use yapp_test prepath
+change controller code in login so it does not use yapp_test prepath
 siteid field has been modified to mean short_name .keep in mind .will have to actually create a field which i can use instead of the short_name/ident field
-add erlpass for password hashing
 interface --depends on itype --not done no tables
 response codes--depends on itype --not done no tables
 interface type --basic table --not done no tables
