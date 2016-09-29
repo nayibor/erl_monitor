@@ -1,5 +1,5 @@
 
-1 month 
+1 month
 
 simple proof of concept ??????
 nothing complicated ?????
@@ -16,8 +16,8 @@ now but important
 ########todo#####
 check on how to create responses based on messages sent 
 check for all possible error conditions and put exceptons around those fuckers
-add bcrypt functionality to the system 
-think about validation
+add bcrypt functionality to the system --very key 
+think about validation 
   
 have to write type specs for all the record types in the system otherwise one day i wont be able to understand it myself one day:)
 have to change the site table so it stores the rules in it .so only one lookup operation needs to be perfomed to process transactions 
