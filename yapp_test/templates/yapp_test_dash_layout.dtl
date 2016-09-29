@@ -31,7 +31,7 @@
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/temp.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/rules.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
-		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/ws_page.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/front_magic.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jem.js"}}"></script>
 
