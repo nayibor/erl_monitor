@@ -2,4 +2,6 @@
 
 	{% block yapp_test_content_header %}{{title}}{% endblock %}
 	
-	{% block yapp_test_content_inner %}{% endblock %} 
+	{% block yapp_test_content_inner %}
+		{% include "yapp_test_trans_list.dtl"  %}
+	{% endblock %} 

@@ -1,0 +1,115 @@
+
+1 month 
+
+simple proof of concept ??????
+nothing complicated ?????
+u like to complicate things 
+
+
+now but not important
+########bugs#####
+work on picklist messing up on ajax load --done a few bugs for the role links pagebut mostly done ? .check in details 
+work on bug when users are added to the rule ajax load  - ---works but there is a bug here 
+bug with add roles validation .generally errors in validation
+
+now but important
+########todo#####
+check on how to create responses based on messages sent 
+check for all possible error conditions and put exceptons around those fuckers
+add bcrypt functionality to the system 
+think about validation
+  
+have to write type specs for all the record types in the system otherwise one day i wont be able to understand it myself one day:)
+have to change the site table so it stores the rules in it .so only one lookup operation needs to be perfomed to process transactions 
+
+
+
+
+work on gproc additions -- basic done 
+ask about erl8583 questions and other stuff ---done
+ask about new features of yaws
+work on cv
+check out other functional programming jobs
+send to worldfirst/others
+https://uk.linkedin.com/in/rvangraan
+
+later but important
+########
+work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
+change controller code so it does not use yapp_test prepath
+siteid field has been modified to mean short_name .keep in mind .will have to actually create a field which i can use instead of the short_name/ident field
+add erlpass for password hashing
+interface --depends on itype --not done no tables
+response codes--depends on itype --not done no tables
+interface type --basic table --not done no tables
+rule category  --basic table --done but no interface
+template category --basic table -- done but no interface
+create new interface using mithral and websockets for user login/viewing of transactions
+#####
+
+
+
+
+
+Nfun2=fun(X,Y)->fun(L2,Y2)when L2 =:=X andalso Y2 =:= Y -> true;(_,_) -> false end end.
+
+
+#Fun<erl_eval.12.54118792>
+Nfun3 = Nfun2(1,2).
+#Fun<erl_eval.12.54118792>
+Nfun4=Nfun3(1,2). ==true
+Nfun3(1,3). == false 
+
+
+Nfunl1=yapp_test_lib_isoproc:setup_rule(<<"inst_test">>).
+#Fun<yapp_test_lib_isoproc.0.55239054>
+5> Nfunl2=Nfunli([{name,<<"Nuku">>}]).
+* 1: variable 'Nfunli' is unbound
+6> Nfunl2=Nfunl1([{name,<<"Nuku">>}]).
+#Fun<yapp_test_lib_isoproc.1.55239054>
+7> Nfunl2([{name,<<"Nuku">>}]).
+true
+8> Nfunl2([{name,<<"Nuku1">>}]).
+false
+9> Nfunl2([{name,<<"Nuku">>}]). 
+true
+
+
+
+
+mnesia--done
+eunit--done
+commontest--done but not done for application 
+specs--done
+doc--done
+django/erlydtl-- done
+messagepack --done
+
+mitral
+sumodb/postgres
+http://pastebin.com/jD4y1Upz
+
+
+
+erlang
+yaws
+mnesia
+erlydtl
+jquery
+ranch ??
+messagepack
+mithral.js
+
+
+xref is a very useful addition when writing code
+django templates use of lists everywhere can make it difficult to use 
+storing complex data in mnesia data can be difficult
+specs in erlang are very interesting
+writing clear vrs fast code
+storing of funs in db can be interesting
+data formats???
+you cant use numeric variables as keys in javascript objects
+be very careful with how erlang treats characters .
+js ??????
+supervisors return the initial state the data was started with when restarting children
+restart in this context

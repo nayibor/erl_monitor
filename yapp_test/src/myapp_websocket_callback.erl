@@ -45,7 +45,7 @@ handle_message({binary, Message},State) ->
 		Updata = msgpack:unpack(Message), 
 		io:format("~nunpacked data is ~p~n",[Updata]),
 		NewData  = maps:from_list(lists:map(fun(X)->{X,X}end,lists:seq(1,10))),
-		M = #{<<"bs">>=>"testing",<<"a">> => 100, <<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
+		M = #{<<"bs">>=>"testing",<<"a">> => 100,name=>"Nuku",<<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
 		Sample_message = msgpack:pack(M),
 		{reply,{binary,Sample_message},State};
 
@@ -58,10 +58,9 @@ handle_info(close, State) ->
 		io:format("closing message bye for now"),
 		{close, <<"testing">>,{text, <<"see you in a bit">>},State};   
      
-handle_info(Message, State) ->
-		M = #{<<"transaction">> =>Message},
-		io:format("message received is ~p~n",[M]),
-		Msg_out = msgpack:pack(M),
+handle_info(Message={transaction_message,FlData}, State) ->
+		%%io:format("message received is ~p~n",[FlData]),
+		Msg_out = msgpack:pack(FlData),
 		{reply,{binary,Msg_out},State}.
 
      

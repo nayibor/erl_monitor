@@ -95,3 +95,4 @@
 
 %%fld_010 problematic/differnt from real world --supposed to be Format: N 14 (YYYYMMDDhhmmss)
 %%list of all fields and their spec for bp-sim
+%%should be able to move various categories

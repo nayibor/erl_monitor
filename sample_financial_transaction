@@ -1,0 +1,55 @@
+financial transction request
+3;4;11;12;22;24;26;32;35;41;42;43;49;52;53;64;
+[2016-09-28 16:56:20.209477] Terminal 80000005 sending message to 127.0.0.1:8005 (online delivery)
+1200:
+[Fixed    n               6 006] 003       [000000]
+[Fixed    n              12 012] 004       [000000001200]
+[Fixed    n               6 006] 011       [005257]
+[Fixed    YYMMDDhhmmss   12 012] 012       [160928165619]
+[Fixed    an             12 012] 022       [B1020120014C]
+[Fixed    n               3 003] 024       [200]
+[Fixed    n               4 004] 026       [5541]
+[LLVAR    n            ..11 006] 032       [414243]
+[LLVAR    z            ..37 033] 035       [4651234560308888=1011201492000000]
+[Fixed    ans             8 008] 041       [80000005]
+[Fixed    ans            15 015] 042       [811234567890105]
+[LLVAR    ans          ..99 009] 043       [Hyderabad]
+[Fixed    an              3 003] 049       [826]
+[Fixed    b               8 016] 052      *[68E79746C86BCFF5]
+[LLVAR    b            ..48 016] 053      *[FEDCBA9876543210]
+[Fixed    b               8 016] 064      *[0011223344556677]
+
+financial transction response
+3;4;11;12;32;39;41;42;49;53;64;
+will have to create the below .
+put in the correct format and then add a message header to indicate length of message then send back to socket
+
+3 is the same -- 				3 	->{n,6,fx,0,<<"Processing Code">>};
+4 is the same --				4 	->{n,12,fx,0,<<"Amount Transaction">>}; 
+11 is the same -- 				11	->{n,6,fx,0,<<"System Trace Audit Number">>};
+12 by me --						12	->{n,12,fx,0,<<"Time, Local transaction (YYMMDDhhmmss)">>};
+32 by me -- 					32	->{n,11,vl,2,<<"Acquirre Identification Code">>};
+39 by me --						39	->{n,3,fx,0,<<"Response Code">>};
+41 is the same -- 				41	->{ans,8,fx,0,<<"Terminal Id">>};
+42 is the same -- 				42	->{ans,15,fx,0,<<"Card Acceptor Identication Code">>};
+49 is the same --				49	->{aorn,3,fx,0,<<"Currency Code Transaction">>};
+53 is the same --for now		53	->{b,48,vl,2,<<"Crypto Info">>};
+64 is the sane --for now		64  ->{hex,8,fx,0,<<"Mac Data">>}
+
+
+financial transction response
+3;4;11;12;32;39;41;42;49;53;64;
+
+[2016-09-28 16:56:49.506670] Terminal 80000005 sending message to 127.0.0.1:8005 (online delivery)
+1210:
+[Fixed    n               6 006] 003       [000000]
+[Fixed    n              12 012] 004       [000000001200]
+[Fixed    n               6 006] 011       [005258]
+[Fixed    YYMMDDhhmmss   12 012] 012       [160928165648]
+[LLVAR    n            ..11 006] 032       [414243]
+[Fixed    n               3 003] 039       [000]
+[Fixed    ans             8 008] 041       [80000005]
+[Fixed    ans            15 015] 042       [811234567890105]
+[Fixed    an              3 003] 049       [826]
+[LLVAR    b            ..48 016] 053      *[FEDCBA9876543210]
+[Fixed    b               8 016] 064      *[0011223344556677]

@@ -80,9 +80,15 @@ handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 					Bitmap_transaction = lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))),
 					io:format("~nraw values ~w int value to use  ~p asci value code is:~p",[lists:sublist(Rest,68,8),list_to_integer(lists:sublist(Rest,68,2)),lists:sublist(Rest,68,8)]),
 					
+					%%next line creates new map and also adds the mti to the map 
+					%%this map will be used as input to the foldr which gets the data elements
+					%%field 1 will be added later after i do some checks . also means the start position will have to go back so the bitmap can be checked
+					%%has to be added when i go into fields which go past 64 data elements which i will have to do soon  
+					Mti_Data_Element= maps:from_list([{ftype,n},{fld_no,0},{name,<<"Mti">>},{val_list_form,lists:sublist(Rest,Mti_size)}]),
+					Map_Data_Element =  maps:put(0,Mti_Data_Element,maps:new()), 
 					Start_index = Mti_size+Bitmap_size+1,
 					%%Bitmap_transaction_test = lists:sublist(Bitmap_transaction,5),
-					OutData =lists:foldl(fun(X,Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
+					OutData =lists:foldl(fun(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
 											    {Ftype,Flength,Fx_var_fixed,Fx_header_length,DataElemName}=?SPEC(Current_index_in),
 												case Fx_var_fixed of
 													fx -> 
@@ -94,18 +100,54 @@ handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 														Data_Element = lists:sublist(Rest,Start_val,Vl_value),
 														New_Index = Start_val+Vl_value
 												end,
-												NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val,Data_Element}]),
-												NewMap = maps:put(Current_index_in,NewData,Map_out_list_in),
+												NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,Data_Element}]),
+												NewMap = maps:put("_"++integer_to_list(Current_index_in),NewData,Map_out_list_in),
 												Fld_num_out = Current_index_in + 1,
 												{Data_for_use_in,New_Index,Fld_num_out,NewMap};
-											(X,Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 48->
+											(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 48->
 												Fld_num_out = Current_index_in + 1,						
 												{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}
 										 end,
-								   {Rest,Start_index,1,maps:new()},Bitmap_transaction),
+								   {Rest,Start_index,1,Map_Data_Element},Bitmap_transaction),
 					
 					{_,_,_,FlData}=OutData,
-					io:format("~nkeys and values so far are ~p",[FlData]),							
+					io:format("~nkeys and values so far are ~p",[FlData]),
+					
+					%%reponse message will have to be created here and then sent back based on the request type 
+					%%will start will just changing the mti and then echoing the response back . 
+					
+					
+					%%echo messager for now. no need for all of this .i can just echo back the message received 
+					%%lnestr mti bitmap message 
+					%LengthString will be sent back unc
+					LenStr_Message_Back = LenStr,
+					%%Mti
+					Mti = lists:sublist(Rest,Mti_size),
+					Mti_Message_Back = 	case  Mti of
+											"1200" ->
+												"1210" ;
+											"1220" ->
+												"1230";
+											"1420" ->
+												"1430";
+											_ ->
+												Mti
+										end,			
+					%%Bitmap will be sent back unchanged
+					Bitmap_Message_Back = lists:sublist(Rest,Mti_size+1,Bitmap_size),							
+					%%Data Elements
+					Data_Message_Back = lists:sublist(Rest,Start_index,length(Rest)-(length(Mti_Message_Back)+length(Bitmap_Message_Back))),
+					Send_Message_Back = LenStr_Message_Back ++ Mti_Message_Back ++ Bitmap_Message_Back ++ Data_Message_Back,
+					
+					%%the below statements have to be placed in some sort of block so even if an error occurs shit does not hit the fin
+					send(AcceptSocket,Send_Message_Back),						
+					Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
+					
+					%%io:format("~n~nSending List is ~p",[Message_send_list]),
+					%%have to write a function that will filter out the information that will be sent to the client 
+					Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+					%%io:format("~n~nSending Statuses ~p",[Status_Send]),
+					
 						% Display the MTI from the response.
 						{noreply, S#state{iso_message=[]}};
 					SizeafterHead when Len < SizeafterHead ->
@@ -116,8 +158,8 @@ handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
  
     
 handle_info({tcp_closed, _Socket}, S) ->
+		io:format("~nSocket Closed~n"),							
 		{stop, normal, S};
-    
     
 handle_info({tcp_error, _Socket, _}, S) ->
 		{stop, normal, S};
