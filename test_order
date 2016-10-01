@@ -16,7 +16,8 @@ now but important
 ########todo#####
 create code for marshalling messages 
 check for all possible error conditions and put exceptons around those fuckers
-docuementation/test cases 
+docuementation/test cases  
+check process limiting for connected processes
 add bcrypt functionality to the system 
 validation of all input into the system
 increas in version of jquery used
