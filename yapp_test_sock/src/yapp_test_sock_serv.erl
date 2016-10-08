@@ -18,11 +18,8 @@
  
  
 -define(SOCK(Msg), {tcp, _Port, Msg}).
--define(TIME, 800).
--define(EXP, 50).
--define(BH,2).
--define(MTI_SIZE,4).
--define(PRIMARY_BITMAP_SIZE,8).
+-define(BH,4).
+
 
 
 start_link(Socket) ->
@@ -57,45 +54,23 @@ handle_cast(_, S) ->
 %%handles connections and proceses the iso messages which are sent through the connection 
 handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 		State_new=Isom++Str,
-		%%io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),
+		io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),
 		case length(State_new) of 
 			Size when Size < ?BH -> 
 				%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
 				{noreply, S#state{iso_message=State_new}};
 			_  ->
 				{LenStr, Rest} = lists:split(?BH, State_new),
-				io:format("~n --length_lengtstr ~p --legthstr ~w ~n--Rest ~n~s",[length(LenStr),LenStr,Rest]),
-				Len = lists:nth(?BH,LenStr) + ?BH,
+				io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
+				%%Len = lists:nth(?BH,LenStr) + ?BH,
+				Len = erlang:list_to_integer(LenStr)+?BH,
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->	
-						try yapp_test_ascii_marsh:process_iso_message(Rest) of 
+						io:format("~nabout to process mesage"),
+						try yapp_test_ascii_marsh_jpos:process_iso_message(Rest) of 
 							FlData ->
-								
-								%%LenStr_Message_Back = LenStr,
-								%%Mti
-								%%Mti = lists:sublist(Rest,?MTI_SIZE),
-								%%Mti_Message_Back = 	case  Mti of
-								%%						"1200" ->
-								%%							"1210" ;
-								%%						"1220" ->
-								%%							"1230";
-								%%						"1420" ->
-								%%							"1430";
-								%%						_ ->
-								%%							Mti
-								%%					end,			
-								%%Bitmap will be sent back unchanged
-								%%Bitmap_Message_Back = lists:sublist(Rest,?MTI_SIZE+1,?PRIMARY_BITMAP_SIZE),	
-								%%Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE+1,
-								%%Data Elements
-								%%Data_Message_Back = lists:sublist(Rest,Start_index,length(Rest)-(length(Mti_Message_Back)+length(Bitmap_Message_Back))),
-								%%Send_Message_Back = LenStr_Message_Back ++ Mti_Message_Back ++ Bitmap_Message_Back ++ Data_Message_Back,
-								%%the below statements have to be placed in some sort of block so even if an error occurs shit does not hit the fin
-								%%send(AcceptSocket,Send_Message_Back),
 								send(AcceptSocket,State_new),						
 								Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
-								%%io:format("~n~nSending List is ~p",[Message_send_list]),
-								%%have to write a function that will filter out the information that will be sent to the client 
 								_Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
 								
 								%%io:format("~n~nSending Statuses ~p",[Status_Send]),
@@ -109,6 +84,7 @@ handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
 								{noreply, S#state{iso_message=[]}}
 						end;
 					SizeafterHead when Len < SizeafterHead ->
+						io:format("~nbits and pieces"),
 						{noreply, S#state{iso_message=State_new}}
 				end
 		end;
@@ -146,3 +122,27 @@ send(Socket, Str) ->
 		ok = gen_tcp:send(Socket,Str).
 
  
+ 
+ 
+		%%LenStr_Message_Back = LenStr,
+		%%Mti
+		%%Mti = lists:sublist(Rest,?MTI_SIZE),
+		%%Mti_Message_Back = 	case  Mti of
+		%%						"1200" ->
+		%%							"1210" ;
+		%%						"1220" ->
+		%%							"1230";
+		%%						"1420" ->
+		%%							"1430";
+		%%						_ ->
+		%%							Mti
+		%%					end,			
+		%%Bitmap will be sent back unchanged
+		%%Bitmap_Message_Back = lists:sublist(Rest,?MTI_SIZE+1,?PRIMARY_BITMAP_SIZE),	
+		%%Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE+1,
+		%%Data Elements
+		%%Data_Message_Back = lists:sublist(Rest,Start_index,length(Rest)-(length(Mti_Message_Back)+length(Bitmap_Message_Back))),
+		%%Send_Message_Back = LenStr_Message_Back ++ Mti_Message_Back ++ Bitmap_Message_Back ++ Data_Message_Back,
+		%%the below statements have to be placed in some sort of block so even if an error occurs shit does not hit the fin
+		%%send(AcceptSocket,Send_Message_Back), 
+	

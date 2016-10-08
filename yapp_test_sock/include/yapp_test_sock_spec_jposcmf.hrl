@@ -1,7 +1,7 @@
 %%%
 %%% @doc header file for specifications
 %%%this will be used to get information about a specific data element in iso message
-%%this format is the format used by bp-sim library and is compatible with most bp-sim messages 
+%%this format is the format used by jPOS Common Message Format based on iso8583 2003 standard
 %%%except network manament messages/acquire reconciliation response messages
 %%%
 %%% @end
@@ -15,80 +15,80 @@
 %%
 -define(SPEC(DataElem), 
 		   case DataElem of
-				1	->{hex,16,fx,0,<<"Secondary Bitmap">>};%%small change 
-				2 	->{n,19,vl,2,<<"Pan">>};
-				3 	->{n,6,fx,0,<<"Processing Code">>};
-				4 	->{n,12,fx,0,<<"Amount Transaction">>};
-				5 	->{n,12,fx,0,<<"Amount Settlement">>};
-				6 	->{n,12,fx,0,<<"Amount, cardholder billing">>};
-				7 	->{n,10,fx,0,<<"Transmission date & time MMDDhhmmss">>};
-				8 	->{n,8,fx,0,<<"Amount, Cardholder billing fee">>};
+				1	->{hex,8,fx,0,<<"Secondary Bitmap">>};%%hex values have some differences in erlang
+				2 	->{n,19,vl,2,<<"Pan">>};%%avail
+				3 	->{n,6,fx,0,<<"Processing Code">>};%%avail
+				4 	->{n,16,fx,0,<<"Amount Transaction">>};%%avail
+				5 	->{n,16,fx,0,<<"Amount Settlement">>};%%avail
+				6 	->{n,16,fx,0,<<"Amount, cardholder billing">>};%%avail
+				7 	->{n,10,fx,0,<<"Transmission date & time MMDDhhmmss">>};%%avail
+				8 	->{n,12,fx,0,<<"Amount, Cardholder billing fee">>};%%avail
 				9 	->{n,8,fx,0,<<"Conversion rate, Settlement">>};
 				10	->{n,8,fx,0,<<"Conversion rate, cardholder billing">>};
-				11	->{n,6,fx,0,<<"System Trace Audit Number">>};
-				12	->{n,12,fx,0,<<"Time, Local transaction (YYMMDDhhmmss)">>};
-				13	->{n,4,fx,0,<<"Date, Local transaction (MMDD)">>};
-				14	->{n,4,fx,0,<<"Date, Expiration YYMM">>};
-				15	->{n,6,fx,0,<<"Settlement Date YYMMDD">>};
+				11	->{n,12,fx,0,<<"System Trace Audit Number">>};%%avail
+				12	->{n,14,fx,0,<<"Time, Local transaction (CCYYMMDDhhmmss)">>};%%avail
+				13	->{n,6,fx,0,<<"Date, Local transaction (CCMMDD)">>};%%avail
+				14	->{n,4,fx,0,<<"Date, Expiration YYMM">>};%%avail
+				15	->{n,8,fx,0,<<"Settlement Date CCYYMMDD">>};%%avail
 				16	->{n,4,fx,0,<<"Conversion Date MMDD">>};
-				17	->{n,4,fx,0,<<"Date, Capture MMDD">>};
-				18	->{n,4,fx,0,<<"Merchant Type">>};
+				17	->{n,4,fx,0,<<"Date, Capture MMDD">>};%%avail
+				18	->{an,140,vl,2,<<"Message Error Indicator">>};%%avail
 				19	->{n,3,fx,0,<<"Country Code">>};
 				20	->{n,3,fx,0,<<"Country Code/Pan Extended">>};
-				21	->{n,3,fx,0,<<"Country Code/Forwarding Institution">>};
-				22	->{an,12,fx,0,<<"Pos Data Code">>};
-				23	->{n,3,fx,0,<<"Card Sequence Number">>};				
-				24	->{n,3,fx,0,<<"Function Code">>};
-				25	->{n,4,fx,0,<<"Message Reason Code">>};
-				26	->{n,4,fx,0,<<"Card Acceptor Business Code">>};
+				21	->{an,21,fx,0,<<"Transaction life cycle ident data">>};%%avail
+				22	->{hex,8,fx,0,<<"Pos Data Code">>};%%avail
+				23	->{n,3,fx,0,<<"jCard Sequence Number">>};%%avail				
+				24	->{n,3,fx,0,<<"Function Code">>};%%avail
+				25	->{n,4,fx,0,<<"Message Reason Code">>};%%avail
+				26	->{n,4,fx,0,<<"Card Acceptor Business Code">>};%%avail
 				27	->{n,1,fx,0,<<"Approval Code">>};
 				28	->{n,6,fx,0,<<"Reconciliation Date YYMMDD">>};
 				29	->{n,3,fx,0,<<"Reconciliation Indicator">>};
-				30	->{n,24,fx,0,<<"Amount Original">>};
+				30	->{n,32,fx,0,<<"Amount Original">>};%%avail
 				31	->{ans,99,vl,2,<<"Acquirer Reference Data">>};
-				32	->{n,11,vl,2,<<"Acquirre Identification Code">>};
-				33	->{n,11,vl,2,<<"Forwarding Identification Code">>};
+				32	->{n,11,vl,2,<<"Acquirre Identification Code">>};%%avail
+				33	->{n,11,vl,2,<<"Forwarding Identification Code">>};%%avail
 				34	->{ns,28,vl,2,<<"Pan Extended">>};
-				35	->{ns,37,vl,2,<<"Track 2 Data">>};
+				35	->{z,37,vl,2,<<"Track 2 Data">>};%%avail
 				36	->{ns,104,vl,2,<<"Track 3 Data">>};
-				37	->{anp,12,fx,0,<<"Retrieval Reference Number">>};
-				38	->{anp,6,fx,0,<<"Approval Code">>};
-				39	->{n,3,fx,0,<<"Response Code">>};
+				37	->{an,12,fx,0,<<"Retrieval Reference Number">>};%%avail
+				38	->{an,6,fx,0,<<"Approval Code">>};%%avail
+				39	->{n,4,fx,0,<<"Response Code">>};%%avail
 				40	->{n,3,fx,0,<<"Service Code">>};
-				41	->{ans,8,fx,0,<<"Terminal Id">>};
-				42	->{ans,15,fx,0,<<"Card Acceptor Identication Code">>};
-				43	->{ans,99,vl,2,<<"Name/Location">>};
+				41	->{an,16,fx,0,<<"Terminal Id">>};%%avail
+				42	->{an,35,vl,2,<<"Card Acceptor Identication Code">>};%%avail
+				43	->{b,9999,vl,2,<<"Name/Location">>};%%avail
 				44	->{ans,99,vl,2,<<"Additional Response Data">>};
-				45	->{ans,76,vl,2,<<"Track 1 Data">>};
-				46	->{ans,204,vl,2,<<"Amount/Fees">>};
-				47	->{ans,999,vl,3,<<"Additional Data National">>};%%small change
-				48	->{ans,999,vl,3,<<"Additional Data Private">>};	%%small change
-				49	->{aorn,3,fx,0,<<"Currency Code Transaction">>};
+				45	->{ans,76,vl,2,<<"Track 1 Data">>};%%avail
+				46	->{ans,216,vl,2,<<"Amount/Fees">>};%%avail
+				47	->{ans,255,vl,3,<<"Additional Data National">>};
+				48	->{ans,255,vl,3,<<"Additional Data Private">>};	
+				49	->{b,9999,vl,2,<<"Currency Code Transaction">>};%%avail
 				50	->{aorn,3,fx,0,<<"Currency Code Reconciliaton">>};
 				51	->{aorn,3,fx,0,<<"Currency Code Cardholder Billing">>};
-				52	->{hex,8,fx,0,<<"Pin Data">>};
-				53	->{b,48,vl,2,<<"Crypto Info">>};
-				54	->{ans,120,vl,2,<<"aAmount Additional">>};
+				52	->{hex,8,fx,0,<<"Pin Data">>};%%avail
+				53	->{b,48,vl,2,<<"Crypto Info">>};%%avail
+				54	->{ans,126,vl,2,<<"aAmount Additional">>};%%avail
 				55	->{b,255,vl,2,<<"Currency Code Cardholder Billing">>};
-				56	->{n,35,vl,2,<<"Original Data Elements">>};
+				56	->{n,41,vl,2,<<"Original Data Elements">>};%%avail
 				57	->{n,3,fx,0,<<"Authorization Life Cycle Code">>};
 				58	->{n,11,vl,2,<<"Authorization Agent Inst Id Code">>};
-				59	->{ans,999,vl,2,<<"Transport Code">>};
-				60	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				61	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				62	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				63	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
+				59	->{ans,999,vl,2,<<"Transport Code">>};%%avail
+				60	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				61	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				62	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				63	->{ans,999,vl,2,<<"Reserved For Nation Use">>};%%avail
 				64	->{hex,8,fx,0,<<"Mac Data">>};
 				65	->{t,8,fx,0,<<"Reserved for Iso Use">>};
 				66	->{ans,204,vl,2,<<"Amount Original Fees">>};	
 				67	->{n,2,fx,0,<<"Extended Payment Data">>};				
-				68	->{n,3,fx,0,<<"Country Code,Receiving Institution">>};				
+				68	->{a,9,fx,0,<<"Terminal Batch Number">>};%%avail				
 				69	->{n,3,fx,0,<<"Country Code,Settlement Institution">>};				
 				70	->{n,3,fx,0,<<"Country Code,Authorizing Agent  Institution">>};				
 				71	->{n,8,fx,0,<<"Message Number">>};				
-				72	->{ans,255,vl,2,<<"Data Record">>};				
+				72	->{b,9999,vl,2,<<"Data Record">>};%%avail				
 				73	->{n,6,fx,0,<<"Date Action YYMMDD">>};				
-				74	->{n,10,fx,0,<<"Credits Number">>};
+				74	->{n,78,fx,0,<<"Recon Data primary">>};%%avail
 				75	->{n,10,fx,0,<<"Credits Reversal Number">>};				
 				76	->{n,10,fx,0,<<"Debits Number">>};				
 				77	->{n,10,fx,0,<<"Debits Reversal Number">>};				
@@ -111,13 +111,13 @@
 				94	->{n,11,vl,2,<<"Transaction Originator Institution Id Code">>};				
 				95	->{ans,99,vl,2,<<"Transaction Originator Institution Id Code">>};				
 				96	->{b,255,vl,2,<<"Key Management Data">>};				
-				97	->{n,16,fx,0,<<"Amount Net Reconciliation">>};				
+				97	->{n,21,fx,0,<<"Amount Net Reconciliation">>};	%%avail			
 				98	->{ans,25,fx,0,<<"Third Party Information">>};				
 				99	->{an,11,vl,2,<<"Settlement Instituition Id">>};				
-				100	->{n,11,vl,2,<<"Receiving Instituition Id">>};				
-				101	->{ans,17,vl,2,<<"File Name">>};				
-				102	->{ans,28,vl,2,<<"Account Number">>};				
-				103	->{ans,28,vl,2,<<"Account Number 2">>};				
+				100	->{n,11,vl,2,<<"Receiving Instituition Id">>};	%%avail			
+				101	->{ans,99,vl,2,<<"File Name">>};	%%avail			
+				102	->{ans,28,vl,2,<<"Account Number">>};%%avail				
+				103	->{ans,28,vl,2,<<"Account Number 2">>};	%%avail			
 				104	->{ans,100,vl,2,<<"Transaction Description">>};				
 				105	->{n,16,fx,0,<<"Credits ChargeBack Amount">>};				
 				106	->{n,16,fx,0,<<"Debits ChargeBack Amount">>};				
@@ -125,9 +125,9 @@
 				108	->{n,10,fx,0,<<"Debits Chargeback Number">>};				
 				109	->{ans,84,vl,2,<<"Credits Fee Amount">>};				
 				110	->{ans,84,vl,2,<<"Debits Fee Amount">>};				
-				111	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
-				112	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
-				113	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
+				111	->{ans,9999,vl,2,<<"Reserved For Iso Use">>};%%avail				
+				112	->{ans,9999,vl,2,<<"Reserved For Iso Use">>};%%avail				
+				113	->{ans,9999,vl,2,<<"Reserved For Iso Use">>};%%avail				
 				114	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
 				115	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				
 				116	->{ans,255,vl,3,<<"Reserved For Iso Use">>};				

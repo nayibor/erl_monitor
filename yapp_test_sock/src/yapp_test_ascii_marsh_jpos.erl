@@ -5,15 +5,15 @@
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 
 
--module(yapp_test_ascii_marsh).
+-module(yapp_test_ascii_marsh_jpos).
 
 
 
 -export([process_iso_message/1,pad_zero/2]).
--include_lib("yapp_test_sock/include/yapp_test_sock_spec.hrl").
+-include_lib("yapp_test_sock/include/yapp_test_sock_spec_jpos.hrl").
 
 -define(MTI_SIZE,4).
--define(PRIMARY_BITMAP_SIZE,8).
+-define(PRIMARY_BITMAP_SIZE,16).
 
 
 
@@ -23,19 +23,19 @@ process_iso_message(Rest)->
 		Mti_size = ?MTI_SIZE,
 		Primary_Bitmap_size = ?PRIMARY_BITMAP_SIZE,
 		%io:format("~n~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
-		%io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),
+		io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),
 		io:format("~n~nfirst twelve integer values are:~p",[lists:sublist(Rest,1,12)]),
 		%io:format("~n~nin progress primary bitmap are:~p",[lists:sublist(Rest,Mti_size+1,8)]),
 		%%gets whether the  first character of the bitmap is 1/0(48,49)cuz of string and then uses this to calculate size of bitmap 
 		Bitmap_size = case lists:nth(1,string:right(integer_to_list(lists:nth(5,Rest),2),8,$0)) of
-						48 -> 8;
-						49 -> 16
+						48 -> 16;
+						49 -> 32
 						end,
 		%io:format("~n~nbitmap size is:~p",[Bitmap_size]),
 		%io:format("~n~nbitmap(pri/sec) is :~p",[lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))]),
 		%io:format("~n~nflattend bitmap(pri/sec) in binary is:~p",[lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size)))]),
 		%%io:format("~nfirst value is ~p and first binary bitmap:~p and hex value is ~p",[lists:nth(5,Rest),string:right(integer_to_list(lists:nth(5,Rest),2),8,$0),integer_to_list(lists:nth(5,Rest),16)]),
-		Bitmap_transaction = lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),8,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))),
+		Bitmap_transaction = lists:flatten(lists:map(fun(X)->string:right(integer_to_list(X,2),4,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))),
 		%io:format("~nraw values ~w int value to use  ~p asci value code is:~p",[lists:sublist(Rest,68,8),list_to_integer(lists:sublist(Rest,68,2)),lists:sublist(Rest,68,8)]),
 		
 		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
@@ -46,6 +46,7 @@ process_iso_message(Rest)->
 				
 		Start_index = Mti_size+Primary_Bitmap_size+1,
 		%%Bitmap_transaction_test = lists:sublist(Bitmap_transaction,5),
+		%%io:format("~nkeys and values so far are ~p",[Map_Data_Element]),
 		OutData =lists:foldl(fun(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
 								    {Ftype,Flength,Fx_var_fixed,Fx_header_length,DataElemName}=?SPEC(Current_index_in),
 									case Fx_var_fixed of
@@ -61,6 +62,7 @@ process_iso_message(Rest)->
 									NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,Data_Element}]),
 									NewMap = maps:put("_"++integer_to_list(Current_index_in),NewData,Map_out_list_in),
 									Fld_num_out = Current_index_in + 1,
+									%%io:format("~nkeys and values so far are ~p",[NewMap]),
 									{Data_for_use_in,New_Index,Fld_num_out,NewMap};
 								(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 48->
 									Fld_num_out = Current_index_in + 1,						
@@ -71,6 +73,8 @@ process_iso_message(Rest)->
 		{_,_,_,FlData}=OutData,
 		io:format("~nkeys and values so far are ~p",[FlData]),
 		FlData.
+
+
 
 
 pad_zero(Listpad,Zero_num)->

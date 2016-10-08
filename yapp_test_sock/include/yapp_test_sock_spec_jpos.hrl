@@ -1,7 +1,7 @@
 %%%
 %%% @doc header file for specifications
 %%%this will be used to get information about a specific data element in iso message
-%%this format is the format used by bp-sim library and is compatible with most bp-sim messages 
+%%this format is the format used by jpos specifically 1993 format_messages library and is compatible with most bp-sim messages 
 %%%except network manament messages/acquire reconciliation response messages
 %%%
 %%% @end
@@ -15,7 +15,7 @@
 %%
 -define(SPEC(DataElem), 
 		   case DataElem of
-				1	->{hex,16,fx,0,<<"Secondary Bitmap">>};%%small change 
+				1	->{b,16,fx,0,<<"Secondary Bitmap">>};%%small change 
 				2 	->{n,19,vl,2,<<"Pan">>};
 				3 	->{n,6,fx,0,<<"Processing Code">>};
 				4 	->{n,12,fx,0,<<"Amount Transaction">>};

@@ -16,7 +16,7 @@
 -record(state, {iso_message=[],socket,port,state_test}). % the current socket containing the iso message  
 -define(SOCK(Msg), {tcp, _Port, Msg}).
 -define(BH,2).
-     
+
  
 test_client(Name) ->
     gen_server:call(Name, test_client).
@@ -43,14 +43,18 @@ init([]) ->
     
 create_message()->
 		% Create a message.
-	 ok.	 
+		%Message = ".U123000......0000000000000001000129271610011023490641424300080000001811234567890101826" .
+		Message = "0f0200B2200000001000000000000000800000201234000000010000110722183012345606A5DFGR021ABCDEFGHIJ 1234567890".
+		%Message = ".g121000......000000000000002059012883161001075456064142430008000000181123456789010182608....vT2...\"3DUfw".
+			 
     %%for testing for sending messages    
 handle_call(send_iso, _From,S = #state{socket=Socket,state_test=State_test}) ->
 
 		case State_test of 
 			good ->
-				create_message(),
-				%%send(Socket,),
+				Message = create_message(),
+				io:format("~nlength of message si ~p",[length(Message)]),
+				send(Socket,Message),				
 				{reply,message_sent,S};
 			_ ->
 				{reply,not_ready,S}
@@ -61,8 +65,9 @@ handle_call(send_websocket, _From,S = #state{socket=Socket,state_test=State_test
 
 		case State_test of 
 			good ->
-				create_message(),
-				%%send(Socket,),
+				%%create_message(),
+				%%Message = ".g121000......000000000000002062012886161001075456064142430008000000181123456789010182608....vT2...3DUfw",
+				%%send(Socket,Message),
 				{reply,message_sent,S};
 			_ ->
 				{reply,not_ready,S}
@@ -98,7 +103,7 @@ handle_cast(_, S) ->
 
 
 handle_info(?SOCK(Str), S = #state{socket=Socket}) ->
-		io:format("Data passing through is ~p",[Str]),
+		io:format("~n~n~n~nData passing through is ~p",[Str]),
 		%%send(AcceptSocket, "Thanks for the name.Lets begin"),		
 		{noreply, S};
        

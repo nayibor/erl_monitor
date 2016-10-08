@@ -6,7 +6,6 @@ nothing complicated ?????
 u like to complicate things 
 
 
-now but not important
 ########bugs#####
 work on picklist messing up on ajax load --done a few bugs for the role links pagebut mostly done ? .check in details 
 work on bug when users are added to the rule ajax load  - ---works but there is a bug here 
@@ -14,28 +13,33 @@ bug with add roles validation .generally errors in validation
 
 now but important
 ########todo#####
-create code for marshalling messages 
-check for all possible error conditions and put exceptons around those fuckers
-docuementation/test cases  
-check process limiting for connected processes
 add bcrypt functionality to the system 
+package up code as a rebar3 application
+increase in version of jquery used
+remove reliace on yapp_test 
+work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
+change controller code in login so it does not use yapp_test prepath
+create code for marshalling messages at least the eight basic types of messages(sending and receiving based on spec)
+check for all possible error conditions and put exceptons around those fuckers
+response codes--depends on itype --not done no tables
+check process limiting for connected processes
 validation of all input into the system
-increas in version of jquery used
+docuementation/test cases  
 have to write type specs for all the record types in the system otherwise one day i wont be able to understand it myself one day:)
 have to change the site table so it stores the rules in it .so only one lookup operation needs to be perfomed to process transactions 
 
 
+
 later but important
 ########
-work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
-change controller code in login so it does not use yapp_test prepath
+
 siteid field has been modified to mean short_name .keep in mind .will have to actually create a field which i can use instead of the short_name/ident field
 interface --depends on itype --not done no tables
-response codes--depends on itype --not done no tables
 interface type --basic table --not done no tables
 rule category  --basic table --done but no interface
 template category --basic table -- done but no interface
 create new interface using mithral and websockets for user login/viewing of transactions
+create a behaviour for a financial message and its processing/spec should be external to the system and modifiable
 #####
 
 
@@ -104,3 +108,6 @@ be very careful with how erlang treats characters .
 js ??????
 supervisors return the initial state the data was started with when restarting children
 restart in this context
+
+
+interesting use of jpos library

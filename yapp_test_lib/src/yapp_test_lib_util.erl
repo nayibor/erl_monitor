@@ -55,21 +55,21 @@ compile_temp_dir(Indir,Outdir) ->
 				erlydtl:compile_file(Indir++"/"++File,lists:nth(1,string:tokens(File,".")), 
 				[
 						{out_dir,Outdir},{record_info,
-										[
-											{usermod_roles, record_info(fields, usermod_roles)},
-										    {usermod_sites, record_info(fields, usermod_sites)},
-										    {usermod_links, record_info(fields, usermod_links)},
-											{usermod_categories, record_info(fields, usermod_categories)},
-											{usermod_inst, record_info(fields, usermod_inst)},
-											{tempmod_temp, record_info(fields, tempmod_temp)},
-											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
-											{tempmod_rules_temp, record_info(fields, tempmod_rules_temp)},
-											{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
-											{tempmod_rule_cat, record_info(fields, tempmod_rule_cat)}
-											
-
-										]
-									 },{verbose,verbose},{debug_info,debug_info}
+											[
+												{usermod_roles, record_info(fields, usermod_roles)},
+											    {usermod_sites, record_info(fields, usermod_sites)},
+											    {usermod_links, record_info(fields, usermod_links)},
+												{usermod_categories, record_info(fields, usermod_categories)},
+												{usermod_inst, record_info(fields, usermod_inst)},
+												{tempmod_temp, record_info(fields, tempmod_temp)},
+												{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
+												{tempmod_rules_temp, record_info(fields, tempmod_rules_temp)},
+												{tempmod_temp_cat, record_info(fields, tempmod_temp_cat)},
+												{tempmod_rule_cat, record_info(fields, tempmod_rule_cat)}
+												
+	
+											]
+										},{verbose,verbose},{debug_info,debug_info}
 				])  
 				end,Directlist).
 	  

@@ -15,7 +15,7 @@
 %%
 -define(SPEC(DataElem), 
 		   case DataElem of
-				1	->{hex,16,fx,0,<<"Secondary Bitmap">>};%%small change 
+				1	->{hex,8,fx,0,<<"Secondary Bitmap">>};%%hex values have some differences in erlang
 				2 	->{n,19,vl,2,<<"Pan">>};
 				3 	->{n,6,fx,0,<<"Processing Code">>};
 				4 	->{n,12,fx,0,<<"Amount Transaction">>};
@@ -61,8 +61,8 @@
 				44	->{ans,99,vl,2,<<"Additional Response Data">>};
 				45	->{ans,76,vl,2,<<"Track 1 Data">>};
 				46	->{ans,204,vl,2,<<"Amount/Fees">>};
-				47	->{ans,999,vl,3,<<"Additional Data National">>};%%small change
-				48	->{ans,999,vl,3,<<"Additional Data Private">>};	%%small change
+				47	->{ans,255,vl,3,<<"Additional Data National">>};
+				48	->{ans,255,vl,3,<<"Additional Data Private">>};	
 				49	->{aorn,3,fx,0,<<"Currency Code Transaction">>};
 				50	->{aorn,3,fx,0,<<"Currency Code Reconciliaton">>};
 				51	->{aorn,3,fx,0,<<"Currency Code Cardholder Billing">>};
@@ -73,11 +73,11 @@
 				56	->{n,35,vl,2,<<"Original Data Elements">>};
 				57	->{n,3,fx,0,<<"Authorization Life Cycle Code">>};
 				58	->{n,11,vl,2,<<"Authorization Agent Inst Id Code">>};
-				59	->{ans,999,vl,2,<<"Transport Code">>};
-				60	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				61	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				62	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
-				63	->{ans,999,vl,3,<<"Reserved For Nation Use">>};%%small change
+				59	->{ans,255,vl,2,<<"Transport Code">>};
+				60	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				61	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				62	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
+				63	->{ans,255,vl,3,<<"Reserved For Nation Use">>};
 				64	->{hex,8,fx,0,<<"Mac Data">>};
 				65	->{t,8,fx,0,<<"Reserved for Iso Use">>};
 				66	->{ans,204,vl,2,<<"Amount Original Fees">>};	
@@ -111,7 +111,7 @@
 				94	->{n,11,vl,2,<<"Transaction Originator Institution Id Code">>};				
 				95	->{ans,99,vl,2,<<"Transaction Originator Institution Id Code">>};				
 				96	->{b,255,vl,2,<<"Key Management Data">>};				
-				97	->{n,16,fx,0,<<"Amount Net Reconciliation">>};				
+				97	->{n,16,fx,2,<<"Amount Net Reconciliation">>};				
 				98	->{ans,25,fx,0,<<"Third Party Information">>};				
 				99	->{an,11,vl,2,<<"Settlement Instituition Id">>};				
 				100	->{n,11,vl,2,<<"Receiving Instituition Id">>};				
