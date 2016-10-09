@@ -52,47 +52,53 @@ handle_cast(_, S) ->
 
 
 %%handles connections and proceses the iso messages which are sent through the connection 
-handle_info(?SOCK(Str), S = #state{socket=AcceptSocket,iso_message=Isom}) ->
-		State_new=Isom++Str,
-		io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),
-		case length(State_new) of 
-			Size when Size < ?BH -> 
-				%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
-				{noreply, S#state{iso_message=State_new}};
-			_  ->
-				{LenStr, Rest} = lists:split(?BH, State_new),
-				io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
-				%%Len = lists:nth(?BH,LenStr) + ?BH,
-				Len = erlang:list_to_integer(LenStr)+?BH,
-				case length(State_new) of 
-					SizeafterHead when Len =:= SizeafterHead ->	
-						io:format("~nabout to process mesage"),
-						try yapp_test_ascii_marsh_jpos:process_iso_message(Rest) of 
-							FlData ->
-								send(AcceptSocket,State_new),						
-								Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
-								_Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
-								
-								%%io:format("~n~nSending Statuses ~p",[Status_Send]),
-								% Display the MTI from the response.
-						
-								{noreply, S#state{iso_message=[]}}
-						catch
-							error:X ->
-								send(AcceptSocket,State_new),
-								io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
-								{noreply, S#state{iso_message=[]}}
-						end;
-					SizeafterHead when Len < SizeafterHead ->
-						io:format("~nbits and pieces"),
-						{noreply, S#state{iso_message=State_new}}
-				end
+handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) ->
+
+		Fun_process_trans = fun({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
+			State_new=Isom++Msg,
+			io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
+			case length(State_new) of 
+				Size when Size < ?BH -> 
+					%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
+					{noreply, S#state{iso_message=State_new}};
+				_  ->
+					{LenStr, Rest} = lists:split(?BH, State_new),
+					io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
+					Len = erlang:list_to_integer(LenStr)+?BH,
+					case length(State_new) of 
+						SizeafterHead when Len =:= SizeafterHead ->	
+							io:format("~nabout to process mesage"),
+							FlData = yapp_test_ascii_marsh_jpos:process_iso_message(Rest),
+							send(AcceptSocket,State_new),						
+							Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
+							_Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+							%%io:format("~n~nSending Statuses ~p",[Status_Send]),
+							% Display the MTI from the response.
+							{noreply, S#state{iso_message=[]}};
+						SizeafterHead when Len < SizeafterHead ->
+							io:format("~nbits and pieces"),
+							{noreply, S#state{iso_message=State_new}}
+					end
+			end
+		
+		
+		end,
+		
+		try Fun_process_trans(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
+        S ->
+			S	
+		catch
+			error:X ->
+			%%error message has to marshalled here and sent back to sender 
+			%%%all of message may not have been streamed in so in the meantime a return message should be formated and sent back to sender
+				send(AcceptSocket_process,Isom_so_far++Str_Prev),
+				io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
+				{noreply, State_old#state{iso_message=[]}}
 		end;
+         
 	 		 	
- 
-    
 handle_info({tcp_closed, _Socket}, S) ->
-		io:format("~nSocket Closed~n"),							
+		io:format("~nSocket Closed"),							
 		{stop, normal, S};
     
 handle_info({tcp_error, _Socket, _}, S) ->
@@ -100,7 +106,7 @@ handle_info({tcp_error, _Socket, _}, S) ->
     
  %%info coming in from as a result of messages received maybe from othe processes 
 handle_info(E, S) ->
-		io:format("unexpected message: ~p~n", [E]),
+		io:format("~nunexpected message: ~p", [E]),
 		{noreply, S}.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -115,34 +121,9 @@ terminate(shutdown, #state{socket=S}) ->
 
     
 terminate(_Reason, _State) ->
-		io:format("terminate reason: ~p~n", [_Reason]).
+		io:format("~nterminate reason: ~p", [_Reason]).
 
 
 send(Socket, Str) ->
 		ok = gen_tcp:send(Socket,Str).
-
- 
- 
- 
-		%%LenStr_Message_Back = LenStr,
-		%%Mti
-		%%Mti = lists:sublist(Rest,?MTI_SIZE),
-		%%Mti_Message_Back = 	case  Mti of
-		%%						"1200" ->
-		%%							"1210" ;
-		%%						"1220" ->
-		%%							"1230";
-		%%						"1420" ->
-		%%							"1430";
-		%%						_ ->
-		%%							Mti
-		%%					end,			
-		%%Bitmap will be sent back unchanged
-		%%Bitmap_Message_Back = lists:sublist(Rest,?MTI_SIZE+1,?PRIMARY_BITMAP_SIZE),	
-		%%Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE+1,
-		%%Data Elements
-		%%Data_Message_Back = lists:sublist(Rest,Start_index,length(Rest)-(length(Mti_Message_Back)+length(Bitmap_Message_Back))),
-		%%Send_Message_Back = LenStr_Message_Back ++ Mti_Message_Back ++ Bitmap_Message_Back ++ Data_Message_Back,
-		%%the below statements have to be placed in some sort of block so even if an error occurs shit does not hit the fin
-		%%send(AcceptSocket,Send_Message_Back), 
 	
