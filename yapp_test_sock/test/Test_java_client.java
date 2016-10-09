@@ -16,19 +16,45 @@ public class Test_java_client {
 		//GenericPackager packager = new GenericPackager("iso93ascii.xml");
 		ISOMsg m = new ISOMsg ();
 		m.setMTI("0200");
+		m.set(2, "1231231312");		
 		m.set(3, "201234");
-		m.set(4, "10000");
-		m.set(7, "110722180");
+		m.set(4, "000010000000");
+		m.set(7, "1107221800");
 		m.set(11, "123456");
+		m.set(12,"161009132458");
 		m.set(32,"414243");
+		m.set(41, "termid12");
+		m.set(43,"Community1");
 		m.set(44, "A5DFGR");
+		m.set(39,"000");
+		m.set(102,"12341234234");
+		m.set(22,"FABCDE123ABD");
 		GenericPackager packager = new GenericPackager("iso93ascii.xml");
 		m.setPackager (packager);
 		byte[] data = m.pack();
 		// print the DE list
 		System.out.println("RESULT : " + new String(data));
+/**
+7220000100B00000
+0111001000100000000000000000000100000000001000000000000000000000
 
-
+0111
+0010
+0010
+0000
+0000
+0000
+0000
+0001
+0000
+0000
+1011
+0000
+0000
+0000
+0000
+0000
+**/
 		for (int i=1;i<=5000;i++)
 		{
 		channel.send (m);
@@ -36,21 +62,6 @@ public class Test_java_client {
 		}
 		
 		channel.disconnect ();
-	}
-	private static void logISOMsg(ISOMsg msg) {
-		System.out.println("----ISO MESSAGE-----");
-		try {
-			System.out.println("  MTI : " + msg.getMTI());
-			for (int i=1;i<=msg.getMaxField();i++) {
-				if (msg.hasField(i)) {
-					System.out.println("    Field-"+i+" : "+msg.getString(i));
-				}
-			}
-		} catch (ISOException e) {
-			e.printStackTrace();
-		} finally {
-			System.out.println("--------------------");
-		}
 	}
 }
 
