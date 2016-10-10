@@ -2,8 +2,6 @@
 @author Nuku Ameyibor <nayibor@startmail.com>
 @copyright 2016  Nuku Ameyibor
 @version 0.1.0
-@title Welcome to the yaws_basic_primer application!
-@doc yapp_test_lib is an embedded erlang yaws web application which teaches basics of building web applications
-with erlang and yaws .
-<br>it has session managment module,user management module which demonstrate session handling,
-crud(create,read,update,delete) functionality for updating role information</br>
+@title Welcome to the yapp_test_lib application!
+@doc this contains libraries for use by the applications for session management,dealing with rules,templates,usermanagement,utility functions
+

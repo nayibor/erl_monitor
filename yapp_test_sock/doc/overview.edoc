@@ -1,0 +1,10 @@
+** this is the overview.doc file for the library application 'yapp_test_sock' **
+@author Nuku Ameyibor <nayibor@startmail.com>
+@copyright 2016  Nuku Ameyibor
+@version 0.1.0
+@title Welcome to the yapp_test_socker server
+@doc yapp_test_sock is the socket server application which listens for connections and passes them on to the acceptor sockets
+<br>
+this server creates the test process for sending test transactions and also creates the supervisor process for the listener socket
+</br>
+
