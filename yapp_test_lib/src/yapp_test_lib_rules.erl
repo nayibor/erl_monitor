@@ -162,9 +162,7 @@ del_rule(Ruleid)->
 
 
 		
-%%-record(tempmod_rules_temp,{id,site_id,template_id,rule_fun,rule_options,description,category_rule,rule_status=disabled,rule_users=[]}).	
-%% @doc this is used for temp additon of rules . not real rule trigger
-%%yapp_test_lib_rules:add_rule(1,11,[{name,<<"test">>}],<<"Test Rule">>,1,<<"enabled">>).
+%% @doc this is used for temp adding rules
 -spec add_rule(Site::pos_integer(),Template::pos_integer(),Rule_options::[tuple()],Description::binary(),Category::pos_integer(),Status::binary())-> ok|{error,atom()}.
 add_rule(Siteid,Template,Rule_options,Description,Category,Status)->
 		
@@ -189,7 +187,6 @@ add_rule(Siteid,Template,Rule_options,Description,Category,Status)->
 		
 		
 %% @doc this is used for editing rules
-%%yapp_test_lib_rules:add_rule(1,11,[{name,<<"test">>}],<<"Test Rule">>,1,<<"enabled">>).
 -spec edit_rule(Ruleid::pos_integer(),Site::pos_integer(),Template::pos_integer(),Rule_options::[tuple()],Description::binary(),Category::pos_integer(),Status::binary())-> ok|{error,atom()}.
 edit_rule(Ruleid,Siteid,Template,Rule_options,Description,Category,Status)->
 			

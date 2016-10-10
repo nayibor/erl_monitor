@@ -1,0 +1,5 @@
+%% encoding: UTF-8
+{application,yapp_test_sock}.
+{modules,[yapp_test_ascii_marsh,yapp_test_ascii_marsh_jpos,
+          yapp_test_ppool_serv,yapp_test_sock_app,yapp_test_sock_serv,
+          yapp_test_sock_sup,yapp_test_sock_supersup,yapp_test_sock_test_gen]}.

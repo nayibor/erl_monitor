@@ -22,53 +22,71 @@
 
 -record(user_state, {state_user,iso_message=[],state_test= <<"bad">> ,reg= <<"false">> }). % the current socket containing the iso message  
 
+-type state() :: #user_state{}.
 
+
+%% @doc web socket callback . 
+%% accepts user state_data from controlle code which it passes to the internal state of the websocket
 init( [_ReqArg,InitialState])->
 		io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
 		{ok, #user_state{state_user=InitialState}}.
 
-handle_open(WSState, State) ->
+
+%% @doc initial setup for user is done here with user registering itself  with gproc service so it can be passed messages. 
+handle_open(_WSState, State) ->
 	Userid=proplists:get_value(id,State#user_state.state_user),
 	try register_process(Userid) of 
-	Val -> {ok, State#user_state{state_test= <<"good">> ,reg= <<"true">> }}
+	_Val -> {ok, State#user_state{state_test= <<"good">> ,reg= <<"true">> }}
 	catch 
 	_:_ -> {ok, State#user_state{state_test= <<"good">> }}
 	end.
 
 
-handle_message({text, Message},State) ->
-		io:format("basic echo handler got ~p~n", [Message]),
-		io:format("current user state is ~p~n",[State]),
-		{reply, {text, <<Message/binary>>},State};
-
-handle_message({binary, Message},State) ->
-		Updata = msgpack:unpack(Message), 
-		io:format("~nunpacked data is ~p~n",[Updata]),
-		NewData  = maps:from_list(lists:map(fun(X)->{X,X}end,lists:seq(1,10))),
-		M = #{<<"bs">>=>"testing",<<"a">> => 100,name=>"Nuku",<<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
-		Sample_message = msgpack:pack(M),
-		{reply,{binary,Sample_message},State};
+%% @doc for receving text mesages
+handle_message({text, _Message},State) ->
+		{noreply,State};
 
 
-handle_message({close, Status, _Reason},State) ->
-		{close, Status,State}.
+%% @doc for receivng binary messages
+handle_message({binary, _Message},State) ->
+		%%Updata = msgpack:unpack(Message), 
+		%%io:format("~nunpacked data is ~p~n",[Updata]),
+		%%NewData  = maps:from_list(lists:map(fun(X)->{X,X}end,lists:seq(1,10))),
+		%%M = #{<<"bs">>=>"testing",<<"a">> => 100,name=>"Nuku",<<"b">> => 2123423.23234, <<"c">> => NewData,<<"d">>=>list_to_binary(lists:seq(1,50))},
+		%%Sample_message = msgpack:pack(M),
+		{noreply,State};
+
+
+%% @doc for receiving unknown messages
+handle_message(_,State) ->
+		{noreply,State}.
     
 
+%% @doc for receiving close messages from other processes
 handle_info(close, State) ->
-		io:format("closing message bye for now"),
+		io:format("closing websocket bye for now"),
 		{close, <<"testing">>,{text, <<"see you in a bit">>},State};   
      
+     
+%% @doc for reciving transaction messages to be sent to the web browser     
 handle_info(Message={transaction_message,FlData}, State) ->
 		%%io:format("message received is ~p~n",[FlData]),
 		Msg_out = msgpack:pack(FlData),
-		{reply,{binary,Msg_out},State}.
+		{reply,{binary,Msg_out},State};
+
+
+%% @doc for receiving unknown messages from other processes
+handle_info(_,State) ->
+		{noreply,State}.
 
      
+%% @doc for final termination of process     
 terminate(Reason, State) -> 
 		io:format("terminate ~p: ~p (state:~p)~n", [self(), Reason, State]),
 		ok.
 
-		
+
+%% @doc for registering a user with gproc		
 register_process(Userid)->
 		gproc:reg({n, l, Userid}, ignored).
 

@@ -1,7 +1,6 @@
 %%% 
 %%% @doc yapp_test_sock application.
-%%%This is the socket server which will process all messages
-%%%<br>this is the starting point for the yapp_test_sock application</br>
+%%%<br>application entry point for socket server </br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 %%%
@@ -18,10 +17,9 @@
 %%%=============================================================================
 %%% API
 %%%=============================================================================
+%% @doc this is for starting the application 
 -spec start(term(), term()) -> {error, term()} | {ok, pid()}.
 start(normal, []) ->
-    %%mnesia:wait_for_tables([usermod_users,usermod_roles,usermod_links,usermod_users_roles,usermod_users_links], 20000),
-    %%these three variables will have to be declared by static means or in the app file as an env variable ***
     {ok, Name} = application:get_env(name),
     {ok, Limit} = application:get_env(limit),    
     yapp_test_sock_supersup:start_link(Name, Limit).

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module yapp_test_lib_isoproc</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module yapp_test_lib_isoproc</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>function for setting up and processing  transactions.
+<p>Copyright © Nuku Ameyibor &lt;nayibor@startmail.com&gt;
+  </p>
+
+
+<h2><a name="description">Description</a></h2>function for setting up and processing  transactions.
+  <br>
+  <br>for setting up templates as well as setting up basic rules system 
+  <br>anonymous functions are used to pack the arguements which are needed to do comparison so that comparison will be faster
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-tempmod_temp">tempmod_temp()</a></h3>
+<p><tt>tempmod_temp() = #tempmod_temp{}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_template-3">add_template/3</a></td><td>this is used for adding a template.</td></tr>
+<tr><td valign="top"><a href="#delete_template-1">delete_template/1</a></td><td>this is for deleting templates along with all rules for that template
+ to be used with utmost care as this removes all rules for a template along with the template from the system.</td></tr>
+<tr><td valign="top"><a href="#edit_template-4">edit_template/4</a></td><td>this is used for editing a template.</td></tr>
+<tr><td valign="top"><a href="#get_template_desc-1">get_template_desc/1</a></td><td>get name by id.</td></tr>
+<tr><td valign="top"><a href="#get_template_filter-1">get_template_filter/1</a></td><td>this is used for getting a template based on being filtered with an index.</td></tr>
+<tr><td valign="top"><a href="#get_template_id-1">get_template_id/1</a></td><td>get template by id.</td></tr>
+<tr><td valign="top"><a href="#get_templates-0">get_templates/0</a></td><td>this is for getting templates
+  description of temp for descripton purposes has been changed to show category of temp in view.</td></tr>
+<tr><td valign="top"><a href="#get_templates_cats-0">get_templates_cats/0</a></td><td>this is for getting categories.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="add_template-3">add_template/3</a></h3>
+<div class="spec">
+<p><tt>add_template(Template_ident::binary(), Description::binary(), Category::pos_integer()) -&gt; ok | {error, binary()}</tt><br></p>
+</div><p>this is used for adding a template</p>
+
+<h3 class="function"><a name="delete_template-1">delete_template/1</a></h3>
+<div class="spec">
+<p><tt>delete_template(Tid::pos_integer()) -&gt; ok | term()</tt><br></p>
+</div><p>this is for deleting templates along with all rules for that template
+ to be used with utmost care as this removes all rules for a template along with the template from the system 	</p>
+
+<h3 class="function"><a name="edit_template-4">edit_template/4</a></h3>
+<div class="spec">
+<p><tt>edit_template(Id::pos_integer(), Template_ident::binary(), Description::binary(), Category::pos_integer()) -&gt; ok | {error, atom()} | {error | term()}</tt><br></p>
+</div><p>this is used for editing a template</p>
+
+<h3 class="function"><a name="get_template_desc-1">get_template_desc/1</a></h3>
+<div class="spec">
+<p><tt>get_template_desc(Id::pos_integer()) -&gt; binary()</tt><br></p>
+</div><p>get name by id</p>
+
+<h3 class="function"><a name="get_template_filter-1">get_template_filter/1</a></h3>
+<div class="spec">
+<p><tt>get_template_filter(Filter::binary()) -&gt; [<a href="#type-tempmod_temp">tempmod_temp()</a>] | [] | term()</tt><br></p>
+</div><p>this is used for getting a template based on being filtered with an index</p>
+
+<h3 class="function"><a name="get_template_id-1">get_template_id/1</a></h3>
+<div class="spec">
+<p><tt>get_template_id(Id::pos_integer()) -&gt; <a href="#type-tempmod_temp">tempmod_temp()</a> | {error, temp_non_exists}</tt><br></p>
+</div><p>get template by id</p>
+
+<h3 class="function"><a name="get_templates-0">get_templates/0</a></h3>
+<div class="spec">
+<p><tt>get_templates() -&gt; [<a href="#type-tempmod_temp">tempmod_temp()</a>] | [] | term()</tt><br></p>
+</div><p>this is for getting templates
+  description of temp for descripton purposes has been changed to show category of temp in view</p>
+
+<h3 class="function"><a name="get_templates_cats-0">get_templates_cats/0</a></h3>
+<div class="spec">
+<p><tt>get_templates_cats() -&gt; [term()] | [] | term()</tt><br></p>
+</div><p>this is for getting categories
+ </p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Oct 10 2016, 01:01:09.</i></p>
+</body>
+</html>

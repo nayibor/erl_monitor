@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module yapp_test_ppool_serv</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module yapp_test_ppool_serv</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>yapp_test_ppool_serv module.
+<p>Copyright © Nuku Ameyibor &lt;nayibor@startmail.com&gt;</p>
+
+<p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
+
+<h2><a name="description">Description</a></h2>yapp_test_ppool_serv module.
+  <br>module for monitoring socket servers 
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-state">state()</a></h3>
+<p><tt>state() = #state{}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#code_change-3">code_change/3</a></td><td>for code changes.</td></tr>
+<tr><td valign="top"><a href="#get_num_sockets-1">get_num_sockets/1</a></td><td>api call which  gets you the number of available sockets/connected sockets.</td></tr>
+<tr><td valign="top"><a href="#get_refs_socks-1">get_refs_socks/1</a></td><td>api call which gets you the references for the connected sockets.</td></tr>
+<tr><td valign="top"><a href="#handle_call-3">handle_call/3</a></td><td>this call is used for getting the number of  connected sockets,available sockets.</td></tr>
+<tr><td valign="top"><a href="#handle_cast-2">handle_cast/2</a></td><td>this call is used for notifying this process if a socket gets connected.</td></tr>
+<tr><td valign="top"><a href="#handle_info-2">handle_info/2</a></td><td>this guy here is for handling downed workers .</td></tr>
+<tr><td valign="top"><a href="#init-1">init/1</a></td><td>callback for genserver,accepts a limit and its supervisor as input.</td></tr>
+<tr><td valign="top"><a href="#start_link-3">start_link/3</a></td><td>api call  starts up the process for monitoring the socket processes as well as passes the parent supervisor for the sockets so more sockets can be created.</td></tr>
+<tr><td valign="top"><a href="#start_socket-1">start_socket/1</a></td><td>api call for adding more socket acceptors to the socket pool in case more sockets are needed later on in the program.</td></tr>
+<tr><td valign="top"><a href="#stop-1">stop/1</a></td><td>this stops this process  but it will get restarted because it is a permanent process.</td></tr>
+<tr><td valign="top"><a href="#terminate-2">terminate/2</a></td><td>for termination.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="code_change-3">code_change/3</a></h3>
+<div class="spec">
+<p><tt>code_change(OldVsn::string(), State::<a href="#type-state">state()</a>, Extra::term()) -&gt; {ok, <a href="#type-state">state()</a>} | {error, any()}</tt><br></p>
+</div><p>for code changes</p>
+
+<h3 class="function"><a name="get_num_sockets-1">get_num_sockets/1</a></h3>
+<div class="spec">
+<p><tt>get_num_sockets(Name::term()) -&gt; [tuple()] | {error, any()}</tt><br></p>
+</div><p>api call which  gets you the number of available sockets/connected sockets</p>
+
+<h3 class="function"><a name="get_refs_socks-1">get_refs_socks/1</a></h3>
+<div class="spec">
+<p><tt>get_refs_socks(Name::term()) -&gt; {conn_clients, [reference()] | []} | {error, any()}</tt><br></p>
+</div><p>api call which gets you the references for the connected sockets</p>
+
+<h3 class="function"><a name="handle_call-3">handle_call/3</a></h3>
+<div class="spec">
+<p><tt>handle_call(Msg::term(), From::pid(), S::<a href="#type-state">state()</a>) -&gt; term()</tt><br></p>
+</div><p>this call is used for getting the number of  connected sockets,available sockets</p>
+
+<h3 class="function"><a name="handle_cast-2">handle_cast/2</a></h3>
+<div class="spec">
+<p><tt>handle_cast(Msg::term(), State::<a href="#type-state">state()</a>) -&gt; {term(), <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>this call is used for notifying this process if a socket gets connected</p>
+
+<h3 class="function"><a name="handle_info-2">handle_info/2</a></h3>
+<div class="spec">
+<p><tt>handle_info(Msg::term(), S::<a href="#type-state">state()</a>) -&gt; {term(), <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>this guy here is for handling downed workers .	</p>
+
+<h3 class="function"><a name="init-1">init/1</a></h3>
+<div class="spec">
+<p><tt>init(X1::{Limit::pos_integer(), Supervisor_pid::pid()}) -&gt; {ok, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>callback for genserver,accepts a limit and its supervisor as input</p>
+
+<h3 class="function"><a name="start_link-3">start_link/3</a></h3>
+<div class="spec">
+<p><tt>start_link(Name::term(), Limit::pos_integer(), Sup::pid()) -&gt; {ok, pid()} | {error, any()}</tt><br></p>
+</div><p>api call  starts up the process for monitoring the socket processes as well as passes the parent supervisor for the sockets so more sockets can be created</p>
+
+<h3 class="function"><a name="start_socket-1">start_socket/1</a></h3>
+<div class="spec">
+<p><tt>start_socket(Name::atom()) -&gt; {ok, pid()} | {error, any()}</tt><br></p>
+</div><p>api call for adding more socket acceptors to the socket pool in case more sockets are needed later on in the program</p>
+
+<h3 class="function"><a name="stop-1">stop/1</a></h3>
+<div class="spec">
+<p><tt>stop(Name::atom()) -&gt; ok | {error, any()}</tt><br></p>
+</div><p>this stops this process  but it will get restarted because it is a permanent process</p>
+
+<h3 class="function"><a name="terminate-2">terminate/2</a></h3>
+<div class="spec">
+<p><tt>terminate(Reason::term(), State::<a href="#type-state">state()</a>) -&gt; ok</tt><br></p>
+</div><p>for termination</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Oct 10 2016, 01:01:25.</i></p>
+</body>
+</html>

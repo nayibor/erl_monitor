@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module yapp_test_sock_serv</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module yapp_test_sock_serv</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>yapp_test_sock_serv module.
+<p>Copyright © Nuku Ameyibor &lt;nayibor@startmail.com&gt;</p>
+
+<p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
+
+<h2><a name="description">Description</a></h2>yapp_test_sock_serv module.
+  <br>this module is responsible for accepting conections from external interfaces and passing it to the asci processor for furthe processing 
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-state">state()</a></h3>
+<p><tt>state() = #state{}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#code_change-3">code_change/3</a></td><td>for code changes.</td></tr>
+<tr><td valign="top"><a href="#handle_call-3">handle_call/3</a></td><td>this call is for all call messages.</td></tr>
+<tr><td valign="top"><a href="#handle_cast-2">handle_cast/2</a></td><td>Accepting a connection
+ counter application is notified of connected client.</td></tr>
+<tr><td valign="top"><a href="#handle_info-2">handle_info/2</a></td><td>handles connections and proceses the iso messages which are sent through the connection
+  this function is the main entry point into the application from external sockets which are connected to it.</td></tr>
+<tr><td valign="top"><a href="#init-1">init/1</a></td><td>callback for genserver,accepts a Socket as input.</td></tr>
+<tr><td valign="top"><a href="#start_link-1">start_link/1</a></td><td>this is used for starting an accepting socket with Socket Listener passed as a parameter.</td></tr>
+<tr><td valign="top"><a href="#terminate-2">terminate/2</a></td><td>for termination.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="code_change-3">code_change/3</a></h3>
+<div class="spec">
+<p><tt>code_change(OldVsn::string(), State::<a href="#type-state">state()</a>, Extra::term()) -&gt; {ok, <a href="#type-state">state()</a>} | {error, any()}</tt><br></p>
+</div><p>for code changes</p>
+
+<h3 class="function"><a name="handle_call-3">handle_call/3</a></h3>
+<div class="spec">
+<p><tt>handle_call(E::term(), From::pid(), State::<a href="#type-state">state()</a>) -&gt; term()</tt><br></p>
+</div><p>this call is for all call messages</p>
+
+<h3 class="function"><a name="handle_cast-2">handle_cast/2</a></h3>
+<div class="spec">
+<p><tt>handle_cast(X1::term(), S::<a href="#type-state">state()</a>) -&gt; {term(), <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Accepting a connection
+ counter application is notified of connected client</p>
+
+<h3 class="function"><a name="handle_info-2">handle_info/2</a></h3>
+<div class="spec">
+<p><tt>handle_info(E::term(), State_old::<a href="#type-state">state()</a>) -&gt; {term(), <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>handles connections and proceses the iso messages which are sent through the connection
+  this function is the main entry point into the application from external sockets which are connected to it 		</p>
+
+<h3 class="function"><a name="init-1">init/1</a></h3>
+<div class="spec">
+<p><tt>init(Socket::port()) -&gt; {ok, pid()} | {error, any()}</tt><br></p>
+</div><p>callback for genserver,accepts a Socket as input</p>
+
+<h3 class="function"><a name="start_link-1">start_link/1</a></h3>
+<div class="spec">
+<p><tt>start_link(Socket::port()) -&gt; {ok, pid()} | {error, any()}</tt><br></p>
+</div><p>this is used for starting an accepting socket with Socket Listener passed as a parameter</p>
+
+<h3 class="function"><a name="terminate-2">terminate/2</a></h3>
+<div class="spec">
+<p><tt>terminate(Reason::term(), State::<a href="#type-state">state()</a>) -&gt; ok</tt><br></p>
+</div><p>for termination</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Oct 10 2016, 01:01:26.</i></p>
+</body>
+</html>

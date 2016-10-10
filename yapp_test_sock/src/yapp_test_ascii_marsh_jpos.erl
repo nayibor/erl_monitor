@@ -1,6 +1,6 @@
 %%%
-%%% @doc yapp_test_sock_serv module.
-%%%<br>this module is responsible for processing iso messages</br>
+%%% @doc yapp_test_ascii_marsh_jpos module.
+%%%<br>this module is responsible for processing iso messages using iso1993 jpos message format</br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 
@@ -9,14 +9,15 @@
 
 
 
--export([process_iso_message/1,pad_zero/2]).
+-export([process_iso_message/1]).
 -include_lib("yapp_test_sock/include/yapp_test_sock_spec_jpos.hrl").
 
 -define(MTI_SIZE,4).
 -define(PRIMARY_BITMAP_SIZE,16).
 
 
-
+%% @doc this part accepts a message with the header removed and extracts the mti,bitmap,data elements into a map object 
+%% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
 -spec process_iso_message([pos_integer()])->map().
 process_iso_message(Rest)->
 		
@@ -69,20 +70,10 @@ process_iso_message(Rest)->
 
 
 
-pad_zero(Listpad,Zero_num)->
-		case erlang:length(Listpad) of 
-			ListPadLength when ListPadLength < Zero_num ->
-					PadList=lists:duplicate(Zero_num-ListPadLength, 48),
-					lists:flatten(PadList,Listpad);
-			ListPadLength when ListPadLength =:= Zero_num ->
-					Listpad
-		end .
-
-
 
 %% @doc marshalls a message to be sent 
 -spec marshall_message([Mti ::pos_integer()],Message_Map::[pos_integer()])->[pos_integer()].
-marshall_message(Mti,Message_Map)->
+marshall_message(_Mti,_Message_Map)->
 		ok.
 		 
 	%%get the spec for the message type you are sending based on the mti of the message and maybe a spec for the kind of message being done (balance enquiry,withdrawal,etc...)

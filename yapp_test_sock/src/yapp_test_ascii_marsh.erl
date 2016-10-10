@@ -9,14 +9,15 @@
 
 
 
--export([process_iso_message/1,pad_zero/2]).
+-export([process_iso_message/1]).
 -include_lib("yapp_test_sock/include/yapp_test_sock_spec.hrl").
 
 -define(MTI_SIZE,4).
 -define(PRIMARY_BITMAP_SIZE,8).
 
 
-
+%% @doc this part accepts a message with the header removed and extracts the mti,bitmap,data elements into a map object 
+%% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
 -spec process_iso_message([pos_integer()])->map().
 process_iso_message(Rest)->
 		
@@ -24,7 +25,7 @@ process_iso_message(Rest)->
 		Primary_Bitmap_size = ?PRIMARY_BITMAP_SIZE,
 		%io:format("~n~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
 		%io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),
-		io:format("~n~nfirst twelve integer values are:~p",[lists:sublist(Rest,1,12)]),
+		%%io:format("~n~nfirst twelve integer values are:~p",[lists:sublist(Rest,1,12)]),
 		%io:format("~n~nin progress primary bitmap are:~p",[lists:sublist(Rest,Mti_size+1,8)]),
 		%%gets whether the  first character of the bitmap is 1/0(48,49)cuz of string and then uses this to calculate size of bitmap 
 		Bitmap_size = case lists:nth(1,string:right(integer_to_list(lists:nth(5,Rest),2),8,$0)) of
@@ -71,17 +72,6 @@ process_iso_message(Rest)->
 		{_,_,_,FlData}=OutData,
 		io:format("~nkeys and values so far are ~p",[FlData]),
 		FlData.
-
-
-pad_zero(Listpad,Zero_num)->
-		case erlang:length(Listpad) of 
-			ListPadLength when ListPadLength < Zero_num ->
-					PadList=lists:duplicate(Zero_num-ListPadLength, 48),
-					lists:flatten(PadList,Listpad);
-			ListPadLength when ListPadLength =:= Zero_num ->
-					Listpad
-		end .
-
 
 
 %% @doc marshalls a message to be sent 

@@ -1,6 +1,6 @@
 %%% 
 %%% @doc yapp_test_sock_sup supervisor module documentation.
-%%%<br>top level supervisor is started here for the sockett</br>
+%%%<br>top level supervisor is started here for the socket</br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 %%%
@@ -22,9 +22,8 @@
 start_link() ->
 		supervisor:start_link(?MODULE, []).
 
-%% This does absolutely nothing, only there to
-%% allow to wait for tables.
--spec init(any()) ->
+%% @doc this is for starting the supervisor for the listening socket for the tcp server 
+-spec init([]) ->
   {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}.
 init([]) ->
 		{ok, Port} = application:get_env(port),
