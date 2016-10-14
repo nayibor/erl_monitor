@@ -121,6 +121,8 @@
 
 %%max number of lockout_macro
 -define(LOCKOUT_COUNTER_MAX,4).
+-define(CHANGE_PASS_MINUTES,10).
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,7 +246,9 @@ read_table_all(Table_name)->
 %% @end
 -spec add_user(string(),string(),string(),pos_integer())-> {error,term()} | ok | term().
 add_user(Email,Fname,Lname,Siteid) ->    
-		F = fun() ->	
+		F = fun() ->
+				Npass = gen_pass(),
+				Bc_pass = hash_password(Npass),			
 				case check_email(Email,add_user,0) =:= exists orelse
 	                 mnesia:read({usermod_sites, Siteid}) =:= [] of
 						true ->
@@ -252,7 +256,7 @@ add_user(Email,Fname,Lname,Siteid) ->
 						false ->
 							Fun_add = fun() ->
 									mnesia:write(#usermod_users{user_email=Email,id=get_set_auto(usermod_users),
-										   password=gen_pass(),fname=Fname,
+										   password=Bc_pass,fname=Fname,
 										   lname=Lname,site_id=Siteid
 										   })
 							end,
@@ -264,14 +268,15 @@ add_user(Email,Fname,Lname,Siteid) ->
 %% @doc this is for reseting the pass of the use  
 -spec reset_pass(pos_integer())->{ok,string()} | {error,term()}.
 reset_pass(Id) ->
+		Npass = gen_pass(),
+		Bc_pass = hash_password(Npass),			
 		Fout = fun () -> 
 			F = fun()->
 					mnesia:read(usermod_users,Id)
 			end,
 			case mnesia:activity(transaction,F) of
 				[S] ->
-					Npass = gen_pass(),
-					Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Npass}) end,
+					Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Bc_pass}) end,
 					ok=mnesia:activity(transaction,Edit_tran),
 					{ok,Npass};	
 				_ ->
@@ -906,28 +911,25 @@ get_links_filter(Filter) ->
 %% @end
 -spec verify_user(string(),string())-> {error,check_username_password} | {error,check_username_password_lock} | {ok,pos_integer(),string(),pos_integer(),pos_integer()} | term() .
 verify_user(Email,Password)->
-	
-		F_out=fun()->
-				F = fun() ->
-					qlc:eval(qlc:q(
-					[S ||
-					S = #usermod_users{user_email=Rc_email} <- mnesia:table(usermod_users),
-					Rc_email =:= Email ]))
-				end,
-				%%useranme and password is wrong and lock is less th
+		F_out=fun()->		
+				F=fun()-> mnesia:index_read(usermod_users,Email,#usermod_users.user_email)end,
 				case mnesia:activity(transaction,F) of  
 						[] -> 
 							{error,check_username_password}; 
-						[S=#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/=Rc_pass andalso Lock_status < ?LOCKOUT_COUNTER_MAX  -> 
-							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
-							{error,check_username_password}; 
-						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =/= Rc_pass  andalso Lock_status >= ?LOCKOUT_COUNTER_MAX  -> 
-							{error,check_username_password_lock}; 
-						[#usermod_users{password=Rc_pass,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status >= ?LOCKOUT_COUNTER_MAX ->	
-							{error,check_username_password_lock}; 
-						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status}] when Password =:=Rc_pass andalso Lock_status < ?LOCKOUT_COUNTER_MAX ->	
-							ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
-							{ok,Id,Fname,Site_id,Inst_id}
+						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status}] ->
+							Password_match_status = match_password(Password,Rc_pass),
+							case {Password_match_status,Lock_status} of 
+							 {Plpass,Pllockstatus}	when Plpass =:= false andalso Pllockstatus < ?LOCKOUT_COUNTER_MAX ->
+								ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
+								{error,check_username_password};
+							{Plpass,Pllockstatus}	when Plpass =:= false andalso Pllockstatus >= ?LOCKOUT_COUNTER_MAX ->		
+								{error,check_username_password_lock};
+							{Plpass,Pllockstatus}	when Plpass =:= true andalso Pllockstatus >= ?LOCKOUT_COUNTER_MAX ->	
+								{error,check_username_password_lock};
+							{Plpass,Pllockstatus}	when Plpass =:= true andalso Pllockstatus < ?LOCKOUT_COUNTER_MAX ->	
+								ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
+								{ok,Id,Fname,Site_id,Inst_id}	
+							end		
 				end
 		end,
 		mnesia:activity(transaction,F_out).
@@ -1099,6 +1101,18 @@ gen_pass() ->
 gen_weak_char(Base) ->
 		Select_dig = random:uniform(string:len(Base)),
 		string:sub_string(Base,Select_dig,Select_dig).
+ 
+ 
+ %% @doc this is for matching hashed passwords in the database
+ -spec match_password(erlpass:password(),erlpass:hash())->boolean().
+ match_password(Password,Dbpass)->
+		erlpass:match(Password, Dbpass).
+ 
+ 
+ %% @doc this is for hashing passwords to be put in the database
+ -spec hash_password(erlpass:password())->erlpass:hash().
+ hash_password(Password)->
+		erlpass:hash(Password).
  
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
  %% @TODO change the hash type

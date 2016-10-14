@@ -4,7 +4,5 @@
 @version 0.1.0
 @title Welcome to the yapp_test_socker server
 @doc yapp_test_sock is the socket server application which listens for connections and passes them on to the acceptor sockets
-<br>
-this server creates the test process for sending test transactions and also creates the supervisor process for the listener socket
-</br>
+<br>there is also a supervisor process created for acceptor sockets as well a test process for sending test transactions</br>
 

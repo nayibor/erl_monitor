@@ -28,7 +28,7 @@
 %% @doc web socket callback . 
 %% accepts user state_data from controlle code which it passes to the internal state of the websocket
 init( [_ReqArg,InitialState])->
-		io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
+		%%io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
 		{ok, #user_state{state_user=InitialState}}.
 
 
@@ -64,7 +64,7 @@ handle_message(_,State) ->
 
 %% @doc for receiving close messages from other processes
 handle_info(close, State) ->
-		io:format("closing websocket bye for now"),
+		%%io:format("closing websocket bye for now"),
 		{close, <<"testing">>,{text, <<"see you in a bit">>},State};   
      
      
@@ -82,7 +82,7 @@ handle_info(_,State) ->
      
 %% @doc for final termination of process     
 terminate(Reason, State) -> 
-		io:format("terminate ~p: ~p (state:~p)~n", [self(), Reason, State]),
+		%%io:format("terminate ~p: ~p (state:~p)~n", [self(), Reason, State]),
 		ok.
 
 

@@ -38,7 +38,6 @@ check_login(Arg,Cookie)->
 				end
 		end.
 
-%%% @TODO have to finish up code for checking whether user has permission to access page 
 %%% @doc check permission for a page
 %%% cookie has already been checked and reset in previous but in case of high usage 
 %%% still needs to be checked maybe due to scheduling ????

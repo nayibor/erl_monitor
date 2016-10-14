@@ -29,9 +29,8 @@ test_message(Message)->
 		io:format(" Time_duration~p~n",[Timeduration/1000]).
 		
 			
-%% @doc this is used for getting the site for a message
-%%for testing purpose the Message will be a proplist containing the instid as a key 
-%%but in production this will represent how the issue id would be extracted
+%% @doc this is used for processing messages coming in
+%% message processing will either be successful or will generate an error tuple depending on error reason
 -spec process_message(map())-> [pos_integer()] | {error,binary()}.
 process_message(Message) ->
 		 case get_site_message(Message) of
@@ -42,7 +41,7 @@ process_message(Message) ->
 						{ok,Id} ->
 							case get_rules_index(Id) of
 								{ok,Rules}->
-									RuleAns = lists:flatten(process_rules(Rules,Site,Message)),
+									RuleAns = lists:append(process_rules(Rules,Site,Message)),
 									lists:foldl(fun(Item,Acc)->
 													case lists:member(Item,Acc) of
 														true ->
@@ -62,10 +61,8 @@ process_message(Message) ->
 	
 	
 %% @doc this is supposed to retrieve the site given a iso message
-%%this part will replace the iso extraction part till ready	
 -spec get_site_message(map())->binary() | undefined.
 get_site_message(Message)->
-
 		case maps:get("_32",Message,<<"fuck">>) of
 			<<"fuck">> ->
 				undefined;
@@ -78,9 +75,6 @@ get_site_message(Message)->
 %%% @doc get sites by index 
 -spec validate_site_index(Filter::binary()) -> tuple().	
 validate_site_index(Filter) ->
-		%F = fun()-> 
-		%		mnesia:index_read(usermod_sites,Filter,#usermod_sites.site_short_name)
-		%	end,
 			case mnesia:dirty_index_read(usermod_sites,Filter,#usermod_sites.site_short_name) of 
 				[#usermod_sites{id=Id}]->
 					{ok,Id};
@@ -92,9 +86,6 @@ validate_site_index(Filter) ->
 %% @doc for getting rules which have a particular index
 -spec get_rules_index(pos_integer())-> {ok,[term()]}|{error,binary()}.
 get_rules_index(Siteid) ->
-		%F = fun()-> 
-		%		mnesia:index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id)
-		%	end,
 			case mnesia:dirty_index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id) of 
 				[]->
 					{error,<<"No Rule">>};
@@ -106,9 +97,6 @@ get_rules_index(Siteid) ->
 %% @doc for getting the template iden for a specific ident
 -spec get_template_ident(pos_integer())->binary().
 get_template_ident(Id)->
-		%F = fun()->
-		%		mnesia:read(tempmod_temp,Id)
-		%	end,
 		    case mnesia:dirty_read(tempmod_temp,Id) of 
 				[#tempmod_temp{ident=Ident}] ->
 				    Ident;

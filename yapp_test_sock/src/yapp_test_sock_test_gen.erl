@@ -8,7 +8,7 @@
 -behaviour(gen_server).
    
 
--export([start_link/0,test_client/1,send_iso/1]).
+-export([start_link/0,test_client/1,send_iso/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).   
    
@@ -26,9 +26,9 @@ test_client(Name) ->
     
  
  %% @doc api call for sending test iso messages
--spec send_iso(atom())->message_sent|not_ready|{error,any()}.    
-send_iso(Name) ->
-		gen_server:call(Name, send_iso).
+-spec send_iso(atom(),string())->message_sent|not_ready|{error,any()}.    
+send_iso(Name,Message) ->
+		gen_server:call(Name, {send_iso,Message}).
        
 	
 %%for starting the gen server 
@@ -57,10 +57,9 @@ create_message()->
 			 
 %% @doc for testing for sending messages 
 -spec handle_call(term(),pid(),state()) -> term().   
-handle_call(send_iso, _From,S = #state{socket=Socket,state_test=State_test}) ->
+handle_call({send_iso,Message}, _From,S = #state{socket=Socket,state_test=State_test}) ->
 		case State_test of 
 			good ->
-				Message = create_message(),
 				io:format("~nlength of message si ~p",[length(Message)]),
 				send(Socket,Message),				
 				{reply,message_sent,S};

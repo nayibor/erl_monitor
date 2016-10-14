@@ -24,13 +24,13 @@ process_iso_message(Rest)->
 		Mti_size = ?MTI_SIZE,
 		Primary_Bitmap_size = ?PRIMARY_BITMAP_SIZE,
 		%io:format("~n~nlength is ~p ~nfull message is:~n~s", [Len-2,Rest]),
-		io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),		
+		%%io:format("~n~nrequest_mti:~p",[lists:sublist(Rest,Mti_size)]),		
 		Bitmap_size = case lists:nth(1,string:right(integer_to_list(list_to_integer([lists:nth(5,Rest)],16),2),4,$0)) of
 						48 -> 16;
 						49 -> 32
 						end,
-		io:format("~n~nbitmap size is:~p",[Bitmap_size]),
-		io:format("~nbmp vals:~p~nraw vals:~w~nvals:~p",[lists:map(fun(X)->string:right(integer_to_list(list_to_integer([X],16),2),4,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size)),lists:sublist(Rest,Mti_size+1,Bitmap_size),lists:sublist(Rest,Mti_size+1,Bitmap_size)]),
+		%%io:format("~n~nbitmap size is:~p",[Bitmap_size]),
+		%%io:format("~nbmp vals:~p~nraw vals:~w~nvals:~p",[lists:map(fun(X)->string:right(integer_to_list(list_to_integer([X],16),2),4,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size)),lists:sublist(Rest,Mti_size+1,Bitmap_size),lists:sublist(Rest,Mti_size+1,Bitmap_size)]),
 		Bitmap_transaction = lists:flatten(lists:map(fun(X)->string:right(integer_to_list(list_to_integer([X],16),2),4,$0)end,lists:sublist(Rest,Mti_size+1,Bitmap_size))),
 		
 		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
@@ -40,16 +40,16 @@ process_iso_message(Rest)->
 		Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),
 		Start_index = Mti_size+Primary_Bitmap_size+1,
 		%%io:format("~nkeys and values so far are ~p",[Map_Data_Element]),
-		OutData =lists:foldl(fun(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
+		OutData = lists:foldl(fun(X,_Acc={Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= 49->						
 								    {Ftype,Flength,Fx_var_fixed,Fx_header_length,DataElemName}=?SPEC(Current_index_in),
 									case Fx_var_fixed of
 										fx -> 
-											Data_Element = lists:sublist(Rest,Index_start_in,Flength),
+											Data_Element = lists:sublist(Data_for_use_in,Index_start_in,Flength),
 											New_Index = Index_start_in+Flength ;	
 										vl ->
-											Vl_value = list_to_integer(lists:sublist(Rest,Index_start_in,Fx_header_length)),
+											Vl_value = list_to_integer(lists:sublist(Data_for_use_in,Index_start_in,Fx_header_length)),
 											Start_val = Index_start_in + Fx_header_length , 										
-											Data_Element = lists:sublist(Rest,Start_val,Vl_value),
+											Data_Element = lists:sublist(Data_for_use_in,Start_val,Vl_value),
 											New_Index = Start_val+Vl_value
 									end,
 									NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,Data_Element}]),
@@ -63,8 +63,8 @@ process_iso_message(Rest)->
 							 end,
 					   {Rest,Start_index,1,Map_Data_Element},Bitmap_transaction),
 		
-		{_,_,_,FlData}=OutData,
-		io:format("~nkeys and values so far are ~p",[FlData]),
+		{_,_,_,FlData} = OutData,
+		%%io:format("~nkeys and values so far are ~p",[FlData]),
 		FlData.
 
 
