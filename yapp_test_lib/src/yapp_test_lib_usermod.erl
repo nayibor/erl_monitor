@@ -61,7 +61,8 @@
 		 delete_user_roles/1,
 		 check_list_roles/1,
 		 check_list_links/1,
-		 get_users_for_rules/0
+		 get_users_for_rules/0,
+		 get_user_det/1
 		 ]).
 
  %%for site stuff
@@ -173,13 +174,24 @@ temp_del()->
 %% @doc for transforming tables		
 transform_table_check()->
 
-Transformer =
-		fun(X) when is_record(X, test_transform) ->
-				#test_transform_new{id = X#test_transform.id,
-									name = X#test_transform.name,
-									extra = newme}
-		end,
-		{atomic, ok} = mnesia:transform_table(test_transform, Transformer,record_info(fields, test_transform_new),test_transform_new).
+		Transformer = fun()->a end,
+		%%fun(X) when is_record(X, test_transform) ->
+%%-record(usermod_users,{id::pos_integer(),user_email::string(),password::string(),fname::string(),lname::string(),site_id::pos_integer(),inst_id::pos_integer(),lock_status=0::0|1|2|3|4}). 
+		
+		%%fun(X)  ->
+		%%		#usermod_users{id = X#usermod_users_new.id,
+		%%					   user_email = X#usermod_users_new.user_email,
+		%%					   password = X#usermod_users_new.password,
+		%%					   fname = X#usermod_users_new.fname,
+		%%					   lname = X#usermod_users_new.lname,
+		%%					   site_id = X#usermod_users_new.site_id,
+		%%					   inst_id = X#usermod_users_new.inst_id,
+		%%					   lock_status = X#usermod_users_new.lock_status,
+		%%					   reset_time_max = undefined,
+		%%					   reset_status =false		     
+		%%					   }
+		%%end,
+		{atomic, ok} = mnesia:transform_table(usermod_users, Transformer,record_info(fields, usermod_users),usermod_users).
 
 		
 
@@ -276,7 +288,7 @@ reset_pass(Id) ->
 			end,
 			case mnesia:activity(transaction,F) of
 				[S] ->
-					Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Bc_pass}) end,
+					Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Bc_pass,reset_status=true}) end,
 					ok=mnesia:activity(transaction,Edit_tran),
 					{ok,Npass};	
 				_ ->
@@ -801,6 +813,20 @@ get_user_id(Id) ->
 		    end.
 
 
+%% @doc get all details about a user 
+-spec get_user_det(pos_integer()) -> tuple().
+get_user_det(Id) ->
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+		    case mnesia:activity(transaction,F) of 
+				[S] ->
+				   S;
+				_ ->
+				   {error,user_non_exists}
+		    end.
+
+
 %%%	@doc get_users_filter . filtered by fname,email,lname
 -spec get_users_filter(string()) -> [string()] | [] | term() .
 get_users_filter(UserDet) ->
@@ -916,20 +942,17 @@ verify_user(Email,Password)->
 				case mnesia:activity(transaction,F) of  
 						[] -> 
 							{error,check_username_password}; 
-						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status}] ->
-							Password_match_status = match_password(Password,Rc_pass),
-							case {Password_match_status,Lock_status} of 
-							 {Plpass,Pllockstatus}	when Plpass =:= false andalso Pllockstatus < ?LOCKOUT_COUNTER_MAX ->
-								ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
-								{error,check_username_password};
-							{Plpass,Pllockstatus}	when Plpass =:= false andalso Pllockstatus >= ?LOCKOUT_COUNTER_MAX ->		
-								{error,check_username_password_lock};
-							{Plpass,Pllockstatus}	when Plpass =:= true andalso Pllockstatus >= ?LOCKOUT_COUNTER_MAX ->	
-								{error,check_username_password_lock};
-							{Plpass,Pllockstatus}	when Plpass =:= true andalso Pllockstatus < ?LOCKOUT_COUNTER_MAX ->	
-								ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
-								{ok,Id,Fname,Site_id,Inst_id}	
-							end		
+						[#usermod_users{lock_status=Lock_status}] when Lock_status >= ?LOCKOUT_COUNTER_MAX ->
+									{error,check_username_password_lock};
+						[S=#usermod_users{site_id=Site_id,inst_id=Inst_id,password=Rc_pass,id=Id,fname=Fname,lock_status=Lock_status,reset_status=Reset_status}] when Lock_status < ?LOCKOUT_COUNTER_MAX ->
+									case  match_password(Password,Rc_pass) of 
+										 false ->
+											ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=Lock_status+1})end),
+											{error,check_username_password};
+										 true ->
+											ok=mnesia:activity(transaction,fun()->mnesia:write(S#usermod_users{lock_status=0})end),
+											{ok,Id,Fname,Site_id,Inst_id,Reset_status}
+									end		
 				end
 		end,
 		mnesia:activity(transaction,F_out).

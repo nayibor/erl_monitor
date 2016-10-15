@@ -33,7 +33,6 @@
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/front_magic.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
-		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jem.js"}}"></script>
 
 	
     </head>
@@ -79,8 +78,12 @@
                              {% block fname %}{% endblock %}</span>
                             <i id="I_119" class="fa fa-cog"></i>
                         </a>
-                        <ul id="UL_120">                  
-                            <li id="LI_127" class="buttonLogout  footer">
+                        <ul id="UL_120">    
+                            <li id="LI_127" class="infoUser reset_pass">
+                                <a href="#" id="A_128">
+                                    <i id="I_129"></i>Reset Pass</a>
+                            </li>						              
+                            <li id="LI_127" class="buttonLogout footer">
                                 <a href="{{yapp_prepath|add:"auth/logout"}}" id="A_128">
                                     <i id="I_129"></i>Logout</a>
                             </li>

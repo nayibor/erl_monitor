@@ -1,7 +1,7 @@
 {application, yapp_test,
  [{description,"Yap Test"},
   {vsn,"0.1.0"},
-  {modules,[myapp_auth,myapp_dash_layout,myapp_dashboard,myapp_dashboard_old,myapp_user,myapp_auth,myapp_links,myapp_roles]},
+  {modules,[myapp_auth,myapp_dashboard,myapp_inst,myapp_links,myapp_roles,myapp_rules,myapp_sites,myapp_temp,myapp_user,myapp_websocket,myapp_websocket_callback]},
   {env, [
          {yapp_appmods,
 			[

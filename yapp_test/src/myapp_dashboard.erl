@@ -33,21 +33,11 @@ out(Arg,error) ->
 
 %%% @doc user is logged but check has to be still done as to whether user has access to pages
 %%  	 all users will have access to landing page as this is waived for all users
-%%       check wont be done here on users right to view dashboard . it will however be done on other controllers
 %%   @end
 out(Arg,ok) ->
 		%%io:format("cookie availables.does page exist??~p~n",[yapp_test_lib_sess:check_perm_page(Arg,?COOKIE_VARIABLE)]),
 		%%out(Arg,ok,yapp_test_lib_sess:check_perm_page(Arg,?COOKIE_VARIABLE)).
 		out(Arg,ok,ok).
-		
-		
-
-%% @doc logged in users whom dont have access to page are shown the page for restricted users (exists/no access)
-%%  	this page is okay .
-%%       users are always looged in when they get here come here so a div with content is okay
-%% @end
-out(Arg,ok,error) ->
-		{page,yapp:prepath(Arg)++?PG_401};
 	
 	
 %%% @doc logged in users whom hav access to this page come here (exists/access)
@@ -60,8 +50,10 @@ out(Arg,ok,ok) ->
 	
 %% @doc	this is for the index_dashboard action get method
 outa(Arg,'GET',["yapp_test","dashboard","index_dashboard"])->
-		myapp_dash_layout:show_dashboard(Arg);
-		%%myapp_dash_layout:out(Arg,Title_Page,gen_content(Arg));
+		Title_Page = "Welcome to Monitor",
+		[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),
+		{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"welcome"}]),
+		{html,UiData};
 
 
 %% @doc for unknown pages which may be specialized for this layout/controller

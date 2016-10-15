@@ -3,5 +3,10 @@
 	{% block yapp_test_content_header %}{{title}}{% endblock %}
 	
 	{% block yapp_test_content_inner %}
-		{% include "yapp_test_trans_list.dtl"  %}
+				{% if page_type == "welcome" %}
+						{% include "yapp_test_trans_list.dtl"  %}
+					{% elif page_type == "reset_pass" %}
+						{% include "yapp_test_reset_pass.dtl"  %}
+                   {% endif %}
+					
 	{% endblock %} 

@@ -10,7 +10,7 @@
 
 
 %%% usermod_users for user information
--record(usermod_users,{id::pos_integer(),user_email::string(),password::string(),fname::string(),lname::string(),site_id::pos_integer(),inst_id::pos_integer(),lock_status=0::0|1|2|3|4}). 
+-record(usermod_users,{id::pos_integer(),user_email::string(),password::string(),fname::string(),lname::string(),site_id::pos_integer(),inst_id::pos_integer(),lock_status=0::0|1|2|3|4,reset_time_max,reset_status=false::true|false}). 
 
 %%% usermod_roles for role information
 -record(usermod_roles,{id::pos_integer(),role_short_name,role_long_name}).

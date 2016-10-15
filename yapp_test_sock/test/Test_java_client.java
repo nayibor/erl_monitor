@@ -39,7 +39,7 @@ public class Test_java_client {
 0111001000100000000000000000000100000000101100000000000000000000
 **/
 
-		for (int i=1;i<=5000;i++)
+		for (int i=1;i<=20000;i++)
 		{
 		channel.send (m);
 		ISOMsg r = channel.receive ();

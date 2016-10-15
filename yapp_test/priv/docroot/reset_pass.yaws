@@ -1,0 +1,33 @@
+<erl>
+%%%
+%%% @doc reset pass page
+%%%<br>dashboard module </br>
+%%%<br>this page will be used for resetting user passes.User should be logged in first </br>
+%%% @end
+%%% @copyright Nuku Ameyibor <nayibor@startmail.com>
+
+-include_lib("yapp_test/include/yapp_test.hrl").
+
+
+%%% @doc check to see whether use is logged in 
+out(Arg) ->
+		out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
+
+		
+%%% @doc for redirecting users not logged in back to login  page  
+out(Arg,error) ->
+		{page,yapp:prepath(Arg)++?INDEX_PAGE};
+
+%%% @doc user is logged but check has to be still done as to whether user has access to pages
+%%  	 all users will have access to landing page as this is waived for all users
+%%   @end
+out(Arg,ok) ->
+		Title_Page = "Reset Password",
+		[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),
+		{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"reset_pass"}]),
+		{html,UiData}.
+
+
+</erl>
+
+
