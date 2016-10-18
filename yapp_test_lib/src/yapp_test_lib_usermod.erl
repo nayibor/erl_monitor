@@ -62,7 +62,8 @@
 		 check_list_roles/1,
 		 check_list_links/1,
 		 get_users_for_rules/0,
-		 get_user_det/1
+		 get_user_det/1,
+		 reset_pass_self/3
 		 ]).
 
  %%for site stuff
@@ -297,6 +298,31 @@ reset_pass(Id) ->
 		end,
 		mnesia:activity(transaction,Fout).
 
+
+%% @doc this is for when the use resets his own password
+%% checks are made if the old password is the same as what is in db. 
+%% if pass is  the same user password is updated with new password and reset_status is changed 
+reset_pass_self(Id,Old_pass,New_pass)->
+		Bc_pass = hash_password(New_pass),			
+		Fout = fun () -> 
+			F = fun()->
+					mnesia:read(usermod_users,Id)
+			end,
+			case mnesia:activity(transaction,F) of
+				[S=#usermod_users{password=Oldp}]->
+					case match_password(Old_pass,Oldp) of
+						true ->
+							Edit_tran = fun()-> mnesia:write(S#usermod_users{password=Bc_pass,reset_status=false}) end,
+							ok=mnesia:activity(transaction,Edit_tran);
+						false ->
+							{error,old_password_non_match}
+					end;
+				_ ->
+					{error,user_non_exists}
+			end
+		end,
+		mnesia:activity(transaction,Fout).
+ 
 
 %% @doc this is for locking the account of the user so the user cant lock in 
 -spec lock_account(pos_integer())-> ok | {error,term()} | term().
@@ -1021,17 +1047,24 @@ get_user_links(UserId)->
 %%%PRIVATE FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% @private for creating urls for viewing based on the lock counter 
+-spec status_url_form(pos_integer|0)->list().
 status_url_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "user/unlock_account_user"++"/" ;
 status_url_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "user/lock_account_user"++"/" .
 
 
+%% @private for creating the class for the urls based on the lock counter
+-spec lock_class_form(pos_integer|0)->list().
 lock_class_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "inlineIcon preferences "++"iconopen unlock" ;
 lock_class_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "inlineIcon preferences "++"iconlock lock" .
 
+
+%% @private for creating the text for the lock counter based on the lock counter
+-spec lock_label_form(pos_integer|0)->list().
 lock_label_form(Lock_stat) when Lock_stat >= ?LOCKOUT_COUNTER_MAX -> "Unlock" ;
 lock_label_form(Lock_stat) when Lock_stat < ?LOCKOUT_COUNTER_MAX -> "Lock" .
 
- 
+  
 %% @private formats lock counter for external viewing
 format_lock_counter(Lock_counter) when Lock_counter >= ?LOCKOUT_COUNTER_MAX-> "Locked";
 format_lock_counter(Lock_counter) when Lock_counter < ?LOCKOUT_COUNTER_MAX -> "Active".

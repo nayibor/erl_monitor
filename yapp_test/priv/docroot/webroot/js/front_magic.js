@@ -26,7 +26,8 @@ var front_magic = {
 	transaction_table:("#table_info tbody"),
 
 	
-	//this function is for initializing the file 
+	//this function is for initializing the websocket object 
+	//it also contains most functions for dealing with the websocket  
 	init:function(){
 		_this = this ;
 

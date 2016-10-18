@@ -123,10 +123,11 @@ var settings={
 			
 			       
 			        //for loggin out a user 
-			        $("#A_128").live('click',function(e){
-			                
+			        $(".logout").live('click',function(e){
 			            settings.disable_okbutt_mgdialg();    
 			            settings.show_message("Logging Out");
+			            $("#UL_120").toggle(); 
+
 			        })
 			        
 			        //for opening the logout div 
@@ -145,17 +146,21 @@ var settings={
 			        $(".load_content").live('click',function(e){
 			            e.preventDefault();
 			            var link=$(this).attr('href');
-			            //alert("content page has been clicked");
-			            settings.load_content(link);  
+			            settings.load_content(link,"normal_stuff");  
 			        }); 
 			        
-					 
+			        //for ressetting user pas
+			        $(".reset_pass_user").live('click',function(e){
+			            e.preventDefault();
+			            var link=$(this).attr('href');
+			            settings.load_content(link,"reset_pass"); 
+			        });  
 			
 		},
 		
 		
 	//for loading the content from the side links into the main viewing divs	
-	load_content:function(users_url){
+	load_content:function(users_url,type){
 		
 					_this=this;
 					 $.ajax({
@@ -174,7 +179,11 @@ var settings={
 			                settings.enable_okbutt_mgdialg();
 			              // console.log(Data)
 			               $("#secondLevelContent").remove();
-			               $("#firstLevelContent").append(Data);                 
+			               $("#firstLevelContent").append(Data); 
+			               if(type=="reset_pass"){
+							   $("#UL_120").toggle();
+							   $(".check_pass_error").html("").hide();
+							   }                
 			            },
 			            error:function(data){
 			                settings.enable_okbutt_mgdialg();

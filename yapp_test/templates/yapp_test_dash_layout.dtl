@@ -31,6 +31,7 @@
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/temp.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/rules.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/reset_pass.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/front_magic.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
 
@@ -62,29 +63,31 @@
 	<input type="hidden" name="get_add_rule" id="get_add_rule" value="{{yapp_prepath|add:"rules/get_add_rule"}}">
 	<input type="hidden" name="save_add_rule" id="save_add_rule" value="{{yapp_prepath|add:"rules/save_add_rule"}}">
 	<input type="hidden" name="save_members_url" id="save_members_url" value="{{yapp_prepath|add:"rules/save_rule_members"}}">
-
+	<input type="hidden" name="reset_pass_user" id="reset_pass_user" value="{{yapp_prepath|add:"reset_pass.yaws"}}">
 
         <div id="oaHeader">
             <div id="oaNavigationExtraTop">
                 <ul id="UL_1">
+					<!--
 					<li id="LI_77">
                         <a href="#" id="A_78">
 							<i id="I_79"></i>
 								<span id="SPAN_80"></span>
 						</a>
                     </li>
+                    -->
                     <li id="LI_115">
                         <a href="#" id="A_116" ><span id="SPAN_118">                              
                              {% block fname %}{% endblock %}</span>
                             <i id="I_119" class="fa fa-cog"></i>
                         </a>
                         <ul id="UL_120">    
-                            <li id="LI_127" class="infoUser reset_pass">
-                                <a href="#" id="A_128">
+                            <li id="LI_127" class="infoUser">
+                                <a href="{{yapp_prepath|add:"reset_pass.yaws?reset_pass=true_reset"}}" class="reset_pass_user" id="A_128">
                                     <i id="I_129"></i>Reset Pass</a>
                             </li>						              
                             <li id="LI_127" class="buttonLogout footer">
-                                <a href="{{yapp_prepath|add:"auth/logout"}}" id="A_128">
+                                <a href="{{yapp_prepath|add:"auth/logout"}}" class="logout" id="A_128">
                                     <i id="I_129"></i>Logout</a>
                             </li>
                         </ul>

@@ -20,14 +20,37 @@ out(Arg,error) ->
 
 %%% @doc user is logged but check has to be still done as to whether user has access to pages
 %%  	 all users will have access to landing page as this is waived for all users
-%%   @end
+%%  @end
 out(Arg,ok) ->
 		Title_Page = "Reset Password",
-		[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),
-		{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"reset_pass"}]),
-		{html,UiData}.
-
-
+		case yaws_api:queryvar(Arg,"reset_pass") of 
+			{ok,"true_reset"} ->
+				{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"reset_pass"}]),
+				{html,UiData};
+			{ok,"reset_user"}->
+				case yaws_api:queryvar(Arg,"old_pass") =:= undefined orelse
+					 yaws_api:queryvar(Arg,"new_pass") =:= undefined orelse
+					 yaws_api:queryvar(Arg,"repeat_new") =:= undefined orelse
+					 yaws_api:queryvar(Arg,"new_pass") =/= yaws_api:queryvar(Arg,"repeat_new") of 
+					true ->	
+						yapp_test_lib_util:message_client(500,"Old Password Empty Or New Password And Repeat Password Not The Same");
+					false ->
+						[_,{id,Id}]= yapp_test_lib_sess:get_user_websocket(Arg,?COOKIE_VARIABLE),
+						{ok,Old_pass} = yaws_api:queryvar(Arg,"old_pass"),
+						{ok,New_pass} = yaws_api:queryvar(Arg,"new_pass"),
+							case  yapp_test_lib_usermod:reset_pass_self(Id,Old_pass,New_pass) of 
+								ok ->
+									yapp_test_lib_sess:kill_session(Arg,?COOKIE_VARIABLE),
+									yapp_test_lib_util:message_client(200,"PassWord Reset Successfully . Please Login With New Password");
+								_  ->
+									yapp_test_lib_util:message_client(500,"Old Password Empty Or New Password And Repeat Password Not The Same")
+							end
+				end;		
+			_ ->
+				[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),
+				{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"reset_pass"}]),
+				{html,UiData}
+		end.
 </erl>
 
 
