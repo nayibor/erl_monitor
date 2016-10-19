@@ -54,7 +54,7 @@ out(Arg,ok,ok) ->
 		
 
 %% @doc	this is for the getting roles
-outa(Arg,'GET',["yapp_test","roles","get_roles"])->
+outa(Arg,'GET',[_,"roles","get_roles"])->
 		Title_Page = "Roles",
 		Roles = yapp_test_lib_usermod:get_roles(),
 		{ok,UiData} = yapp_test_roles_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Roles}]),
@@ -64,7 +64,7 @@ outa(Arg,'GET',["yapp_test","roles","get_roles"])->
 %% @doc this is used for filtering list . query strings will be used here 
 %% 		returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query
-outa(Arg,'GET',["yapp_test","roles","search_roles"])->
+outa(Arg,'GET',[_,"roles","search_roles"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -80,14 +80,14 @@ outa(Arg,'GET',["yapp_test","roles","search_roles"])->
 %% @doc this is used for adding a new role 
 %% 		should returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","roles","get_add_role"])->
+outa(_Arg,'GET',[_,"roles","get_add_role"])->
 
 		{ok,UiData} = yapp_test_add_role:render([{type_user_tran,"add_role"}]),
 		{html,UiData};	
 		
 %% @doc for editing roles
 %% 		
-outa(_Arg,'GET',["yapp_test","roles","get_edit_roles",Roleid])->
+outa(_Arg,'GET',[_,"roles","get_edit_roles",Roleid])->
 		case yapp_test_lib_usermod:get_roles_id(list_to_integer(Roleid)) of 
 			{ok,S} ->	
 				{ok,UiData} = yapp_test_add_role:render([{data,S},{type_user_tran,"edit_role"}]),
@@ -101,7 +101,7 @@ outa(_Arg,'GET',["yapp_test","roles","get_edit_roles",Roleid])->
 %% @doc this is used for adding a new role 
 %% 		should returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query		
-outa(Arg,'POST',["yapp_test","roles","save_add_role"])->
+outa(Arg,'POST',[_,"roles","save_add_role"])->
 	
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->
@@ -126,7 +126,7 @@ outa(Arg,'POST',["yapp_test","roles","save_add_role"])->
 		
 		
 		
-outa(_Arg,'GET',["yapp_test","roles","get_role_links",Roleid])->
+outa(_Arg,'GET',[_,"roles","get_role_links",Roleid])->
 		
 		Links = yapp_test_lib_usermod:get_links_for_roles(),
 		Rlinks = yapp_test_lib_usermod:get_role_links_setup(list_to_integer(Roleid)),
@@ -135,7 +135,7 @@ outa(_Arg,'GET',["yapp_test","roles","get_role_links",Roleid])->
 		
 		
 %%	@doc for saving roles for a user 
-outa(Arg,'POST',["yapp_test","roles","save_role_links"])->
+outa(Arg,'POST',[_,"roles","save_role_links"])->
 		
 		
 		case  yaws_api:postvar(Arg,"roleid") =:= {ok,[]} orelse

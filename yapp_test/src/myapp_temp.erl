@@ -56,7 +56,7 @@ out(Arg,ok,ok) ->
 		
 
 %% @doc	this is for the getting institutions
-outa(Arg,'GET',["yapp_test","temp","get_temp"])->
+outa(Arg,'GET',[_,"temp","get_temp"])->
 		Title_Page = "Templates",
 		Temps = yapp_test_lib_isoproc:get_templates(),
 		{ok,UiData} = yapp_test_temp_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Temps}]),
@@ -64,7 +64,7 @@ outa(Arg,'GET',["yapp_test","temp","get_temp"])->
 
 
 %% @doc this is for getting the sites but using a filter
-outa(Arg,'GET',["yapp_test","temp","search_temp"])->
+outa(Arg,'GET',[_,"temp","search_temp"])->
 		
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -80,7 +80,7 @@ outa(Arg,'GET',["yapp_test","temp","search_temp"])->
 		
 %% @doc this is used for adding a new template 
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","temp","get_add_temp"])->
+outa(_Arg,'GET',[_,"temp","get_add_temp"])->
 
 		Cats = yapp_test_lib_isoproc:get_templates_cats(),
 		{ok,UiData} = yapp_test_add_temp:render([{cats,Cats},{type_user_tran,"add_temp"}]),
@@ -88,7 +88,7 @@ outa(_Arg,'GET',["yapp_test","temp","get_add_temp"])->
 				
 		
 %% @doc this is used for editing a template
-outa(_Arg,'GET',["yapp_test","temp","get_edit_temp",TempId])->
+outa(_Arg,'GET',[_,"temp","get_edit_temp",TempId])->
 
 		case yapp_test_lib_isoproc:get_template_id(list_to_integer(TempId)) of 
 			{ok,S} -> 
@@ -103,7 +103,7 @@ outa(_Arg,'GET',["yapp_test","temp","get_edit_temp",TempId])->
 	
 %% @doc this is used for adding a new template 
 %%		returns an erlydtl html page afer filter and query		
-outa(Arg,'POST',["yapp_test","temp","save_add_temp"])->
+outa(Arg,'POST',[_,"temp","save_add_temp"])->
 
 		case  
 		      yaws_api:postvar(Arg,"ident") =:= undefined orelse
@@ -143,7 +143,7 @@ outa(Arg,'POST',["yapp_test","temp","save_add_temp"])->
 	
 %% @doc this is used for deleting templates and associated rules
 %%		should be used carefully
-outa(_Arg,'DELETE',["yapp_test","temp","del_temp",TempId])->
+outa(_Arg,'DELETE',[_,"temp","del_temp",TempId])->
 		yapp_test_lib_isoproc:delete_template(list_to_integer(TempId)),
 		yapp_test_lib_util:message_client(200,"Template And Template Rules Deleted");
 		

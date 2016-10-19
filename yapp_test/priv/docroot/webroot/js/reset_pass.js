@@ -36,10 +36,12 @@ var reset_pass_usr = {
 		});      		
 		},
 	//this is for updating the password once all the criteria has been met 
+	//data has to be uriencoded incase password contains special characters
 	    update_password:function(old_pass,new_pass,repeat_new_pass){
 				var _this=this;
 		        var formurl=$("#reset_pass_user").val();
-		        var formdata="old_pass="+old_pass+"&new_pass="+new_pass+"&repeat_new="+repeat_new_pass+"&reset_pass=reset_user";      
+		        var formdata="old_pass="+encodeURIComponent(old_pass)+"&new_pass="+encodeURIComponent(new_pass)
+		        +"&repeat_new="+encodeURIComponent(repeat_new_pass)+"&reset_pass=reset_user";      
 		        $.ajax({
 		            url: formurl,
 		            data:formdata,

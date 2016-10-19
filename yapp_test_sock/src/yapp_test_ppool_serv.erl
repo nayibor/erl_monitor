@@ -6,7 +6,7 @@
 
 -module(yapp_test_ppool_serv).
 -behaviour(gen_server).
--export([ start_link/3, start_socket/1,get_num_sockets/1,stop/1]).
+-export([ start_link/3, start_socket/2,get_num_sockets/1,stop/1,increase_limit/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).
 
@@ -46,12 +46,19 @@ start_link(Name, Limit, Sup) when is_atom(Name), is_integer(Limit) ->
 
 
 %% @doc api call for adding more socket acceptors to the socket pool in case more sockets are needed later on in the program
--spec start_socket(atom())->{ok,pid()}|{error,any()}.
-start_socket(Name) ->
-    gen_server:call(Name, start_sock).
+-spec start_socket(atom(),pos_integer())->{ok,pid()}|{error,any()}.
+start_socket(Name,Numb) ->
+    gen_server:call(Name,{start_sock,Numb}).
 
 
-%% @doc api call which  gets you the number of available sockets/connected sockets
+%% @doc api call for increasing the limit of the number of extra acceptor sockets which can be added to system
+-spec increase_limit(atom(),pos_integer())->{ok,pid()}|{error,any()}.
+increase_limit(Name,Numb) ->
+    gen_server:call(Name,{increase_limit,Numb}).
+
+
+
+%% @doc api call which  gets you the number of available websockets/sockets
 -spec get_num_sockets(term())->[tuple()] | {error,any()}.
 get_num_sockets(Name)->
 	gen_server:call(Name, num_sock).
@@ -63,7 +70,7 @@ stop(Name) ->
     gen_server:call(Name, stop).
 
 
-%% @doc callback for genserver,accepts a limit and its supervisor as input 
+%% @doc callback for genserver,accepts a limit and its supervisor as inputt
 -spec init({Limit::pos_integer(),Supervisor_pid::pid()}) -> {ok, state()}.
 init({Limit, Sup}) ->
     %% We need to find the Pid of the worker supervisor from here,
@@ -73,6 +80,7 @@ init({Limit, Sup}) ->
     {ok, #state{limit=Limit}}.
 
 
+
 %% @doc this call is used for getting the number of  connected sockets,available sockets
 %% it will come  from gproc which will keep info about connected sockets and other such info
 -spec handle_call(term(),pid(),state()) -> term().
@@ -80,20 +88,25 @@ handle_call(num_sock, _From, S = #state{limit=N}) ->
 	MatchHead = {'_', '_', <<"websocket">>},
 	Guard = [],
 	Result = ['$$'],
-	Pids_web =  (gproc:select([{MatchHead, Guard, Result}])),
+	Pids_web =  (catch gproc:select([{MatchHead, Guard, Result}])),
 	Pids_sock= (catch gproc:lookup_pids({p, l,<<"conn_sock">>})),
-	{reply, [{avail_sockets,N},{pid_conn_web,Pids_web},{pid_conn_sock,Pids_sock}],S};
+	{reply, [{avail_sockets,N},{pid_conn_web,erlang:length(Pids_web)},{pid_conn_sock,erlang:length(Pids_sock)}],S};
 	
 	
 %% @doc this call is used for starting an extra socket if number is below limit
-handle_call(start_sock, _From, S = #state{limit=N, sup=Sup}) when N > 0 ->
-    {ok, Pid} = supervisor:start_child(Sup, []),
-    {reply, {ok,Pid}, S#state{limit=N-1}};
+handle_call({start_sock,Numb}, _From, S = #state{limit=N, sup=Sup}) when N-Numb > 0 ->
+    _List_children=empty_listeners(Sup,Numb),
+    {reply, ok, S#state{limit=N-Numb}};
     
     
 %% @doc this call is used for starting extra sockets socket but wont happen to limit reached 
-handle_call(start_sock, _From, S = #state{limit=N}) when N =< 0 ->
+handle_call({start_sock,Numb}, _From, S = #state{limit=N}) when N-Numb =< 0 ->
     {reply, {error,max_reached}, S};    
+
+%% @doc this call is used for increasing the default limit by a number 
+handle_call({increase_limit,Numb}, _From, S = #state{limit=N}) ->
+    {reply,ok, S#state{limit=N+Numb}};
+
 
 
 %% @doc this callback is used for stopping

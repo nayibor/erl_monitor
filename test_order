@@ -23,13 +23,15 @@ have to check about weird characters one --done
 prevent user from listening on more than one computer ?????? and prevent people from trying to restablish once they arent allowed -done
 make the supervisor do all restarts and remove that from monitoring application -done 
 monitor must have ability to only view connected sockets as well as monitor them only -done
+increase tcp connection count from console --done 
 
 
-remove reliace on yapp_test ---can be sent out now 
-work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
-change controller code in login so it does not use yapp_test prepath
+remove reliace on yapp_test ---done
+
+rename applicaton folders and appnames 
+prevent websocket from entering into race condition 
 modify install script and create loading script for loading initial application data 
-package up code as a rebar3 application
+package up code as a rebar3 application - push it  
 
 
 

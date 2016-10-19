@@ -53,7 +53,7 @@ out(Arg,ok,ok) ->
 		
 		
 %% @doc	this is for the getting institutions
-outa(Arg,'GET',["yapp_test","rules","get_rules"])->
+outa(Arg,'GET',[_,"rules","get_rules"])->
 		Title_Page = "Rules",
 		Rules = yapp_test_lib_rules:get_rules(),
 		{ok,UiData} = yapp_test_rules_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Rules}]),
@@ -61,7 +61,7 @@ outa(Arg,'GET',["yapp_test","rules","get_rules"])->
 	
 		
 %% @doc this is for getting the sites but using a filter
-outa(Arg,'GET',["yapp_test","rules","search_rules"])->
+outa(Arg,'GET',[_,"rules","search_rules"])->
 		
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -78,7 +78,7 @@ outa(Arg,'GET',["yapp_test","rules","search_rules"])->
 		
 %% @doc this is used for adding a new rule
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","rules","get_add_rule"])->
+outa(_Arg,'GET',[_,"rules","get_add_rule"])->
 		Sites = yapp_test_lib_usermod:get_sites(),
 		Temps = yapp_test_lib_isoproc:get_templates(),
 		Categories = yapp_test_lib_rules:get_rule_cats(),
@@ -88,7 +88,7 @@ outa(_Arg,'GET',["yapp_test","rules","get_add_rule"])->
 		
 		
 	%% @doc this is used for adding a new rule 
-outa(_Arg,'GET',["yapp_test","rules","get_edit_rule",RuleId])->
+outa(_Arg,'GET',[_,"rules","get_edit_rule",RuleId])->
 
 		case yapp_test_lib_rules:get_rule_id(list_to_integer(RuleId)) of 
 			{ok,S} -> 
@@ -103,7 +103,7 @@ outa(_Arg,'GET',["yapp_test","rules","get_edit_rule",RuleId])->
 
 %% @doc this is used for adding a new template 
 %%		returns an erlydtl html page afer filter and query		
-outa(Arg,'POST',["yapp_test","rules","save_add_rule"])->
+outa(Arg,'POST',[_,"rules","save_add_rule"])->
 		%%io:format("~ntesting addition of rule~p",[yaws_api:parse_post(Arg)]),
 		case  
 		      yaws_api:postvar(Arg,"siteid") =:= undefined orelse
@@ -146,7 +146,7 @@ outa(Arg,'POST',["yapp_test","rules","save_add_rule"])->
 		end;      
 		
 %% @doc for getting people whom should have access to a rule  		
-outa(_Arg,'GET',["yapp_test","rules","get_rule_members",Ruleid])->
+outa(_Arg,'GET',[_,"rules","get_rule_members",Ruleid])->
 		Ruleint=list_to_integer(Ruleid),
 		case yapp_test_lib_rules:get_rule_id(Ruleint) of 
 			{ok,_Members} ->
@@ -158,7 +158,7 @@ outa(_Arg,'GET',["yapp_test","rules","get_rule_members",Ruleid])->
 				yapp_test_lib_util:message_client(500,"Rule Does Not Exist")
 		end;
 
-outa(Arg,'POST',["yapp_test","rules","save_rule_members"])->
+outa(Arg,'POST',[_,"rules","save_rule_members"])->
 
 		%%io:format("Rules including members/non members are ~n~p",[yaws_api:parse_post(Arg)]),
 		Data = lists:map(fun({Postkey,Postval})-> {Postkey,lists:map(fun(Pv)->list_to_integer(Pv)end,string:tokens(Postval,","))}  end ,yaws_api:parse_post(Arg)),
@@ -173,7 +173,7 @@ outa(Arg,'POST',["yapp_test","rules","save_rule_members"])->
 
 
 %% @doc this is used for deleting rules 
-outa(_Arg,'DELETE',["yapp_test","rules","delete_rule",Ruleid])->
+outa(_Arg,'DELETE',[_,"rules","delete_rule",Ruleid])->
 
 		%%io:format("Rule for deletion is  ~n~p",[list_to_integer(Ruleid)]),
 		yapp_test_lib_rules:del_rule(list_to_integer(Ruleid)),

@@ -52,7 +52,7 @@ out(Arg,ok,ok) ->
 		outa(Arg,Method,Path).
 		
 %% @doc	this is for the index_dashboard action get method
-outa(Arg,'GET',["yapp_test","user","get_users"])->
+outa(Arg,'GET',[_,"user","get_users"])->
 		Title_Page = "Users",
 		
 		
@@ -65,7 +65,7 @@ outa(Arg,'GET',["yapp_test","user","get_users"])->
 %% @doc this is used for filtering list . query strings will be used here 
 %% 		returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query
-outa(Arg,'GET',["yapp_test","user","search_user"])->
+outa(Arg,'GET',[_,"user","search_user"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -82,7 +82,7 @@ outa(Arg,'GET',["yapp_test","user","search_user"])->
 %% @doc for adding a new user
 %% 		retrieving user interface partt
 %% 		returns an erlydtl html page
-outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
+outa(_Arg,'GET',[_,"user","get_add_user"])->
 		Sites = yapp_test_lib_usermod:get_sites(), 
 		{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{type_user_tran,"add_user"}]),
 		{html,UiData};
@@ -91,7 +91,7 @@ outa(_Arg,'GET',["yapp_test","user","get_add_user"])->
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part 
-outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
+outa(_Arg,'GET',[_,"user","get_edit_user",UserId])->
 		Intid=list_to_integer(UserId),
 		case yapp_test_lib_usermod:get_user_id(Intid) of 
 			{_Id,Email,Fname,Lname,Siteid} ->
@@ -108,7 +108,7 @@ outa(_Arg,'GET',["yapp_test","user","get_edit_user",UserId])->
 %%		insertion part
 %% 		returns a messagpack object showing status 
 %%  	validation has not been done here but will be done later 
-outa(Arg,'POST',["yapp_test","user","save_add_user"])->
+outa(Arg,'POST',[_,"user","save_add_user"])->
 		
 		%%Userdata = yaws_api:parse_post(Arg),
 		%%io:format("post data is ~p ",[Userdata]),
@@ -144,7 +144,7 @@ outa(Arg,'POST',["yapp_test","user","save_add_user"])->
 				
 %% @doc this is used for getting roles for a particular user
 %% 		returns an erlydtl html page 
-outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
+outa(_Arg,'GET',[_,"user","get_roles_user",UserId])->
 		Userrole =  yapp_test_lib_usermod:get_user_roles(list_to_integer(UserId)),
 		Roles = yapp_test_lib_usermod:get_roles(),
 		{ok,UiData} = yapp_test_edit_roles:render([{useroles,Userrole},{roles,Roles}]),
@@ -155,7 +155,7 @@ outa(_Arg,'GET',["yapp_test","user","get_roles_user",UserId])->
 %% @doc this is for updating roles
 %%		insertion part
 %% 		returns a messagpack object showing status 
-outa(Arg,'POST',["yapp_test","user","save_roles_user"])->
+outa(Arg,'POST',[_,"user","save_roles_user"])->
 		
 		case  yaws_api:postvar(Arg,"roles") =:= undefined orelse
 		      yaws_api:postvar(Arg,"id") =:= {ok,[]} orelse 
@@ -182,7 +182,7 @@ outa(Arg,'POST',["yapp_test","user","save_roles_user"])->
 %% 		message pack functionality has to be worked on 
 %%		this part also is supposed to return a error status code when the change is not succesful
 %%      have to work on that also 
-outa(_Arg,'POST',["yapp_test","user","reset_pass_user",UserId])->
+outa(_Arg,'POST',[_,"user","reset_pass_user",UserId])->
 		
 		Result = yapp_test_lib_usermod:reset_pass(list_to_integer(UserId)),
 		case  Result of
@@ -196,7 +196,7 @@ outa(_Arg,'POST',["yapp_test","user","reset_pass_user",UserId])->
 %%		query string part of url may have to be further parsed
 %% 		insertion part
 %%		return a messagepack object showing status 
-outa(_Arg,'POST',["yapp_test","user","lock_account_user",UserId])->
+outa(_Arg,'POST',[_,"user","lock_account_user",UserId])->
 		
 		Result = yapp_test_lib_usermod:lock_account(list_to_integer(UserId)),
 		case  Result of
@@ -209,7 +209,7 @@ outa(_Arg,'POST',["yapp_test","user","lock_account_user",UserId])->
 %%		query string part of url may have to be further parsed
 %% 		insertion part
 %%		return a messagepack object showing status 
-outa(_Arg,'POST',["yapp_test","user","unlock_account_user",UserId])->
+outa(_Arg,'POST',[_,"user","unlock_account_user",UserId])->
 		Result = yapp_test_lib_usermod:unlock_account(list_to_integer(UserId)),
 		case  Result of
 		  ok -> yapp_test_lib_util:message_client(200,"Account Unlocked");

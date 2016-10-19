@@ -41,11 +41,11 @@ out(Arg) ->
 		
 		
 %% @doc this is for users whom are trying to login
-out(Arg,'POST',["yapp_test","auth","login"]) ->
+out(Arg,'POST',[_,"auth","login"]) ->
 		out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE));
 
 %% @doc this is for loggin out users
-out(Arg,'GET',["yapp_test","auth","logout"]) ->
+out(Arg,'GET',[_,"auth","logout"]) ->
 		yapp_test_lib_sess:kill_session(Arg,?COOKIE_VARIABLE),
 		{redirect_local, yapp:prepath(Arg)++?INDEX_PAGE};
 		

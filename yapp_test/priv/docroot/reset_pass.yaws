@@ -24,9 +24,6 @@ out(Arg,error) ->
 out(Arg,ok) ->
 		Title_Page = "Reset Password",
 		case yaws_api:postvar(Arg,"reset_pass") of 
-			{ok,"true_reset"} ->
-				{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"reset_pass"}]),
-				{html,UiData};
 			{ok,"reset_user"}->
 				case yaws_api:postvar(Arg,"old_pass") =:= undefined orelse
 					 yaws_api:postvar(Arg,"new_pass") =:= undefined orelse

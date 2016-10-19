@@ -54,7 +54,7 @@ out(Arg,ok,ok) ->
 		
 		
 %% @doc	this is for the index page of the links 
-outa(Arg,'GET',["yapp_test","links","get_links"])->
+outa(Arg,'GET',[_,"links","get_links"])->
 		Title_Page = "Links",
 		Links = yapp_test_lib_usermod:get_links(),
 		{ok,UiData} = yapp_test_links_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links}]),
@@ -62,7 +62,7 @@ outa(Arg,'GET',["yapp_test","links","get_links"])->
 		
 				
 %% @doc	this is for searching for a link		
-outa(Arg,'GET',["yapp_test","links","search_links"])->
+outa(Arg,'GET',[_,"links","search_links"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		%%io:format("get data is ~p,~n",[yaws_api:parse_query(Arg)]),
 		case  yaws_api:queryvar(Arg,"filter") of
@@ -81,7 +81,7 @@ outa(Arg,'GET',["yapp_test","links","search_links"])->
 %% @doc for adding a new link
 %% 		retrieving user interface partt
 %% 		returns an erlydtl html page
-outa(_Arg,'GET',["yapp_test","links","get_add_link"])->
+outa(_Arg,'GET',[_,"links","get_add_link"])->
 		Categories = yapp_test_lib_usermod:get_cats(), 
 		{ok,UiData} = yapp_test_add_link:render([{cats,Categories},{type_user_tran,"add_link"}]),
 		{html,UiData};	
@@ -90,7 +90,7 @@ outa(_Arg,'GET',["yapp_test","links","get_add_link"])->
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part 
-outa(_Arg,'GET',["yapp_test","links","get_edit_link",Linkid])->
+outa(_Arg,'GET',[_,"links","get_edit_link",Linkid])->
 		case yapp_test_lib_usermod:get_links_id(list_to_integer(Linkid)) of 
 			{ok,S} ->
 				Cats = yapp_test_lib_usermod:get_cats(), 
@@ -107,7 +107,7 @@ outa(_Arg,'GET',["yapp_test","links","get_edit_link",Linkid])->
 %%		insertion part
 %% 		returns a messagpack object showing status 
 %%  	validation has not been done here but will be done later 
-outa(Arg,'POST',["yapp_test","links","save_link"])->
+outa(Arg,'POST',[_,"links","save_link"])->
 		
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->

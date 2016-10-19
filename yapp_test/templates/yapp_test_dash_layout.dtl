@@ -83,7 +83,7 @@
                         </a>
                         <ul id="UL_120">    
                             <li id="LI_127" class="infoUser">
-                                <a href="{{yapp_prepath|add:"reset_pass.yaws?reset_pass=true_reset"}}" class="reset_pass_user" id="A_128">
+                                <a href="{{yapp_prepath|add:"reset_pass_self.yaws"}}" class="reset_pass_user" id="A_128">
                                     <i id="I_129"></i>Reset Pass</a>
                             </li>						              
                             <li id="LI_127" class="buttonLogout footer">

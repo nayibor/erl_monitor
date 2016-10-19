@@ -55,7 +55,7 @@ out(Arg,ok,ok) ->
 		
 		
 %% @doc	this is for the getting institutions
-outa(Arg,'GET',["yapp_test","inst","get_inst"])->
+outa(Arg,'GET',[_,"inst","get_inst"])->
 		Title_Page = "Institutions",
 		Inst = yapp_test_lib_usermod:get_inst(),
 		{ok,UiData} = yapp_test_inst_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),
@@ -63,7 +63,7 @@ outa(Arg,'GET',["yapp_test","inst","get_inst"])->
 				
 	
 %% @doc this is for getting the sites but using a filter
-outa(Arg,'GET',["yapp_test","inst","search_inst"])->
+outa(Arg,'GET',[_,"inst","search_inst"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -80,7 +80,7 @@ outa(Arg,'GET',["yapp_test","inst","search_inst"])->
 
 %% @doc this is used for adding a new insittution 
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","inst","get_add_inst"])->
+outa(_Arg,'GET',[_,"inst","get_add_inst"])->
 
 		{ok,UiData} = yapp_test_add_inst:render([{type_user_tran,"add_inst"}]),
 		{html,UiData};	
@@ -89,7 +89,7 @@ outa(_Arg,'GET',["yapp_test","inst","get_add_inst"])->
 
 %% @doc this is used for adding a new insittution 
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","inst","get_edit_inst",Instid])->
+outa(_Arg,'GET',[_,"inst","get_edit_inst",Instid])->
 		
 		Stid=list_to_integer(Instid),
 		case yapp_test_lib_usermod:get_inst_id(Stid) of 
@@ -103,7 +103,7 @@ outa(_Arg,'GET',["yapp_test","inst","get_edit_inst",Instid])->
 	
 	%% @doc this is used for adding a new insittution 
 %%		returns an erlydtl html page afer filter and query		
-outa(Arg,'POST',["yapp_test","inst","save_add_inst"])->
+outa(Arg,'POST',[_,"inst","save_add_inst"])->
 		
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->

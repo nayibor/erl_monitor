@@ -53,7 +53,7 @@ out(Arg,ok,ok) ->
 		outa(Arg,Method,Path).
 		
 %% @doc	this is for the getting sites
-outa(Arg,'GET',["yapp_test","sites","get_sites"])->
+outa(Arg,'GET',[_,"sites","get_sites"])->
 		Title_Page = "Sites",
 		Sites = yapp_test_lib_usermod:get_sites(),
 		{ok,UiData} = yapp_test_sites_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Sites}]),
@@ -61,7 +61,7 @@ outa(Arg,'GET',["yapp_test","sites","get_sites"])->
 
 
 %% @doc this is for getting the sites but using a filter
-outa(Arg,'GET',["yapp_test","sites","search_sites"])->
+outa(Arg,'GET',[_,"sites","search_sites"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
@@ -78,7 +78,7 @@ outa(Arg,'GET',["yapp_test","sites","search_sites"])->
 %% @doc this is used for adding a new site 
 %% 		should returns a messagpack object for efficiency purposes
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',["yapp_test","sites","get_add_site"])->
+outa(_Arg,'GET',[_,"sites","get_add_site"])->
 
 		Inst = yapp_test_lib_usermod:get_inst(),
 		{ok,UiData} = yapp_test_add_site:render([{inst,Inst},{type_user_tran,"add_site"}]),
@@ -86,7 +86,7 @@ outa(_Arg,'GET',["yapp_test","sites","get_add_site"])->
 
 
 %%% @doc this is for getting a site so it can be edited		
-outa(_Arg,'GET',["yapp_test","sites","get_edit_site",Siteid])->
+outa(_Arg,'GET',[_,"sites","get_edit_site",Siteid])->
 
 		Inst = yapp_test_lib_usermod:get_inst(),
 		case yapp_test_lib_usermod:get_site_id(list_to_integer(Siteid)) of 
@@ -100,7 +100,7 @@ outa(_Arg,'GET',["yapp_test","sites","get_edit_site",Siteid])->
 				
 
 %%% @doc this is for saving a site
-outa(Arg,'POST',["yapp_test","sites","save_add_site"])->
+outa(Arg,'POST',[_,"sites","save_add_site"])->
 		
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->

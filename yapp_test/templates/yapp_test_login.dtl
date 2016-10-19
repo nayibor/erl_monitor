@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />        
+        <title>ERL-MONITOR</title>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/login.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/main.css"}}"/>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-1.4.4.min.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery.main.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-ui.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/login.js"}}"></script>
+    </head>
+	<body class="hasInterface hasGradient hasSidebar">
+        <div id="oaHeader">
+            <div id="oaNavigationExtraTop">
+            </div>
+        </div>
+        <div id="oaNavigation">
+            <ul id="oaNavigationTabs">
+                <li class="active  first last">
+                    <div class="left">
+						<div class="right">
+                            <a href="#" accesskey="Home">Authentication</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div id="firstLevelContent">
+            <div id="secondLevelContent">
+				<form class="login_form" id="login_form" name="login_form" method="POST" action="{{yapp_prepath|add:"auth/login"}}">
+				    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="80">
+							<img src="{{yapp_prepath|add:"webroot/img/login-welcome.gif"}}">&nbsp;&nbsp;
+							</td>
+							<td width="100%">
+								<span class="tab-s">&nbsp;</span><br/>
+								<span class="tab-s">&nbsp;</span><br />
+								<span class="install_error">Please Enter Correct Username and Password To Login</span><br />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<table cellpadding="0" cellspacing="0" border="0">
+									<tr height="24">
+										<td>Username:&nbsp;</td>
+										<td>
+											<input class="flat" type="text" name="username" id="username" tabindex="1" />
+										</td>
+									</tr>
+									<tr height="24">
+										<td>Password:&nbsp;</td>
+											<td>
+												<input class="flat" type="password" name="password" id="password" tabindex="2" />
+											</td>
+									</tr>
+									<tr height="24">
+										<td>&nbsp;</td>
+										<td>
+											<input type="submit" name="login" id="login" value="Login" tabindex="3" />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</form> 
+            </div>
+       </div>
+    </body>
+</html>
