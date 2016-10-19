@@ -46,7 +46,13 @@ out(Arg,ok,ok) ->
 		Path = string:tokens(Uri#url.path, "/"), 
 		Method = (Arg#arg.req)#http_request.method,
 		outa(Arg,Method,Path).
-	
+
+
+%% @doc	this is for the index_dashboard action get method
+outa(_Arg,'GET',["yapp_test","dashboard","index_dashboard_view"])->
+		Title_Page = "Welcome to Monitor",
+		{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"welcome"}]),
+		{html,UiData};
 	
 %% @doc	this is for the index_dashboard action get method
 outa(Arg,'GET',["yapp_test","dashboard","index_dashboard"])->

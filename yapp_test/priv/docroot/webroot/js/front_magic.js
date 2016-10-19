@@ -24,6 +24,8 @@ $(document).ready(function(){
 var front_magic = {
 	  
 	transaction_table:("#table_info tbody"),
+	max_rows :15,
+	current_num:0,
 
 	
 	//this function is for initializing the websocket object 
@@ -51,7 +53,7 @@ var front_magic = {
 		        
 		webs.connect();
 		
-		},	
+	},	
 		
 	//this is for building an item which can be appended to the main table div	
 	build_item:function(message){
@@ -91,14 +93,20 @@ var front_magic = {
 				 .append(term_location).append(response_code);
 		return tr_all; 
        
-		},
+	},
 	//this function is for processing the messags as they come through 
 	process_message:function(message){
 	   _this = this ;
-	   var new_item= _this.build_item(message);
-	   //console.log(new_item);
-	   $(_this.transaction_table).prepend(new_item); 
-	    }	
+	   _this.current_num++;
+	   if (_this.current_num>=_this.max_rows){
+		   //console.log("limit reached");
+		    $(_this.transaction_table+" tr:first").remove();
+			$(_this.transaction_table).append(_this.build_item(message)); 
+	    }
+	   else{
+			$(_this.transaction_table).append(_this.build_item(message)); 
 	
+		}	
+		//console.log("total number is "+_this.current_num);
 	}
-
+}

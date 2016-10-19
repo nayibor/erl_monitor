@@ -15,39 +15,35 @@ now but important
 ########todo#####
 add bcrypt functionality to the system (add_user,reset_pass,verify_user) --done 
 abililty to reset admin password from the console side -- done
+password reset page for users to reset password--done
+setup correct allowd links for a role --done 
+create link for getting back to dashboard --done
+reduce number of rows for table for viewing transactions **************done 
+have to check about weird characters one --done
+prevent user from listening on more than one computer ?????? and prevent people from trying to restablish once they arent allowed -done
+make the supervisor do all restarts and remove that from monitoring application -done 
+monitor must have ability to only view connected sockets as well as monitor them only -done
 
-table for configuration fo password stuff//every site password reset  duration for user/password reset when admin reset/reminder duration  
-user must reset password b4 can log in . can be done only for a specific time window.workflow for modifying password--now 
-password reset page for users to reset password
-reset all users passwrd for an instiution/site/system
 
-prevent user from listening on more than one computer ??????
-make the supervisor do all restarts and remove that from monitoring application
-monitor must have ability to only view connected sockets as well as monitor them only
-modify install script and create loading script for loading initial application data
 remove reliace on yapp_test ---can be sent out now 
 work on login.yaws page to user yapp_prepath as the source of the links possibly use template for it ???
 change controller code in login so it does not use yapp_test prepath
-increase in version of jquery used/remove all unnneccary js/css code being used  to enable modals etc...-----
+modify install script and create loading script for loading initial application data 
 package up code as a rebar3 application
+
+
+
 ********test intergration with rtps test/send out  ********
-
-
-create code for marshalling messages at least the eight basic types of messages(sending and receiving based on spec) but start with advices
-check for all possible error condiprocess_iso_messagetions and put exceptons around those fuckers --mostly done 
-response codes--depends on itype --not done no tables
 create new interface using mithral and websockets for user login/viewing of transactions
+create code for marshalling messages at least the eight basic types of messages(sending and receiving based on spec) but start with advices
+increase in version of jquery used/remove all unnneccary js/css code being used  to enable modals etc...-----
+response codes--depends on itype --not done no tables
 check process limiting for connected processes
 validation of all input into the system---very very important but not done but can be easily done 
 docuementation/test cases  
 have to write type specs for all the record types in the system otherwise one day i wont be able to understand it myself one day:)
 have to change the site table so it stores the rules in it .so only one lookup operation needs to be perfomed to process transactions 
-
-
-
-later but important
 ########
-
 siteid field has been modified to mean short_name .keep in mind .will have to actually create a field which i can use instead of the short_name/ident field
 interface --depends on itype --not done no tables
 interface type --basic table --not done no tables
@@ -109,19 +105,18 @@ ranch ??
 messagepack
 mithral.js
 
-jpos
-xref is a very useful addition when writing code
-django templates use of lists everywhere can make it difficult to use 
+
 storing complex data in mnesia data can be difficult
-specs in erlang are very interesting
 writing clear vrs fast code
+xref is a very useful addition when writing code
+django templates use of lists everywhere can make it difficult to use
 storing of funs in db can be interesting
+implementing specs/protocols in erlang is very interesting
 data formats???
 you cant use numeric variables as keys in javascript objects
 be very careful with how erlang treats characters .
 js ??????
 supervisors return the initial state the data was started with when restarting children
-restart in this context
-
-
-interesting use of jpos library
+jpos library 
+after some time messages dont appear on screen 
+seems websocket disconnects or something funny going on there after some number of transactions?? .memory leak 

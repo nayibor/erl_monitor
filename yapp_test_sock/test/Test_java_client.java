@@ -4,8 +4,10 @@ import org.jpos.iso.channel.ASCIIChannel;
 import org.jpos.iso.packager.GenericPackager;
 import org.jpos.util.LogListener;
 import org.jpos.util.SimpleLogListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-
+//this is for sending transactions to the transaction socket server for testing purposes 
 public class Test_java_client {
 	public static void main (String[] args) throws Exception {
 		Logger logger = new Logger();
@@ -21,7 +23,7 @@ public class Test_java_client {
 		m.set(4, "000010000000");
 		m.set(7, "1107221800");
 		m.set(11, "123456");
-		m.set(12,"161009132458");
+		//m.set(12,"161009132458");
 		m.set(32,"414243");
 		m.set(41, "termid12");
 		m.set(43,"Community1");
@@ -29,23 +31,34 @@ public class Test_java_client {
 		m.set(39,"000");
 		m.set(102,"12341234234");
 		m.set(22,"FABCDE123ABD");
-		GenericPackager packager = new GenericPackager("iso93ascii.xml");
-		m.setPackager (packager);
-		byte[] data = m.pack();
+		//GenericPackager packager = new GenericPackager("iso93ascii.xml");
+		//m.setPackager (packager);
+		//byte[] data = m.pack();
 		// print the DE list
-		System.out.println("RESULT : " + new String(data));
+		//Date today = new Date();
+		//SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmss");
+		//m.set(12,DATE_FORMAT.format(today));
+		//System.out.println("RESULT : " + DATE_FORMAT.format(today));
+
+
 /**
 7220000100B00000
 0111001000100000000000000000000100000000101100000000000000000000
 **/
 
-		for (int i=1;i<=20000;i++)
+		for (int i=1;i<=50000;i++)
 		{
+		Date today = new Date();
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmss");
+		m.set(11,String.valueOf(i));
+		m.set(12,DATE_FORMAT.format(today));
 		channel.send (m);
 		ISOMsg r = channel.receive ();
 		}
 		
 		channel.disconnect ();
+		
+		
 	}
 }
 

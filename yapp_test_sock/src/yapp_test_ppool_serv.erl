@@ -6,7 +6,7 @@
 
 -module(yapp_test_ppool_serv).
 -behaviour(gen_server).
--export([ start_link/3, start_socket/1,get_num_sockets/1,get_refs_socks/1,stop/1]).
+-export([ start_link/3, start_socket/1,get_num_sockets/1,stop/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          code_change/3, terminate/2]).
 
@@ -33,9 +33,8 @@
 
 
 -record(state, {limit=0,
-                sup,
-                connected_clients_pid=[],
-                refs}).
+                sup
+                }).
 
 -type state() :: #state{}.
 
@@ -58,11 +57,6 @@ get_num_sockets(Name)->
 	gen_server:call(Name, num_sock).
 	
 
-%% @doc api call which gets you the references for the connected sockets
--spec get_refs_socks(term())-> {conn_clients,[reference()]|[]}|{error,any()}.
-get_refs_socks(Name)->
-	gen_server:call(Name, get_refs_socks).
-
 %% @doc this stops this process  but it will get restarted because it is a permanent process
 -spec stop(atom())->ok | {error,any()}.
 stop(Name) ->
@@ -74,31 +68,32 @@ stop(Name) ->
 init({Limit, Sup}) ->
     %% We need to find the Pid of the worker supervisor from here,
     %% but alas, this would be calling the supervisor while it waits for us!
-    self() ! {start_worker_supervisor, Sup},
-    {ok, #state{limit=Limit, refs=gb_sets:empty()}}.
+    %%self() ! {start_worker_supervisor, Sup},
+    gen_server:cast(self(),{start_worker_supervisor, Sup}),
+    {ok, #state{limit=Limit}}.
 
 
 %% @doc this call is used for getting the number of  connected sockets,available sockets
+%% it will come  from gproc which will keep info about connected sockets and other such info
 -spec handle_call(term(),pid(),state()) -> term().
-handle_call(num_sock, _From, S = #state{limit=N,connected_clients_pid=Clist}) ->
-	{reply, [{avail_sockets,N},{connected_sockets,erlang:length(Clist)}],S};
+handle_call(num_sock, _From, S = #state{limit=N}) ->
+	MatchHead = {'_', '_', <<"websocket">>},
+	Guard = [],
+	Result = ['$$'],
+	Pids_web =  (gproc:select([{MatchHead, Guard, Result}])),
+	Pids_sock= (catch gproc:lookup_pids({p, l,<<"conn_sock">>})),
+	{reply, [{avail_sockets,N},{pid_conn_web,Pids_web},{pid_conn_sock,Pids_sock}],S};
 	
 	
-%% @doc this call is used for starting a socket if number is below limit
-handle_call(start_sock, _From, S = #state{limit=N, sup=Sup, refs=R}) when N > 0 ->
+%% @doc this call is used for starting an extra socket if number is below limit
+handle_call(start_sock, _From, S = #state{limit=N, sup=Sup}) when N > 0 ->
     {ok, Pid} = supervisor:start_child(Sup, []),
-    Ref = erlang:monitor(process, Pid),
-    {reply, {ok,Pid}, S#state{limit=N-1, refs=gb_sets:add(Ref,R)}};
+    {reply, {ok,Pid}, S#state{limit=N-1}};
     
     
-%% @doc this call is used for starting a socket but wont happen to limit reached 
+%% @doc this call is used for starting extra sockets socket but wont happen to limit reached 
 handle_call(start_sock, _From, S = #state{limit=N}) when N =< 0 ->
     {reply, {error,max_reached}, S};    
-
-
-%% @doc this callback is used for getting the references for the sockets
-handle_call(get_refs_socks, _From, S=#state{connected_clients_pid=Clist}) ->
-	{reply,{conn_clients,Clist},S};
 
 
 %% @doc this callback is used for stopping
@@ -110,45 +105,24 @@ handle_call(stop, _From, State) ->
 handle_call(_Msg, _From, State) ->
     {noreply, State}.
     
-    
-%% @doc this call is used for notifying this process if a socket gets connected
--spec handle_cast(term(),state()) -> {term(),state()}.    
-handle_cast({notify_connect,Pid},State=#state{connected_clients_pid=Clist})->
-	io:format("halla !!!"),
-	gen_server:cast(Pid,okay_connect),
-	{noreply,State#state{connected_clients_pid=[Pid|Clist]}};
+
+%%t @doc this is used for starting the socket server supervisor,test gen server for sending testing messages  
+%%this also  starts a  number of socket acceptors(as speficied in the .app file for the number of sockets ) once the socket supervisor has been started    
+%%this also links this process to the socket server supervisor  as they depend on each other and killing one kills the other :)
+%%test gen server is also started here
+%%user can add five extra sockets to the number of sockets allowed
+handle_cast({start_worker_supervisor, Sup}, S = #state{limit=N}) ->
+    {ok, Pid} = supervisor:start_child(Sup, ?SPEC()),
+    {ok, _Test} = supervisor:start_child(Sup, ?TEST()),
+    _List_children=empty_listeners(Pid,N),
+    link(Pid),
+    {noreply, S#state{sup=Pid,limit=5}};
 
 
 %% @doc this callback for unknown casts
 handle_cast(_Msg, State) ->
     {noreply, State}.
     
-	
-%% @doc this guy here is for handling downed workers .	
--spec handle_info(term(),state()) -> {term(),state()}.    
-handle_info({'DOWN', Ref, process, Pid, _}, S = #state{refs=Refs}) ->
-    io:format("received down msg from pid ~p~n",[Pid]),
-    case gb_sets:is_element(Ref, Refs) of
-        true ->
-            handle_down_worker(Ref,Pid,S);
-        false -> %% Not our responsibility
-            {noreply, S}
-    end;
-    
-    
-%%t @doc this is used for starting the socket server supervisor,test gen server for sending testing messages  
-%%this also  starts a  number of socket acceptors(as speficied in the .app file for the number of sockets ) once the socket supervisor has been started    
-%%this also links this process to the socket server supervisor  as they depend on each other and killing one kills the other :)
-%%test gen server is also started here 
-handle_info({start_worker_supervisor, Sup}, S = #state{limit=N,refs=Refs}) ->
-    {ok, Pid} = supervisor:start_child(Sup, ?SPEC()),
-    {ok, _Test} = supervisor:start_child(Sup, ?TEST()),
-    List_children=empty_listeners(Pid,N),
-    Ref_list=lists:map(fun({ok,Cpid})-> erlang:monitor(process,Cpid) end,List_children),
-    Mon_refs=lists:foldl(fun(X,Acc)-> gb_sets:add(X,Acc) end,Refs,Ref_list),
-    link(Pid),
-    {noreply, S#state{sup=Pid,limit=5,refs=Mon_refs}};
-
 
 %% @doc for unknown messages
 handle_info(Msg, State) ->
@@ -166,23 +140,6 @@ code_change(_OldVsn, State, _Extra) ->
 -spec terminate(term(),state())->ok.
 terminate(_Reason, _State) ->
     ok.
-
-
-%% @doc for handling crashed sockets .new sockets will be added if the number is less than what is to be allowed
--spec handle_down_worker(reference(),pid(),state())->{noreply,state()}.
-handle_down_worker(Ref,Pid_down,S = #state{limit=L,connected_clients_pid=Cpid ,sup=Sup, refs=Refs})when L > 0 ->
-			io:format("Mayday i am down!!!:~n"),
-            {ok, Pid} = supervisor:start_child(Sup, []),
-            NewRef =    erlang:monitor(process, Pid),
-            Conn_pids = lists:delete(Pid_down,Cpid), 
-            NewRefs = gb_sets:insert(NewRef, gb_sets:delete(Ref,Refs)),
-            {noreply, S#state{refs=NewRefs,connected_clients_pid=Conn_pids}};
-    
-    
- %% @doc for handling crashed sockets .new sockets arent added   
-handle_down_worker(Ref,Pid_down,S = #state{limit=L,connected_clients_pid=Cpid, refs=Refs})when L=< 0 ->
-			Conn_pids = lists:delete(Pid_down,Cpid), 
-            {noreply, S#state{connected_clients_pid=Conn_pids,refs=gb_sets:delete(Ref,Refs)}}.
 
 
 %% @doc for starting a socket acceptor

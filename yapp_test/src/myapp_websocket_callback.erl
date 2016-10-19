@@ -28,7 +28,7 @@
 %% @doc web socket callback . 
 %% accepts user state_data from controlle code which it passes to the internal state of the websocket
 init( [_ReqArg,InitialState])->
-		%%io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
+		io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
 		{ok, #user_state{state_user=InitialState}}.
 
 
@@ -38,7 +38,7 @@ handle_open(_WSState, State) ->
 	try register_process(Userid) of 
 	_Val -> {ok, State#user_state{state_test= <<"good">> ,reg= <<"true">> }}
 	catch 
-	_:_ -> {ok, State#user_state{state_test= <<"good">> }}
+	_:_ -> {error, <<"already_registered">>}
 	end.
 
 
@@ -88,6 +88,6 @@ terminate(Reason, State) ->
 
 %% @doc for registering a user with gproc		
 register_process(Userid)->
-		gproc:reg({n, l, Userid}, ignored).
+		gproc:reg({n, l, Userid}, <<"websocket">>).
 
 

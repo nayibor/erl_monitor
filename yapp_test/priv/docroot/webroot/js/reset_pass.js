@@ -43,8 +43,8 @@ var reset_pass_usr = {
 		        $.ajax({
 		            url: formurl,
 		            data:formdata,
-		            type: 'GET',
-		            dataType:'json',
+		            type: 'POST',
+		            dataType:'html',
 		            beforeSend:function(){
 		                settings.disable_okbutt_mgdialg() ;
 		                settings.show_message("Updating Password...");

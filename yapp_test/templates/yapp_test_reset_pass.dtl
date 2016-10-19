@@ -56,13 +56,6 @@
                     <input type ="button" name="reset_pass_usr_butt" id="reset_pass_usr_butt" value="Reset Pass">
                 </li>		
             </ul>
-            <!--
-            <ul class='tableActions' style="width:100% !important;">
-                <li>
-					<label class="check_pass_error" style ="color:red !important">this is for viewing erros with passwords</label>		
-                </li>
-             </ul>
-            -->
 
             <div class='clear'></div>
             <div class='corner left'></div>

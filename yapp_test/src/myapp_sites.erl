@@ -16,7 +16,7 @@
 -export([
 		 out/1
 		 ]).
-		 
+		    
 	 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("yapp_test/include/yapp_test.hrl").

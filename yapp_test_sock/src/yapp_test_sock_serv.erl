@@ -49,15 +49,9 @@ handle_call(_E, _From, State) ->
 %%counter application is notified of connected client
 -spec handle_cast(term(),state()) -> {term(),state()}.    
 handle_cast(accept, S = #state{socket=ListenSocket}) ->
-		{ok, AcceptSocket} = gen_tcp:accept(ListenSocket),
-		{ok, Name} = application:get_env(name),
-		gen_server:cast(Name, {notify_connect,self()}),
+		{ok, AcceptSocket} = gen_tcp:accept(ListenSocket),	
+		(catch gproc:reg({p, l,<<"conn_sock">>}, ignored)),
 		{noreply, S#state{socket=AcceptSocket}};
-
-
-%% @doc this is used for sending a message back to socket about receiption of notification about connection
-handle_cast(okay_connect,S)->
-		{noreply,S};
 		
 		
 %% unknown casts
@@ -91,7 +85,7 @@ handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_
 								{error,_Reason}->
 									{noreply, S#state{iso_message=[]}};
 								_ ->
-									[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+									_Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
 									{noreply, S#state{iso_message=[]}}    	
 							%%io:format("~n~nSending Statuses ~p",[Status_Send]),
 							end;

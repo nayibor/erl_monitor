@@ -34,7 +34,7 @@ init([]) ->
 		{ok, {{simple_one_for_one, 60, 3600},
         [{socket,
          {yapp_test_sock_serv, start_link, [ListenSocket]}, % pass the socket!
-         temporary, 1000, worker, [yapp_test_sock_serv]}
+         permanent, 1000, worker, [yapp_test_sock_serv]}
          ]}}.
 
 
