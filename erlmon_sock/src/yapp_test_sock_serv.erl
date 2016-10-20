@@ -46,7 +46,7 @@ handle_call(_E, _From, State) ->
 
 
 %% @doc Accepting a connection
-%%counter application is notified of connected client
+%%counter application is notified of connected clientt
 -spec handle_cast(term(),state()) -> {term(),state()}.    
 handle_cast(accept, S = #state{socket=ListenSocket}) ->
 		{ok, AcceptSocket} = gen_tcp:accept(ListenSocket),	
