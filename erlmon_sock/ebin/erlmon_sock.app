@@ -5,4 +5,4 @@
   {registered, []},
   {mod,{yapp_test_sock_app,[]}},
   {env,[{port, 8005},{name,counter},{limit,10}]},
-  {applications,[kernel,stdlib,mnesia]}]}.
+  {applications,[kernel,stdlib,mnesia,erlmon_lib]}]}.
