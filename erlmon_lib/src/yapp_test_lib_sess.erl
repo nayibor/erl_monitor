@@ -9,7 +9,7 @@
 -github("https://bitbucket.com/nameyibor").
 -license("Apache License 2.0").
 -include_lib("yaws/include/yaws_api.hrl").
--include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
+-include_lib("erlmon_lib/include/yapp_test_lib.hrl").
 
 
 %%%functions for checking user/page permissions

@@ -16,7 +16,7 @@
 		 ]).
 
 %%included so that records can be added when compiling templates
--include_lib("yapp_test_lib/include/yapp_test_lib.hrl").
+-include_lib("erlmon_lib/include/yapp_test_lib.hrl").
 
 -define(RECORDS_INFO_IN,[{usermod_users, record_info(fields, usermod_users)},
 							{usermod_roles, record_info(fields, usermod_roles)},
