@@ -20,7 +20,7 @@
 		 
 	 
 -include_lib("yaws/include/yaws_api.hrl").
--include_lib("yapp_test/include/yapp_test.hrl").
+-include_lib("erl_mon/include/yapp_test.hrl").
 
 
 %%% @doc check to see whether use is logged in 

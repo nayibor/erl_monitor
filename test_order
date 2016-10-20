@@ -13,21 +13,6 @@ bug with add roles validation .generally errors in validation
 
 now but important
 ########todo#####
-add bcrypt functionality to the system (add_user,reset_pass,verify_user) --done 
-abililty to reset admin password from the console side -- done
-password reset page for users to reset password--done
-setup correct allowd links for a role --done 
-create link for getting back to dashboard --done
-reduce number of rows for table for viewing transactions **************done 
-have to check about weird characters one --done
-prevent user from listening on more than one computer ?????? and prevent people from trying to restablish once they arent allowed -done
-make the supervisor do all restarts and remove that from monitoring application -done 
-monitor must have ability to only view connected sockets as well as monitor them only -done
-increase tcp connection count from console --done 
-
-
-remove reliace on yapp_test ---done
-
 rename applicaton folders and appnames 
 prevent websocket from entering into race condition 
 modify install script and create loading script for loading initial application data 

@@ -1,10 +1,10 @@
 %%%
 %%% @doc myapp_inst module.
-%%%<br>contains module for working with sites/banks</br>
+%%%<br>contains code for working with istitutions</br>
 %%% @end
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 
--module(myapp_sites).
+-module(myapp_inst).
 -author("Nuku Ameyibor <nayibor@startmail.com>").
 -github("https://bitbucket.com/nameyibor").
 -license("Apache License 2.0").
@@ -16,10 +16,10 @@
 -export([
 		 out/1
 		 ]).
-		    
+		 
 	 
 -include_lib("yaws/include/yaws_api.hrl").
--include_lib("yapp_test/include/yapp_test.hrl").
+-include_lib("erl_mon/include/yapp_test.hrl").
 
 
 %%% @doc check to see whether use is logged in 
@@ -52,80 +52,83 @@ out(Arg,ok,ok) ->
 		Method = (Arg#arg.req)#http_request.method,
 		outa(Arg,Method,Path).
 		
-%% @doc	this is for the getting sites
-outa(Arg,'GET',[_,"sites","get_sites"])->
-		Title_Page = "Sites",
-		Sites = yapp_test_lib_usermod:get_sites(),
-		{ok,UiData} = yapp_test_sites_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Sites}]),
+		
+		
+%% @doc	this is for the getting institutions
+outa(Arg,'GET',[_,"inst","get_inst"])->
+		Title_Page = "Institutions",
+		Inst = yapp_test_lib_usermod:get_inst(),
+		{ok,UiData} = yapp_test_inst_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),
 		{html,UiData};	
-
-
+				
+	
 %% @doc this is for getting the sites but using a filter
-outa(Arg,'GET',[_,"sites","search_sites"])->
+outa(Arg,'GET',[_,"inst","search_inst"])->
 		%%io:format("query string is ~n~p ",[Search_query]),
 		case  yaws_api:queryvar(Arg,"filter") of
 		   {ok,Filter} ->
 				
-				Sites = yapp_test_lib_usermod:get_filter_site(list_to_binary(Filter)),
-				{ok,UiData} = yapp_test_sites_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Sites}]),		
+				Inst = yapp_test_lib_usermod:get_inst_filter(list_to_binary(Filter)),
+				{ok,UiData} = yapp_test_inst_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),		
 				{html,UiData}; 
 			undefined ->
-				Sites = yapp_test_lib_usermod:get_sites(),
-				{ok,UiData} = yapp_test_sites_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Sites}]),		
+				Inst = yapp_test_lib_usermod:get_inst(),
+				{ok,UiData} = yapp_test_inst_search:render([{yapp_prepath,yapp:prepath(Arg)},{data,Inst}]),		
 				{html,UiData}
 		end;
+	
 
-%% @doc this is used for adding a new site 
-%% 		should returns a messagpack object for efficiency purposes
+%% @doc this is used for adding a new insittution 
 %%		returns an erlydtl html page afer filter and query		
-outa(_Arg,'GET',[_,"sites","get_add_site"])->
+outa(_Arg,'GET',[_,"inst","get_add_inst"])->
 
-		Inst = yapp_test_lib_usermod:get_inst(),
-		{ok,UiData} = yapp_test_add_site:render([{inst,Inst},{type_user_tran,"add_site"}]),
+		{ok,UiData} = yapp_test_add_inst:render([{type_user_tran,"add_inst"}]),
 		{html,UiData};	
+	
 
 
-%%% @doc this is for getting a site so it can be edited		
-outa(_Arg,'GET',[_,"sites","get_edit_site",Siteid])->
-
-		Inst = yapp_test_lib_usermod:get_inst(),
-		case yapp_test_lib_usermod:get_site_id(list_to_integer(Siteid)) of 
-			{ok,S} ->	
-				%%	io:format("~p",[S]),
-				{ok,UiData} = yapp_test_add_site:render([{inst,Inst},{data,S},{type_user_tran,"edit_site"}]),
-				{html,UiData};
-			_ ->
-				yapp_test_lib_util:message_client(500,"Site does Not exist")
-		end;	
-				
-
-%%% @doc this is for saving a site
-outa(Arg,'POST',[_,"sites","save_add_site"])->
+%% @doc this is used for adding a new insittution 
+%%		returns an erlydtl html page afer filter and query		
+outa(_Arg,'GET',[_,"inst","get_edit_inst",Instid])->
+		
+		Stid=list_to_integer(Instid),
+		case yapp_test_lib_usermod:get_inst_id(Stid) of 
+			{error,inst_non_exists} ->
+				yapp_test_lib_util:message_client(500,"Inst Does Not Exist");		
+			S ->
+				{ok,UiData} = yapp_test_add_inst:render([{type_user_tran,"edit_inst"},{data,S}]),
+				{html,UiData}
+		end;
+		
+	
+	%% @doc this is used for adding a new insittution 
+%%		returns an erlydtl html page afer filter and query		
+outa(Arg,'POST',[_,"inst","save_add_inst"])->
 		
 		case  yaws_api:postvar(Arg,"id") of
 		   {ok,Edit_id_val} ->
 				{ok,Sname} = yaws_api:postvar(Arg, "sname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
-		        {ok,Inst} = yaws_api:postvar(Arg, "inst"),
-		        case yapp_test_lib_usermod:update_site(list_to_integer(Edit_id_val),list_to_binary(Sname),list_to_binary(Lname),list_to_integer(Inst)) of 
+				{ok,Ident} = yaws_api:postvar(Arg, "ident"),
+				case yapp_test_lib_usermod:edit_inst(list_to_integer(Edit_id_val),list_to_binary(Sname),list_to_binary(Lname),list_to_binary(Ident)) of
 					ok ->
-						yapp_test_lib_util:message_client(200,"Site edited successfully");
+						yapp_test_lib_util:message_client(200,"Inst edited successfully");
 					{error,Reason} ->
 						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
 				end;
-		   undefined ->   
+		   undefined ->
 		        {ok,Sname} = yaws_api:postvar(Arg, "sname"),
 		        {ok,Lname} = yaws_api:postvar(Arg, "lname"),
-				{ok,Inst} = yaws_api:postvar(Arg, "inst"),
-		        case yapp_test_lib_usermod:add_site(list_to_binary(Sname),list_to_binary(Lname),list_to_integer(Inst)) of 
+				{ok,Ident} = yaws_api:postvar(Arg, "ident"),
+				case yapp_test_lib_usermod:add_inst(list_to_binary(Sname),list_to_binary(Lname),list_to_binary(Ident)) of
 					ok ->
-						yapp_test_lib_util:message_client(200,"Site added successfully");
+						yapp_test_lib_util:message_client(200,"Inst Added successfully");
 					{error,Reason} ->
 						yapp_test_lib_util:message_client(500,atom_to_list(Reason))
-				end				
-		end;
+				end
+		end;	
 		
-
+		
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
 outa(Arg,_Method,_)->

@@ -40,7 +40,7 @@ var front_magic = {
 		});
 		
 
-		webs = new wsClient("localhost", "8004","yapp_test/websock/setup");
+		webs = new wsClient("localhost", "8004","erl_mon/websock/setup");
 		//callbacks are being used for various printing functionality
 		webs.onMessage=function(data){
 		//console.log(data);
