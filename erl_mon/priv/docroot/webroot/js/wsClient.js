@@ -60,7 +60,7 @@ var wsClient = function(server_ip, server_port,cont_act) {
 					{clearInterval(client.setup_timer);}
 			   else
 			   {client.connect();}
-			}, 2000);		
+			}, 500);		
 	    };
 	    //send callback
 	    this.send=function(msg){    

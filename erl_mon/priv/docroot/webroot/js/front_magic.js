@@ -47,7 +47,7 @@ var front_magic = {
 		//console.log("decoded message is ");
 		//message pack
 		var message = msgpack.decode(new Uint8Array(data.data));
-		_this.process_message(message);
+		front_magic.process_message(message);
 		};
 		
 		        

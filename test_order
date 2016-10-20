@@ -13,9 +13,9 @@ bug with add roles validation .generally errors in validation
 
 now but important
 ########todo#####
-rename applicaton folders and appnames --done 
-prevent websocket from entering into race condition 
-modify install script and create loading script for loading initial application data 
+prevent websocket from entering into race condition --will sort out later a little tricky though
+
+modify install script and create loading script for loading initial application data which loads backup data
 package up code as a rebar3 application - push it  
 
 
