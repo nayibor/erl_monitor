@@ -18,8 +18,10 @@ mnesia is database management system packaged with erlang
 erlydtl is django templating done using erlang  
 messagepack,djnago templates for message format,templating
 
-the yapp_test_lib contains libraries for the application 
-the yapp_test is the web application
-the yapp_test_sock is for now the tcp server
+the erl_mon applicaton is the web application
+the erlmon_sock is for now the tcp server
+the erlmon_lib contains libraries used by erlmon_sock and erl_mon
+
+a release is being worked on and will be done soon with instructions for installation 
 
 
