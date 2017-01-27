@@ -28,7 +28,7 @@
 %% @doc web socket callback . 
 %% accepts user state_data from controlle code which it passes to the internal state of the websocket
 init( [_ReqArg,InitialState])->
-		io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
+		%%io:format("User State is ~p and pid is ~p ~n ",[InitialState,self()]),
 		{ok, #user_state{state_user=InitialState}}.
 
 
@@ -69,7 +69,7 @@ handle_info(close, State) ->
      
      
 %% @doc for reciving transaction messages to be sent to the web browser     
-handle_info(Message={transaction_message,FlData}, State) ->
+handle_info({transaction_message,FlData}, State) ->
 		%%io:format("message received is ~p~n",[FlData]),
 		Msg_out = msgpack:pack(FlData),
 		{reply,{binary,Msg_out},State};
@@ -88,6 +88,6 @@ terminate(Reason, State) ->
 
 %% @doc for registering a user with gproc		
 register_process(Userid)->
-		gproc:reg({n, l, Userid}, <<"websocket">>).
+		gproc:reg({p, l, Userid}, <<"websocket">>).
 
 

@@ -142,11 +142,11 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 								{noreply, S#state{iso_message=[]}};
 							_ ->
 								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
-								lists:map(fun(I)-> (catch gproc:send({n, l, I},{transaction_message,FlData})) end,Message_send_list),	 							
+								lists:map(fun(I)-> (catch gproc:send({p, l, I},{transaction_message,FlData})) end,Message_send_list),	 							
 								{noreply, S#state{iso_message=[]}}    	
 						end;
 					SizeafterHead when Len < SizeafterHead ->
-						io:format("~nbits and pieces"),
+						%%io:format("~nbits and pieces"),
 						{noreply, S#state{iso_message=State_new}}
 				end
 		end.

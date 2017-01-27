@@ -67,8 +67,7 @@ get_site_message(Message)->
 			<<"fuck">> ->
 				undefined;
 			 Site ->
-				 Site_ident =  maps:get(val_list_form,Site),
-				 erlang:list_to_binary(Site_ident)
+				 Site_ident =  maps:get(val_binary_form,Site)
 		end. 
 		
 			
