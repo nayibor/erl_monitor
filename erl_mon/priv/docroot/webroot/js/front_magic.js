@@ -39,6 +39,12 @@ var front_magic = {
 		
 		});
 		
+		
+		//var strWindowFeatures = "location=yes,height=570,width=520,scrollbars=yes,status=yes";
+		//var URL = "https://www.linkedin.com/cws/share?mini=true&amp;url=" + location.href;
+		//var win = window.open(URL, "_blank", strWindowFeatures);
+		
+		
 
 		webs = new wsClient("localhost", "8004","erl_mon/websock/setup");
 		//callbacks are being used for various printing functionality

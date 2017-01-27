@@ -63,51 +63,17 @@ handle_cast(_, S) ->
 %% this function is the main entry point into the application from external sockets which are connected to it 		
 -spec handle_info(term(),state()) -> {term(),state()}.    
 handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) ->
-
-		Fun_process_trans = fun({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
-			State_new=Isom++Msg,
-			%%io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
-			case length(State_new) of 
-				Size when Size < ?BH -> 
-					%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
-					{noreply, S#state{iso_message=State_new}};
-				_  ->
-					{LenStr, Rest} = lists:split(?BH, State_new),
-					%%io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
-					Len = erlang:list_to_integer(LenStr)+?BH,
-					case length(State_new) of 
-						SizeafterHead when Len =:= SizeafterHead ->	
-							%%io:format("~nabout to process mesage"),
-							FlData = yapp_test_ascii_marsh_jpos:process_iso_message(Rest),
-							send(AcceptSocket,State_new),						
-							Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
-						    case Message_send_list of
-								{error,_Reason}->
-									{noreply, S#state{iso_message=[]}};
-								_ ->
-									_Status_Send = [{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
-									{noreply, S#state{iso_message=[]}}    	
-							%%io:format("~n~nSending Statuses ~p",[Status_Send]),
-							end;
-						SizeafterHead when Len < SizeafterHead ->
-							io:format("~nbits and pieces"),
-							{noreply, S#state{iso_message=State_new}}
-					end
-			end
 		
-		
-		end,
-		
-		try Fun_process_trans(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
+		try process_transaction(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
         S ->
 			S	
 		catch
 			error:X ->
 			%%error message has to marshalled here and sent back to sender at this point 
 			%%%all of message may not have been streamed in so in the meantime a return message should be formated and sent back to sender
-				send(AcceptSocket_process,Isom_so_far++Str_Prev),
-				io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
-				{noreply, State_old#state{iso_message=[]}}
+			send(AcceptSocket_process,Isom_so_far++Str_Prev),
+			io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
+			{noreply, State_old#state{iso_message=[]}}
 		end;
          
 	 		 	
@@ -152,3 +118,35 @@ terminate(_Reason, #state{socket=S}) ->
 send(Socket, Str) ->
 		gen_tcp:send(Socket,Str).
 	
+
+%% @doc this is for processing the transactions which come through the system 
+process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
+		State_new=Isom++Msg,
+		%%io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
+		case length(State_new) of 
+			Size when Size < ?BH -> 
+				%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
+				{noreply, S#state{iso_message=State_new}};
+			_  ->
+				{LenStr, Rest} = lists:split(?BH, State_new),
+				%%io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
+				Len = erlang:list_to_integer(LenStr)+?BH,
+				case length(State_new) of 
+					SizeafterHead when Len =:= SizeafterHead ->	
+						%%io:format("~nabout to process mesage"),
+						FlData = yapp_test_ascii_marsh_jpos:process_iso_message({binary,Rest}),
+						send(AcceptSocket,State_new),						
+						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
+					    case Message_send_list of
+							{error,_Reason}->
+								{noreply, S#state{iso_message=[]}};
+							_ ->
+								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+								lists:map(fun(I)-> (catch gproc:send({n, l, I},{transaction_message,FlData})) end,Message_send_list),	 							
+								{noreply, S#state{iso_message=[]}}    	
+						end;
+					SizeafterHead when Len < SizeafterHead ->
+						io:format("~nbits and pieces"),
+						{noreply, S#state{iso_message=State_new}}
+				end
+		end.

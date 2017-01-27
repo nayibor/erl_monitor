@@ -1,0 +1,24 @@
+<!doctype html>
+        <title>ERL-MONITOR-MITHRIL</title>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/login.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/form.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/main.css"}}"/>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/jquery-ui.css"}}"/>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/ui.theme.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/custom.jq.css"}}"/>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/jquery-picklist.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/chosen.css"}}" />
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/font-awesome.min.css"}}"/>
+        <link rel="stylesheet" type="text/css" href="{{yapp_prepath|add:"webroot/css/dashb.css"}}"/>
+        <!--
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
+        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/reset_pass.js"}}"></script>
+	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/front_magic.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
+		-->
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/mithril.min.js"}}"></script>
+    <body>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/mithril_scr.js"}}"></script>	
+	</body>
+    

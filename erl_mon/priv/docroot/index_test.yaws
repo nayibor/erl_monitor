@@ -1,0 +1,14 @@
+<erl>
+-include_lib("erl_mon/include/yapp_test.hrl").
+
+%%% @doc check to see whether use is logged in 
+out(Arg) ->
+		yapp_test_lib_util:message_client(200,"asdf
+		asdfsadfffffffffafsdfsafsafasdfsadfas
+		asdfsafasdfasdfasfasdfasfasdfsfdasf
+		adsfsafasdfsadfasfsafasdfd
+		adfasfsadfsafasdfadsfadffsfsdfasd").
+
+</erl>
+
+

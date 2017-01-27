@@ -33,7 +33,7 @@
 -spec compile_temp() -> term() . 
 compile_temp() ->
 		compile_templates([
-							{"/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/yapp_test/templates","/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/yapp_test/ebin"
+							{"/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erl_mon/templates","/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erl_mon/ebin"
 							}
 						  ]
 						 ).

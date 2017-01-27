@@ -23,9 +23,11 @@
 
 
 %%% @doc check to see whether use is logged in 
+%%%% temporal change to allow all urls to pass through to aid in testing of mithril 
 out(Arg) ->
-		out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
-
+%%%		out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
+		out(Arg,ok,ok).
+		
 		
 %%% @doc for redirecting users not logged in back to login  page  
 out(Arg,error)->
@@ -42,6 +44,10 @@ out(Arg,ok) ->
 out(Arg,ok,error) ->
 		%%io:format("user logged in and but does not have permission to acces page"),
 		{page,yapp:prepath(Arg)++?PG_401};
+		
+		
+		
+		
 		
 %%% @doc logged in users whom hav access to this page come here (exists/access)
 %%%		  only users whom have permission to access the websocket exchanges will come here 
@@ -64,8 +70,23 @@ outa(Arg,'GET',[_,"websock","setup"])->
             %%{close_if_unmasked, CloseUnmasked}
 			   ],
 		{websocket, CallbackMod, Opts};
-		
 	
+	
+%% @doc this page is for the mithril.js page which will be used for viewing transactions
+%% @doc	this is for the index_dashboard action get method
+outa(Arg,'GET',[_,"websock","mithril"])->
+		{ok,UiData} = yapp_test_mithril_layout:render([{yapp_prepath,yapp:prepath(Arg)}]),
+		{html,UiData};
+		
+%% @doc this page is for the mithril.js page which will be used for testing web services 
+%% @doc	this is for the index_dashboard action get method
+outa(Arg,'GET',[_,"websock","mithril_webs"])->
+		
+		%%Json = json2:encode({struct,[{name,"John"},{name,"Mary"}]}),
+		Struct = json2:encode({struct,[{name,"John"},{name,"Mary"}]}),
+		{content,"application/json; charset=iso-8859-1",Struct};
+			
+		
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		error handler takes cares of this so whats the essence ???		
 outa(Arg,_Method,_)->

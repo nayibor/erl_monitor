@@ -458,7 +458,7 @@ get_site_id(Siteid) ->
 
 
 %%% @doc add link
--spec add_link(string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
+-spec add_link(string(),string(),true|false,pos_integer(),string(),link_type()) -> ok | term()  .
 add_link(Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
 		F = fun() ->
 				mnesia:write(#usermod_links{id=get_set_auto(usermod_links),link_controller=Controller,link_allow=Link_allow,link_type=Link_type,
@@ -468,7 +468,7 @@ add_link(Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
 	
 	
 %%edit_link	 
--spec edit_link(pos_integer(),string(),string(),string(),string(),string(),link_type()) -> ok | term()  .
+-spec edit_link(pos_integer(),string(),string(),true|false,pos_integer(),string(),link_type()) -> ok | term()  .
 edit_link(Id,Controller,Link_action,Link_allow,Link_category,Link_name,Link_type) ->
 	Fout = fun () -> 
 				F = fun()->
