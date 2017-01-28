@@ -69,7 +69,7 @@ handle_info(close, State) ->
      
      
 %% @doc for reciving transaction messages to be sent to the web browser     
-handle_info({transaction_message,FlData}, State) ->
+handle_info({<<"tdata">>,FlData}, State) ->
 		%%io:format("message received is ~p~n",[FlData]),
 		Msg_out = msgpack:pack(FlData),
 		{reply,{binary,Msg_out},State};

@@ -97,15 +97,16 @@ process_iso_message({binary,Rest})->
 		Bitmap_transaction = << << (convert_base(One)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
 		
 		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
-		Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,binary:part(Bin_message,0,?MTI_SIZE)}]),
-		Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,1},{name,<<"Bitmap">>},{val_binary_form,Bitmap_transaction},{val_hex_form,Bitmap_Segment}]),
-		Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
-		Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),
+		%Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,binary:part(Bin_message,0,?MTI_SIZE)}]),
+		%Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,1},{name,<<"Bitmap">>},{val_binary_form,Bitmap_transaction},{val_hex_form,Bitmap_Segment}]),
+		%Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
+		%%Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),new
+		Map_Data_Element = maps:new(),
 		Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE,
 		
 		OutData = fold_bin(
 			fun( <<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
-					{Ftype,Flength,Fx_var_fixed,Fx_header_length,DataElemName} = get_spec_field(Current_index_in),
+					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = get_spec_field(Current_index_in),
 					Data_index = case Fx_var_fixed of
 						fx -> 
 							Data_element_fx = binary:part(Data_for_use_in,Index_start_in,Flength),
@@ -118,12 +119,13 @@ process_iso_message({binary,Rest})->
 							Data_element_vl = binary:part(Data_for_use_in,Start_val,Header_value),
 							New_Index_vl = Start_val+Header_value,
 							{Data_element_vl,New_Index_vl}
-					end,
+					end, 
 					{Data_element,New_Index} = Data_index,
-					NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,erlang:binary_to_list(Data_element)},{val_binary_form,Data_element}]),
+					%%NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,erlang:binary_to_list(Data_element)},{val_binary_form,Data_element}]),
+					NewData  = maps:from_list([{val_list_form,erlang:binary_to_list(Data_element)},{val_binary_form,Data_element}]),
 					NewMap = maps:put("_"++integer_to_list(Current_index_in),NewData,Map_out_list_in),
 					%%NewMap = maps:put(Current_index_in,NewData,Map_out_list_in),
-					Fld_num_out = Current_index_in + 1,
+					Fld_num_out = Current_index_in + 1, 
 					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
 				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
 					Fld_num_out = Current_index_in + 1,					
