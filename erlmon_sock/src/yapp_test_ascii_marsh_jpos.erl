@@ -121,10 +121,8 @@ process_iso_message({binary,Rest})->
 							{Data_element_vl,New_Index_vl}
 					end, 
 					{Data_element,New_Index} = Data_index,
-					%%NewData  = maps:from_list([{ftype,Ftype},{fld_no,Current_index_in},{name,DataElemName},{val_list_form,erlang:binary_to_list(Data_element)},{val_binary_form,Data_element}]),
-					NewData  = maps:from_list([{val_list_form,erlang:binary_to_list(Data_element)},{val_binary_form,Data_element}]),
-					NewMap = maps:put("_"++integer_to_list(Current_index_in),NewData,Map_out_list_in),
-					%%NewMap = maps:put(Current_index_in,NewData,Map_out_list_in),
+					%%NewData  = maps:from_list([{val_binary_form,Data_element}]),
+					NewMap = maps:put(<< <<"_">>/binary,(erlang:integer_to_binary(Current_index_in))/binary>>,Data_element,Map_out_list_in),
 					Fld_num_out = Current_index_in + 1, 
 					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
 				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
@@ -132,7 +130,6 @@ process_iso_message({binary,Rest})->
 					{Rest_bin,{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}}
 			end, {Bin_message,Start_index,1,Map_Data_Element},Bitmap_transaction),
 		{_,_,_,FlData} = OutData,
-		%%io:format("~nkeys and values so far are ~p",[FlData]),
 		FlData.
 
 %%this is for performing a binary fold kind of like a list fold 
@@ -165,13 +162,7 @@ convert_base(Data_Base_16)->
 -spec marshall_message([Mti ::pos_integer()],Message_Map::[pos_integer()])->[pos_integer()].
 marshall_message(_Mti,_Message_Map)->
 		ok.
-		 
-	%%get the spec for the message type you are sending based on the mti of the message and maybe a spec for the kind of message being done (balance enquiry,withdrawal,etc...)
-	%%ecalculate the various fields starting from field 2 and the header length which may be applied to field based on the spec of the field
-	%%will generate an exception if field is supposed to be available in map but is not based on specification for that field 
-	%%append primary mti,pbitmap,sbitmap(if available)
-	%%calculate size of the above field and put in 2 bit message header 
-	%%return function and send to interface 
+
 
 
 %% @doc this part gets the specifications for a particular field 

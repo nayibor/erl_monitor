@@ -137,12 +137,13 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 						FlData = yapp_test_ascii_marsh_jpos:process_iso_message({binary,Rest}),
 						send(AcceptSocket,State_new),						
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
+						Msg_out = msgpack:pack(FlData),
 					    case Message_send_list of
 							{error,_Reason}->
 								{noreply, S#state{iso_message=[]}};
 							_ ->
 								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
-								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,FlData})) end,Message_send_list),	 							
+								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Message_send_list),	 							
 								{noreply, S#state{iso_message=[]}}    	
 						end;
 					SizeafterHead when Len < SizeafterHead ->

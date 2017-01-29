@@ -90,7 +90,7 @@ handle_call(num_sock, _From, S = #state{limit=N}) ->
 	Result = ['$$'],
 	Pids_web =  (catch gproc:select([{MatchHead, Guard, Result}])),
 	Pids_sock= (catch gproc:lookup_pids({p, l,<<"conn_sock">>})),
-	{reply, [{avail_sockets,N},{pid_conn_web,erlang:length(Pids_web)},{pid_conn_sock,erlang:length(Pids_sock)}],S};
+	{reply, [{avail_sockets,N},{pid_conn_web_list,Pids_web},{pid_conn_web,erlang:length(Pids_web)},{pid_conn_sock,erlang:length(Pids_sock)},{pid_conn_sock_list,Pids_sock}],S};
 	
 	
 %% @doc this call is used for starting an extra socket if number is below limit

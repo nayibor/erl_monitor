@@ -49,10 +49,9 @@ var front_magic = {
 		webs = new wsClient("localhost", "8004","erl_mon/websock/setup");
 		//callbacks are being used for various printing functionality
 		webs.onMessage=function(data){
-		//console.log(data);
-		//console.log("decoded message is ");
-		//message pack
+
 		var message = msgpack.decode(new Uint8Array(data.data));
+		//console.log(message);
 		front_magic.process_message(message);
 		};
 		
@@ -67,31 +66,31 @@ var front_magic = {
 		var tr_all=document.createElement("tr");
 		
 		var pan=document.createElement("td");
-        $(pan).html((message['_2'])? message._2.val_list_form : "");
+        $(pan).html((message['_2'])? message._2.toString() : "");
      
 		var pr_code=document.createElement("td");
-        $(pr_code).html((message['_3'])? message._3.val_list_form : "");
+        $(pr_code).html((message['_3'])? message._3.toString() : "");
      
 		var amount=document.createElement("td");
-        $(amount).html((message['_4'])? message._4.val_list_form : "");
+        $(amount).html((message['_4'])? message._4.toString() : "");
      
 		var stan=document.createElement("td");
-        $(stan).html((message['_11'])? message._11.val_list_form : "");
+        $(stan).html((message['_11'])? message._11.toString() : "");
 		
 		var date_time_trans=document.createElement("td");
-        $(date_time_trans).html((message['_12'])? message._12.val_list_form : "");
+        $(date_time_trans).html((message['_12'])? message._12.toString() : "");
 		
 		var pos_code=document.createElement("td");
-        $(pos_code).html((message['_22'])? message._22.val_list_form : "");
+        $(pos_code).html((message['_22'])? message._22.toString() : "");
         
         var termid=document.createElement("td");
-        $(termid).html((message['_41'])? message._41.val_list_form : "");
+        $(termid).html((message['_41'])? message._41.toString() : "");
 		
 		var term_location=document.createElement("td");
-        $(term_location).html((message['_43'])? message._43.val_list_form : "");
+        $(term_location).html((message['_43'])? message._43.toString() : "");
         
         var response_code=document.createElement("td");
-        $(response_code).html((message['_39'])? message._39.val_list_form : "");
+        $(response_code).html((message['_39'])? message._39.toString() : "");
 				
 		$(tr_all).append(pan).append(pr_code).append(amount)
 				 .append(stan).append(date_time_trans)
