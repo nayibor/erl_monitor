@@ -16,10 +16,99 @@
 -define(PRIMARY_BITMAP_SIZE,16).
 
 
+%%this is for performing a binary fold kind of like a list fold
+-spec fold_bin(Fun, T, Bin) -> T when
+	Fun  		:: fun((Input, T) -> {Reminder, T}),
+	Bin  		:: binary(),
+	Input		:: binary(),
+	Reminder	:: binary().
+%% base case first
+fold_bin(_Fun, Accum, <<>>) -> Accum;
+fold_bin(Fun, Accum, Bin) ->
+		{NewBin, NewAccum} = Fun(Bin, Accum),
+		fold_bin(Fun, NewAccum, NewBin).
+
+
+
+ 
+%%this is for padding a binary up to a length of N digits with a binary character
+%%mostly used in the bitmap
+%%pad character size <2
+
+pad_data(Bin,Number,Character)when is_binary(Bin),is_integer(Number),Number > 0,is_binary(Character),size(Character)<2 -> pad_data(Bin,Number,Character,Number-size(Bin)).
+pad_data(Bin,Number,Character,Counter) when Counter > 0 -> pad_data(<<Character/binary,Bin/binary>>,Number,Character,Counter-1);
+pad_data(Bin,_Number,_Character,Counter) when Counter =< 0 -> Bin.
+
+%%this is for creating correct interpretation of the bitmap for a binary 
+convert_base(Data_Base_16)->
+		Fth_base16 = erlang:binary_to_integer(Data_Base_16,16),
+		erlang:integer_to_binary(Fth_base16,2).
+
+%%this converts data between bases and also pads the data  for our purposes
+convert_base_pad(Data_Base_16,Number_pad,Pad_digit)->
+        Data_base2 = convert_base(Data_Base_16),
+		pad_data(Data_base2,Number_pad,Pad_digit).
+
+
+
+
+%% @doc this part accepts a message with the header removed and extracts the mti,bitmap,data elements into a map object 
+%% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
+%%the data is first converted into a binary before the processing is done . much faster and uses less memory than list couterpart below	
+process_iso_message({binary,Rest})-> 
+		 Bin_message = erlang:list_to_binary(Rest),
+		 %%io:format("~nmessageis ~p",[Bin_message]),
+		 Fthdig = binary:part(Bin_message,4,1),
+		 Pad_left_z_basetwo = convert_base_pad(Fthdig,4,<<"0">>),		 
+		%%io:format("~n4base pad is ~p",[Pad_left_z_basetwo]),
+		 Bitmap_test_num = binary:part(Pad_left_z_basetwo,0,1),
+		 Bitmap_size = case Bitmap_test_num of
+							<<"0">> -> 16;
+							<<"1">> -> 32
+						end,
+		Bitmap_Segment = binary:part(Bin_message,?MTI_SIZE,Bitmap_size),
+		Bitmap_transaction = << << (convert_base_pad(One,4,<<"0">>)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
+		
+		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
+		%Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,binary:part(Bin_message,0,?MTI_SIZE)}]),
+		%Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,1},{name,<<"Bitmap">>},{val_binary_form,Bitmap_transaction},{val_hex_form,Bitmap_Segment}]),
+		%Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
+		%%Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),new
+		Map_Data_Element = maps:new(),
+		Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE,
+		
+		OutData = fold_bin(
+			fun( <<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
+					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = get_spec_field(Current_index_in),
+					Data_index = case Fx_var_fixed of
+						fx -> 
+							Data_element_fx = binary:part(Data_for_use_in,Index_start_in,Flength),
+							New_Index_fx = Index_start_in+Flength,
+							{Data_element_fx,New_Index_fx};
+						vl ->
+							Header = binary:part(Data_for_use_in,Index_start_in,Fx_header_length),
+							Header_value = erlang:binary_to_integer(Header),
+							Start_val = Index_start_in + Fx_header_length,
+							Data_element_vl = binary:part(Data_for_use_in,Start_val,Header_value),
+							New_Index_vl = Start_val+Header_value,
+							{Data_element_vl,New_Index_vl}
+					end, 
+					{Data_element,New_Index} = Data_index,
+					%%NewData  = maps:from_list([{val_binary_form,Data_element}]),
+					NewMap = maps:put(Current_index_in,Data_element,Map_out_list_in),
+					Fld_num_out = Current_index_in + 1, 
+					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
+				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
+					Fld_num_out = Current_index_in + 1,					
+					{Rest_bin,{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}}
+			end, {Bin_message,Start_index,1,Map_Data_Element},Bitmap_transaction),
+		{_,_,_,FlData} = OutData,
+		FlData;
+
+
 %% @doc this part accepts a message with the header removed and extracts the mti,bitmap,data elements into a map object 
 %% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
 %%this part does this using a list and all data is processed as a list 
--spec process_iso_message({list | binary,pos_integer()})->map().
 process_iso_message({list,Rest})->
 		
 		Fthdig = [lists:nth(5,Rest)] ,
@@ -74,89 +163,8 @@ process_iso_message({list,Rest})->
 		
 		{_,_,_,FlData} = OutData,
 		%%io:format("~nkeys and values so far are ~p",[FlData]),
-		FlData;
-
-	
-%% @doc this part accepts a message with the header removed and extracts the mti,bitmap,data elements into a map object 
-%% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
-%%the data is first converted into a binary before the processing is done  	
-process_iso_message({binary,Rest})-> 
-		 Bin_message = erlang:list_to_binary(Rest),
-		 %%io:format("~nmessageis ~p",[Bin_message]),
-		 Fthdig = binary:part(Bin_message,4,1),
-		 Fth_base16 = erlang:binary_to_integer(Fthdig,16),
-		 Fth_base2 = erlang:integer_to_binary(Fth_base16,2),
-		 Pad_left_z_basetwo  = pad_data(Fth_base2,4,<<"0">>),
-		 %%io:format("~n4base pad is ~p",[Pad_left_z_basetwo]),
-		 Bitmap_test_num = binary:part(Pad_left_z_basetwo,0,1),
-		 Bitmap_size = case Bitmap_test_num of
-							<<"0">> -> 16;
-							<<"1">> -> 32
-						end,
-		Bitmap_Segment = binary:part(Bin_message,?MTI_SIZE,Bitmap_size),
-		Bitmap_transaction = << << (convert_base(One)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
-		
-		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
-		%Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,binary:part(Bin_message,0,?MTI_SIZE)}]),
-		%Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,1},{name,<<"Bitmap">>},{val_binary_form,Bitmap_transaction},{val_hex_form,Bitmap_Segment}]),
-		%Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
-		%%Map_Data_Element = maps:put(<<"_bitmap">>,Bitmap_Data_ELement,Map_Data_Element1),new
-		Map_Data_Element = maps:new(),
-		Start_index = ?MTI_SIZE+?PRIMARY_BITMAP_SIZE,
-		
-		OutData = fold_bin(
-			fun( <<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
-					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = get_spec_field(Current_index_in),
-					Data_index = case Fx_var_fixed of
-						fx -> 
-							Data_element_fx = binary:part(Data_for_use_in,Index_start_in,Flength),
-							New_Index_fx = Index_start_in+Flength,
-							{Data_element_fx,New_Index_fx};
-						vl ->
-							Header = binary:part(Data_for_use_in,Index_start_in,Fx_header_length),
-							Header_value = erlang:binary_to_integer(Header),
-							Start_val = Index_start_in + Fx_header_length,
-							Data_element_vl = binary:part(Data_for_use_in,Start_val,Header_value),
-							New_Index_vl = Start_val+Header_value,
-							{Data_element_vl,New_Index_vl}
-					end, 
-					{Data_element,New_Index} = Data_index,
-					%%NewData  = maps:from_list([{val_binary_form,Data_element}]),
-					NewMap = maps:put(Current_index_in,Data_element,Map_out_list_in),
-					Fld_num_out = Current_index_in + 1, 
-					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
-				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
-					Fld_num_out = Current_index_in + 1,					
-					{Rest_bin,{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}}
-			end, {Bin_message,Start_index,1,Map_Data_Element},Bitmap_transaction),
-		{_,_,_,FlData} = OutData,
 		FlData.
 
-%%this is for performing a binary fold kind of like a list fold 
--spec fold_bin(Fun, T, Bin) -> T when
-	Fun  		:: fun((Input, T) -> {Reminder, T}),
-	Bin  		:: binary(),
-	Input		:: binary(),
-	Reminder	:: binary().
-%% base case first
-fold_bin(_Fun, Accum, <<>>) -> Accum;
-fold_bin(Fun, Accum, Bin) ->
-		{NewBin, NewAccum} = Fun(Bin, Accum),
-		fold_bin(Fun, NewAccum, NewBin).
- 
-
-%%this is for padding so that i can create the 4 byte bin representing a bitmap of the various elements 
--spec pad_data(Bin::binary(),Number::pos_integer(),Character::binary())->binary().
-pad_data(Bin,Number,Character)when is_binary(Bin),is_integer(Number),Number > 0,is_binary(Character),size(Character)<2 -> pad_data(Bin,Number,Character,Number-size(Bin)).
-pad_data(Bin,Number,Character,Counter) when Counter > 0 -> pad_data(<<Character/binary,Bin/binary>>,Number,Character,Counter-1);
-pad_data(Bin,_Number,_Character,Counter) when Counter =< 0 -> Bin.
-
-%%this is for converting a number from one base to another for the purposing of processing transactions
--spec convert_base(Data_Base_16::binary())->binary().
-convert_base(Data_Base_16)->
-		Fth_base16 = erlang:binary_to_integer(Data_Base_16,16),
-		Data_base2 = erlang:integer_to_binary(Fth_base16,2),
-		pad_data(Data_base2,4,<<"0">>).
 
 %% @doc marshalls a message to be sent 
 -spec marshall_message([Mti ::pos_integer()],Message_Map::[pos_integer()])->[pos_integer()].
