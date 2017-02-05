@@ -122,7 +122,7 @@ process_iso_message({binary,Rest})->
 					end, 
 					{Data_element,New_Index} = Data_index,
 					%%NewData  = maps:from_list([{val_binary_form,Data_element}]),
-					NewMap = maps:put(<< <<"_">>/binary,(erlang:integer_to_binary(Current_index_in))/binary>>,Data_element,Map_out_list_in),
+					NewMap = maps:put(Current_index_in,Data_element,Map_out_list_in),
 					Fld_num_out = Current_index_in + 1, 
 					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
 				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->

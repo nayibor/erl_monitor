@@ -26,6 +26,7 @@ var front_magic = {
 	transaction_table:("#table_info tbody"),
 	max_rows :15,
 	current_num:0,
+	message :{},
 
 	
 	//this function is for initializing the websocket object 
@@ -50,9 +51,9 @@ var front_magic = {
 		//callbacks are being used for various printing functionality
 		webs.onMessage=function(data){
 
-		var message = msgpack.decode(new Uint8Array(data.data));
-		//console.log(message);
-		front_magic.process_message(message);
+		 front_magic.message = msgpack.decode(new Uint8Array(data.data));
+		//console.log(front_magic.message);
+		front_magic.process_message(front_magic.message);
 		};
 		
 		        
@@ -61,36 +62,44 @@ var front_magic = {
 	},	
 		
 	//this is for building an item which can be appended to the main table div	
+	//have to sanitize data before putting in browser
 	build_item:function(message){
 		_this = this ;
+	
+		for (var key in message) {
+		  if (message.hasOwnProperty(key)) {
+		    message[key]= message[key].toString();
+		  }
+		}
+		
 		var tr_all=document.createElement("tr");
 		
 		var pan=document.createElement("td");
-        $(pan).html((message['_2'])? message._2.toString() : "");
+        $(pan).html((message[2])? message[2] : "");
      
 		var pr_code=document.createElement("td");
-        $(pr_code).html((message['_3'])? message._3.toString() : "");
+        $(pr_code).html((message[3])? message[3] : "");
      
 		var amount=document.createElement("td");
-        $(amount).html((message['_4'])? message._4.toString() : "");
+        $(amount).html((message[4])? message[4] : "");
      
 		var stan=document.createElement("td");
-        $(stan).html((message['_11'])? message._11.toString() : "");
+        $(stan).html((message[11])? message[11] : "");
 		
 		var date_time_trans=document.createElement("td");
-        $(date_time_trans).html((message['_12'])? message._12.toString() : "");
+        $(date_time_trans).html((message[12])? message[12] : "");
 		
 		var pos_code=document.createElement("td");
-        $(pos_code).html((message['_22'])? message._22.toString() : "");
+        $(pos_code).html((message[22])? message[22] : "");
         
         var termid=document.createElement("td");
-        $(termid).html((message['_41'])? message._41.toString() : "");
+        $(termid).html((message[41])? message[41] : "");
 		
 		var term_location=document.createElement("td");
-        $(term_location).html((message['_43'])? message._43.toString() : "");
+        $(term_location).html((message[43])? message[43] : "");
         
         var response_code=document.createElement("td");
-        $(response_code).html((message['_39'])? message._39.toString() : "");
+        $(response_code).html((message[39])? message[39] : "");
 				
 		$(tr_all).append(pan).append(pr_code).append(amount)
 				 .append(stan).append(date_time_trans)

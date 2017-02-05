@@ -63,7 +63,7 @@ process_message(Message) ->
 %% @doc this is supposed to retrieve the site given a iso message
 -spec get_site_message(map())->binary() | undefined.
 get_site_message(Message)->
-		case maps:get(<<"_32">>,Message,<<"fuck">>) of
+		case maps:get(32,Message,<<"fuck">>) of
 			<<"fuck">> ->
 				undefined;
 			 Site ->

@@ -66,12 +66,14 @@ handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_
 		
 		try process_transaction(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
         S ->
+			inet:setopts(AcceptSocket_process, [{active, once}]),
 			S	
 		catch
 			error:X ->
 			%%error message has to marshalled here and sent back to sender at this point 
 			%%%all of message may not have been streamed in so in the meantime a return message should be formated and sent back to sender
 			send(AcceptSocket_process,Isom_so_far++Str_Prev),
+			inet:setopts(AcceptSocket_process, [{active, once}]),
 			io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
 			{noreply, State_old#state{iso_message=[]}}
 		end;
@@ -102,22 +104,21 @@ code_change(_OldVsn, State, _Extra) ->
 %% @doc for termination
 -spec terminate(term(),state())->ok.
 terminate(normal, #state{socket=S}) ->
-		gen_tcp:close(S);
+		ok = gen_tcp:close(S);
     
     
 terminate(shutdown, #state{socket=S}) ->
-		gen_tcp:close(S);
+		ok = gen_tcp:close(S);
 
     
 terminate(_Reason, #state{socket=S}) ->
-		gen_tcp:close(S),
+		ok = gen_tcp:close(S),
 		io:format("~nterminate reason: ~p", [_Reason]).
 
 %% @doc for sending information through the socket
 -spec send(port(),[pos_integer()])->ok|{error,any()}.
 send(Socket, Str) ->
-		gen_tcp:send(Socket,Str).
-	
+		ok = gen_tcp:send(Socket,Str).
 
 %% @doc this is for processing the transactions which come through the system 
 process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
@@ -135,7 +136,7 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 					SizeafterHead when Len =:= SizeafterHead ->	
 						%%io:format("~nabout to process mesage"),
 						FlData = yapp_test_ascii_marsh_jpos:process_iso_message({binary,Rest}),
-						send(AcceptSocket,State_new),						
+						ok = send(AcceptSocket,State_new),						
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
 						Msg_out = msgpack:pack(FlData),
 					    case Message_send_list of
