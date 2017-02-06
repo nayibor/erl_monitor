@@ -3,15 +3,11 @@
 This application is for an opensource transaction monitoring system.
 
 
-This system receives iso 8583 messages from diverse sources on  a tcp-ip server. 
-
-It forwards it to a websocket server for distrubition to user browsers whom are authorized to view those messages.
-
-Main purpose of this application is to receive realtime feedback on status of transactions so that quick actions.
-
-Can be taken as opposed to polling of the database or other non real time means of monitoring.
-
-Monitoring system will give visual and audio cues in case of important events and may support basic analytics.
+...This system receives iso 8583 messages from diverse sources on  a tcp-ip server.. 
+...It forwards it to a websocket server for distrubition to user browsers whom are authorized to view those messages..
+...Main purpose of this application is to receive realtime feedback on status of transactions so that quick actions..
+...Can be taken as opposed to polling of the database or other non real time means of monitoring..
+...Monitoring system will give visual and audio cues in case of important events and may support basic analytics..
 
 
 There is also a backend web application/mis system for:
