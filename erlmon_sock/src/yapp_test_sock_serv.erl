@@ -9,7 +9,7 @@
 -behaviour(gen_server).
 
 -record(state, {iso_message=[],socket}). % the current socket
-
+ 
 
 
 -export([start_link/1]).
@@ -134,8 +134,7 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 				Len = erlang:list_to_integer(LenStr)+?BH,
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->	
-						%%io:format("~nabout to process mesage"),
-						FlData = yapp_test_ascii_marsh_jpos:process_iso_message({binary,Rest}),
+						FlData = yapp_test_ascii:unpack({binary,Rest}),
 						ok = send(AcceptSocket,State_new),						
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
 						Msg_out = msgpack:pack(FlData),

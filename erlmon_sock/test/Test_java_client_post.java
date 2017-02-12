@@ -12,7 +12,7 @@ public class Test_java_client {
 	public static void main (String[] args) throws Exception {
 		Logger logger = new Logger();
 		logger.addListener (new SimpleLogListener (System.out));
-		ISOChannel channel = new ASCIIChannel ("localhost", 8005, new GenericPackager("iso93ascii.xml"));
+		PostChannel channel = new PostChannel ("localhost", 8005, new PostPackager());
 		((LogSource)channel).setLogger (logger, "test-channel");
 		channel.connect ();
 		//GenericPackager packager = new GenericPackager("iso93ascii.xml");
@@ -33,7 +33,7 @@ public class Test_java_client {
 		m.set(22,"FABCDE123ABD");
 		
 
-		for (int i=1;i<=10;i++)
+		for (int i=1;i<=1;i++)
 		{
 		Date today = new Date();
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmss");

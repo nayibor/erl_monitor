@@ -1,0 +1,9 @@
+<erl>
+
+%%% @doc check to see whether use is logged in 
+out(Arg) ->
+	{html,"funky stuff"}.
+		
+
+</erl>
+
