@@ -55,31 +55,46 @@ convert_base_pad(Data_Base_16,Number_pad,Pad_digit)->
 unpack({binary,Rest})-> 
 		 
 		 Bin_message = erlang:list_to_binary(Rest),
-		 io:format("message is ~p~n",[Bin_message]),
-		 Fthdig = binary:part(Bin_message,4,1),
-		 Pad_left_z_basetwo = convert_base_pad(Fthdig,4,<<"0">>),		 
+		 %%io:format("message is ~p~n",[Bin_message]),
+		 %%Fthdig = binary:part(Bin_message,4,1),
+		 %%Pad_left_z_basetwo = convert_base_pad(Fthdig,4,<<"0">>),		 
 		%%io:format("~n4base pad is ~p",[Pad_left_z_basetwo]),
-		 Bitmap_test_num = binary:part(Pad_left_z_basetwo,0,1),
-		 Bitmap_size = case Bitmap_test_num of
-							<<"0">> -> 16;
-							<<"1">> -> 32
-						end,
-		Bitmap_Segment = binary:part(Bin_message,?MTI_SIZE,Bitmap_size),
-		Bitmap_transaction = << << (convert_base_pad(One,4,<<"0">>)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
+		 %%Bitmap_test_num = binary:part(Pad_left_z_basetwo,0,1),
+		 %%Bitmap_size = case Bitmap_test_num of
+		%%					<<"0">> -> 16;
+		%%					<<"1">> -> 32
+		%%				end,
+		%%Bitmap_Segment = binary:part(Bin_message,?MTI_SIZE,Bitmap_size),
+		%%Bitmap_transaction = << << (convert_base_pad(One,4,<<"0">>)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
 		%%add bitmap as well as mti to map which holds data elements so they can help in processing rules 
 		%%Mti_Data_Element = maps:from_list([{ftype,ans},{fld_no,0},{name,<<"Mti">>},{val_binary_form,binary:part(Bin_message,0,?MTI_SIZE)}]),
 		%%Bitmap_Data_ELement = maps:from_list([{ftype,b},{fld_no,1},{name,<<"Bitmap">>},{val_binary_form,Bitmap_transaction},{val_hex_form,Bitmap_Segment}]),
 		%%Map_Data_Element1 =  maps:put(<<"_mti">>,Mti_Data_Element,maps:new()), 
 		%%Map_Data_Element = maps:put(0,Bitmap_Data_ELement,Map_Data_Element1),
-		<<Mti_pbmp:20/binary,Process_binary/binary>> = Bin_message,
-		process_binary(Process_binary,Bitmap_transaction,fun(Index_f)->yapp_test_ascii_def:get_spec_field(Index_f)end).
+		<<Mti_pbmp:4/binary,Process_binary/binary>> = Bin_message,
+		process_binary(Process_binary,iso_msg).
+
 
 
 %% @doc this function is used to derive various fields given a spec and a bitmap to be used 
 %% can be used for getting various iso message fields as well as getting subfields out of an iso message
-%%condtion should be put in place that will let you find the bitmap
-process_binary(Bin_message,Bitmap_transaction,Spec_fun)->
-		Map_Data_Element = maps:new(),
+%%all data needed to calculate bitmamp should be part of input to this function 
+process_binary(Bin_message,Message_Area)->
+		{Btmptrans,Msegt,Spec_fun} = case Message_Area of
+								iso_msg ->
+									Fthdig = binary:part(Bin_message,0,1),
+									Pad_left_z_basetwo = convert_base_pad(Fthdig,4,<<"0">>),		 
+									Bitmap_test_num = binary:part(Pad_left_z_basetwo,0,1),
+									Bitmap_size = case Bitmap_test_num of
+											<<"0">> -> 16;
+											<<"1">> -> 32
+											end,
+									Bitmap_Segment = binary:part(Bin_message,0,Bitmap_size),		
+									<<_Ignore_seg:16/binary,Message_seg/binary>> = Bin_message,
+									Bit_mess = << << (convert_base_pad(One,4,<<"0">>)):4/binary >>  || <<One:1/binary>> <= Bitmap_Segment >>,
+									{Bit_mess,Message_seg,fun(Index_f)->yapp_test_ascii_def:get_spec_field(Index_f)end} 
+							end,	
+		Map_Data_Element = maps:put(<<"bitmap">>,Btmptrans,maps:new()),
 		OutData = fold_bin(
 			fun( <<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
 					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = Spec_fun(Current_index_in),
@@ -104,9 +119,10 @@ process_binary(Bin_message,Bitmap_transaction,Spec_fun)->
 			   (<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
 					Fld_num_out = Current_index_in + 1,					
 					{Rest_bin,{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}}
-			end, {Bin_message,0,1,Map_Data_Element},Bitmap_transaction),
-			{_,_,_,FlData} = OutData,
-			FlData.
+			end, {Msegt,0,1,Map_Data_Element},Btmptrans),
+			{_,_,_,Fldata} = OutData,
+			io:format("message is ~p",[Fldata]),
+			Fldata.
 
 %% @doc marshalls a message to be sent 
 -spec pack(Message_Map::map())->[pos_integer()].
