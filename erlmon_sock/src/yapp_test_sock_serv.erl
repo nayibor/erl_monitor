@@ -19,7 +19,7 @@
  %% macros for messages received on socket
 -define(SOCK(Msg), {tcp, _Port, Msg}).
 %%for header size of incoming message
--define(BH,4).
+-define(BH,2).
 
 -type state() :: #state{}.
 
@@ -62,9 +62,9 @@ handle_cast(_, S) ->
 %% @doc handles connections and proceses the iso messages which are sent through the connection 
 %% this function is the main entry point into the application from external sockets which are connected to it 		
 -spec handle_info(term(),state()) -> {term(),state()}.    
-handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) ->
+handle_info(?SOCK(Str_Sock), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) ->
 		
-		try process_transaction(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
+		try process_transaction(?SOCK(Str_Sock), State_old = #state{socket=AcceptSocket_process,iso_message=Isom_so_far}) of
         S ->
 			inet:setopts(AcceptSocket_process, [{active, once}]),
 			S	
@@ -72,7 +72,7 @@ handle_info(?SOCK(Str_Prev), State_old = #state{socket=AcceptSocket_process,iso_
 			error:X ->
 			%%error message has to marshalled here and sent back to sender at this point 
 			%%%all of message may not have been streamed in so in the meantime a return message should be formated and sent back to sender
-			send(AcceptSocket_process,Isom_so_far++Str_Prev),
+			send(AcceptSocket_process,Isom_so_far++Str_Sock),
 			inet:setopts(AcceptSocket_process, [{active, once}]),
 			io:format("~nError Message ~p ~nwith input ~p",[erlang:get_stacktrace(),X]),
 			{noreply, State_old#state{iso_message=[]}}
@@ -123,26 +123,25 @@ send(Socket, Str) ->
 %% @doc this is for processing the transactions which come through the system 
 process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
 		State_new=Isom++Msg,
-		%%io:format("~nfull message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
+		%%io:format("~nfull snet  message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
 		case length(State_new) of 
 			Size when Size < ?BH -> 
-				%%io:format("smaller size  is ~p,~n~n~n",[State_new]),
 				{noreply, S#state{iso_message=State_new}};
 			_  ->
 				{LenStr, Rest} = lists:split(?BH, State_new),
-				%%io:format("~n --length of header string is ~p -- string for header ~w -- length of  message is ~p",[length(LenStr),LenStr,length(Rest)]),
-				Len = erlang:list_to_integer(LenStr)+?BH,
+				%%io:format("~n--length of header string is ~p ~n--string for header ~w ~n--fake sum ~p --~n length of  message is ~p",[length(LenStr),LenStr,lists:sum(LenStr),length(Rest)]),
+				Len = lists:sum(LenStr)+?BH,
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->	
 						FlData = yapp_test_ascii:unpack({binary,Rest}),
-						ok = send(AcceptSocket,State_new),						
+						ok = send(AcceptSocket,State_new),	
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
 						Msg_out = msgpack:pack(FlData),
 					    case Message_send_list of
 							{error,_Reason}->
 								{noreply, S#state{iso_message=[]}};
 							_ ->
-								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+								[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
 								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Message_send_list),	 							
 								{noreply, S#state{iso_message=[]}}    	
 						end;
