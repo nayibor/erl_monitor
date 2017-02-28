@@ -10,7 +10,6 @@
 -export([unpack/1,convert_base_pad/3,pad_data/3]).
 
 -define(MTI_SIZE,4).
--define(BITMAP_SIZE,16).
 
 
 %%this is for performing a binary fold kind of like a list fold
@@ -57,7 +56,7 @@ convert_base_pad(Data_Base_10,Number_pad,Pad_digit)->
 %% exceptions can be thrown here if the string for the message hasnt been formatted well but they should be caught in whichever code is calling the system 
 %%the data is first converted into a binary before the processing is done . much faster and uses less memory than list couterpart below	
 unpack({binary,Rest})-> 
-		%%io:format("init message is ~p~n",[Rest]),
+		%%io:format("~ninit message is ~s",[Rest]),
 		Bin_message = erlang:list_to_binary(Rest),
 		process_binary(Bin_message,iso_msg).
 
@@ -69,14 +68,22 @@ unpack({binary,Rest})->
 process_binary(Bin_message,Message_Area)->
 		{Btmptrans,Msegt,Spec_fun,Map_Init} = case Message_Area of
 								iso_msg ->
-									<<Mti:?MTI_SIZE/binary,Bitmap_Segment:?BITMAP_SIZE/binary,Rest/binary>> = Bin_message,
+									Test_area = binary_part(Bin_message,4,1),
+									<<One_dig/integer>> = Test_area,
+									Bitsize = case  binary_part(convert_base_pad(One_dig,8,<<"0">>),0,1) of
+														<<"0">> -> 8;
+														<<"1">> -> 16
+											  end,		
+									<<Mti:?MTI_SIZE/binary,Bitmap_Segment:Bitsize/binary,Rest/binary>> = Bin_message,
 									Bit_mess = << << (convert_base_pad(One,8,<<"0">>))/binary >>  || <<One/integer>> <= Bitmap_Segment >>,
 									Mti_map = maps:put(0,Mti,maps:new()),
-									{Bit_mess,<<Bitmap_Segment/binary,Rest/binary>>,fun(Index_f)->yapp_test_ascii_post:get_spec_field(Index_f)end,Mti_map} 
-							end,	
+									Bit_map = maps:put(1,Bitmap_Segment,Mti_map),
+									{Bit_mess,<<Bitmap_Segment/binary,Rest/binary>>,fun(Index_f)->yapp_test_ascii_post:get_spec_field(Index_f)end,Bit_map} 
+											  end,	
 		OutData = fold_bin(
-			fun( <<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
+			 fun(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
 					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = Spec_fun(Current_index_in),
+					
 					Data_index = case Fx_var_fixed of
 						fx -> 
 							Data_element_fx = binary:part(Data_for_use_in,Index_start_in,Flength),
@@ -89,17 +96,22 @@ process_binary(Bin_message,Message_Area)->
 							Data_element_vl = binary:part(Data_for_use_in,Start_val,Header_value),
 							New_Index_vl = Start_val+Header_value,
 							{Data_element_vl,New_Index_vl}
-					end, 
+								end, 
 					{Data_element,New_Index} = Data_index,
 					NewMap = maps:put(Current_index_in,Data_element,Map_out_list_in),
+					%%io:format("~nso far ~p and field_num is ~p",[NewMap,Current_index_in]),
 					Fld_num_out = Current_index_in + 1, 
 					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
-			   (<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
+				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> andalso Current_index_in =:=1->
+					New_Index_fx = Index_start_in+8,
+					Fld_num_out = Current_index_in + 1,					
+					{Rest_bin,{Data_for_use_in,New_Index_fx,Fld_num_out,Map_out_list_in}};
+			    (<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> ->
 					Fld_num_out = Current_index_in + 1,					
 					{Rest_bin,{Data_for_use_in,Index_start_in,Fld_num_out,Map_out_list_in}}
 			end, {Msegt,0,1,Map_Init},Btmptrans),
 		{_,_,_,Fldata} = OutData,
-			%%io:format("map is ~p",[Fldata]),
+		%%io:format("~nmap is ~p",[Fldata]),
 		Fldata.
 
 %% @doc marshalls a message to be sent 
