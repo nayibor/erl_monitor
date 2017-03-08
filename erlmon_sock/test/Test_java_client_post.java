@@ -25,16 +25,22 @@ public class Test_java_client_post {
 		Date today = new Date();
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMdd");
 		m.set(12,DATE_FORMAT.format(today));
+		m.set(14,"0205");
+	    m.set(18,"5399");
 		m.set(22,"123");
+		m.set(25,"00");
 		m.set(32,"414243");
+		m.set(37,"206305000014");
 		m.set(39,"00");
-		m.set(41, "termid12");
+		m.set(41, "termid");
+		m.set(42, "termid12");
 		m.set(43,"Community1Community1Community1Community1");
 		m.set(44, "A5DFGR");
+		m.set(49, "840");
 		m.set(102,"12341234234");
-		
+//01110010001101000100010010000001000010101111000010000000000000000011000100110000001100010011001000110011001100010011001000110011	
 
-		for (int i=1;i<=1;i++)
+		for (int i=1;i<=10000;i++)
 		{
 		
 		m.set(11,String.valueOf(i));
@@ -54,11 +60,11 @@ public class Test_java_client_post {
  * 
  * 
 * to compile in new changes
-*javac -cp .:jpos-2.0.7-SNAPSHOT.jar Test_java_client.java 
+*javac -cp .:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post.java 
 *to run new changes 
-* java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client
+* java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post
 * for i in 1 2 3 4 5
 do
-   java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client &
+   java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post &
 done 
 **/

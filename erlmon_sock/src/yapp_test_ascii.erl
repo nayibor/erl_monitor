@@ -68,16 +68,15 @@ unpack({binary,Rest})->
 process_binary(Bin_message,Message_Area)->
 		{Btmptrans,Msegt,Spec_fun,Map_Init} = case Message_Area of
 								iso_msg ->
-									Test_area = binary_part(Bin_message,4,1),
-									<<One_dig/integer>> = Test_area,
+									<<One_dig/integer>> = binary_part(Bin_message,4,1),
 									Bitsize = case  binary_part(convert_base_pad(One_dig,8,<<"0">>),0,1) of
 														<<"0">> -> 8;
 														<<"1">> -> 16
 											  end,		
 									<<Mti:?MTI_SIZE/binary,Bitmap_Segment:Bitsize/binary,Rest/binary>> = Bin_message,
 									Bit_mess = << << (convert_base_pad(One,8,<<"0">>))/binary >>  || <<One/integer>> <= Bitmap_Segment >>,
-									Mti_map = maps:put(0,Mti,maps:new()),
-									Bit_map = maps:put(1,Bitmap_Segment,Mti_map),
+									Mti_map = maps:put(<<"mti">>,Mti,maps:new()),
+									Bit_map = maps:put(<<"bit">>,Bitmap_Segment,Mti_map),
 									{Bit_mess,<<Bitmap_Segment/binary,Rest/binary>>,fun(Index_f)->yapp_test_ascii_post:get_spec_field(Index_f)end,Bit_map} 
 											  end,	
 		OutData = fold_bin(
@@ -102,7 +101,7 @@ process_binary(Bin_message,Message_Area)->
 					%%io:format("~nso far ~p and field_num is ~p",[NewMap,Current_index_in]),
 					Fld_num_out = Current_index_in + 1, 
 					{Rest_bin,{Data_for_use_in,New_Index,Fld_num_out,NewMap}};
-				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">> andalso Current_index_in =:=1->
+				(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"0">>,Current_index_in =:=1,Message_Area =:=iso_msg->
 					New_Index_fx = Index_start_in+8,
 					Fld_num_out = Current_index_in + 1,					
 					{Rest_bin,{Data_for_use_in,New_Index_fx,Fld_num_out,Map_out_list_in}};

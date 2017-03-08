@@ -42,6 +42,7 @@ process_message(Message) ->
 							case get_rules_index(Id) of
 								{ok,Rules}->
 									RuleAns = lists:append(process_rules(Rules,Site,Message)),
+									RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew()),
 									lists:foldl(fun(Item,Acc)->
 													case lists:member(Item,Acc) of
 														true ->
@@ -50,7 +51,7 @@ process_message(Message) ->
 															[Item|Acc]	
 													 end
 												end,
-									 [],RuleAns);
+									 [],RuleAnsPlusAdmin);
 								{error,Reason}->
 									Reason
 							end;	
@@ -58,6 +59,18 @@ process_message(Message) ->
 							{error,Reason}
 					end
 		 end.
+	
+	
+	
+%% @doc for getting the admins/superadmins in system
+%%		these group of guys in system get to see all transaction rolling through system
+%%      doesnt matter which site they belong to .they see everything in system
+-spec get_admin_vew()->[pos_integer()].
+get_admin_vew()->
+	Admn_users = mnesia:dirty_index_read(usermod_users_roles,1,#usermod_users_roles.role_id) ,
+	SuperAdm_users = mnesia:dirty_index_read(usermod_users_roles,3,#usermod_users_roles.role_id),
+	lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],lists:append(Admn_users,SuperAdm_users)).	
+	
 	
 	
 %% @doc this is supposed to retrieve the site given a iso message
@@ -121,10 +134,13 @@ process_rules(Rules,Siteident,Message)->
 
 
 
+
+
+
 %%this is actually used for processing the template
 %%user data as well data from the message are extracted and compared 
 -spec process_rule_inst(Template_type::binary(),Site_Rule::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
-process_rule_inst(<<"site_temp">>,Site_rule,_Options_creator,Isomessage)->
+process_rule_inst(<<"site_temp">>,_Site_rule,_Options_creator,_Isomessage)->
 		true;
 		
 %%this is actually used for processing the template

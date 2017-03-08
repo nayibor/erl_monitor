@@ -23,7 +23,7 @@
 		 transform_table_check/0,
 		 temp_del/0
 		 ]).
-
+ 
 %%% for role stuff
 -export([add_role_link/2,
 		 add_role/2,
@@ -41,7 +41,8 @@
 		 get_links/0,
 		 get_links_id/1,
 		 get_links_filter/1,
-		 find_link_details/1]).
+		 find_link_details/1
+		 ]).
 		  
 %%% for user stuff		 
 -export([get_user_roles/1,
@@ -439,6 +440,7 @@ get_roles_id(Roleid) ->
 		end.	
 	
 	
+
 	
 %%% @doc get sites by id 
 -spec get_site_id(pos_integer()) -> [usermod_sites()] | [] | term().
@@ -1143,7 +1145,7 @@ check_ident(Ident,Type,Id)->
 
 	    
     
-%% @private returns link details of a particular linkk
+%% @private returns link details of a particular link
 -spec find_link_details(pos_integer()) -> link_det() | undefined . 
 find_link_details(Linkid)->
 		F = fun() ->
@@ -1187,6 +1189,7 @@ gen_weak_char(Base) ->
  hash_password(Password)->
 		erlpass:hash(Password).
  
+ %% @TODO Use dialyzer for static testing 
  %% @TODO Finish checking for the correct return type for mnesia:activity/2 to aid in dialyzer analysis
  %% @TODO change the hash type
  %% @TODO optimize how the link categories are retrieved 
