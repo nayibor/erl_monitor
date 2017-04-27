@@ -23,17 +23,17 @@ public class Test_java_client {
 		m.set(4, "000010000000");
 		m.set(7, "1107221800");
 		m.set(11, "123456");
-		//m.set(12,"161009132458");
+		m.set(12,"161009132458");
 		m.set(32,"414243");
 		m.set(41, "termid12");
 		m.set(43,"Community1");
 		m.set(44, "A5DFGR");
 		m.set(39,"000");
-		//m.set(102,"12341234234");
+		m.set(102,"12341234234");
 		m.set(22,"FABCDE123ABD");
 		
 
-		for (int i=1;i<=10;i++)
+		for (int i=1;i<=50000;i++)
 		{
 		Date today = new Date();
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmss");

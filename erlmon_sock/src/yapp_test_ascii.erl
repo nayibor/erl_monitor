@@ -82,7 +82,6 @@ process_binary(Bin_message,Message_Area)->
 		OutData = fold_bin(
 			 fun(<<X:1/binary, Rest_bin/binary>>, {Data_for_use_in,Index_start_in,Current_index_in,Map_out_list_in}) when X =:= <<"1">> ->
 					{_Ftype,Flength,Fx_var_fixed,Fx_header_length,_DataElemName} = Spec_fun(Current_index_in),
-					
 					Data_index = case Fx_var_fixed of
 						fx -> 
 							Data_element_fx = binary:part(Data_for_use_in,Index_start_in,Flength),

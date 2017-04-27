@@ -121,6 +121,8 @@ send(Socket, Str) ->
 		ok = gen_tcp:send(Socket,Str).
 
 %% @doc this is for processing the transactions which come through the system 
+%% transction data will be also given to a throwaway process whic which will save the data in mnesia for statistics ,if possible do other stuff b4 dying 
+%%this will be done b4 after the message is sent to all involved but in a seperaate process  
 process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
 		State_new=Isom++Msg,
 		%%io:format("~nfull snet  message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
@@ -141,7 +143,7 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 							{error,_Reason}->
 								{noreply, S#state{iso_message=[]}};
 							_ ->
-								[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
+								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
 								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Message_send_list),	 							
 								{noreply, S#state{iso_message=[]}}    	
 						end;

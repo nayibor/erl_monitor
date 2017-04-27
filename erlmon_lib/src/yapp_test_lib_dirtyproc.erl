@@ -67,9 +67,8 @@ process_message(Message) ->
 %%      doesnt matter which site they belong to .they see everything in system
 -spec get_admin_vew()->[pos_integer()].
 get_admin_vew()->
-	Admn_users = mnesia:dirty_index_read(usermod_users_roles,1,#usermod_users_roles.role_id) ,
-	SuperAdm_users = mnesia:dirty_index_read(usermod_users_roles,3,#usermod_users_roles.role_id),
-	lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],lists:append(Admn_users,SuperAdm_users)).	
+	View_trans_all_users = mnesia:dirty_index_read(usermod_users_roles,7,#usermod_users_roles.role_id) ,
+	lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],View_trans_all_users).	
 	
 	
 	
@@ -131,10 +130,6 @@ process_rules(Rules,Siteident,Message)->
 					(#tempmod_rules_temp{rule_status=Rstat})when Rstat =:= <<"disabled">> -> 
 						false
 				end,Rules).
-
-
-
-
 
 
 %%this is actually used for processing the template
