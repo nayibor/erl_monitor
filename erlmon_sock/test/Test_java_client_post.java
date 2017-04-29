@@ -62,8 +62,8 @@ public class Test_java_client_post {
 * to compile in new changes
 *javac -cp .:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post.java 
 *to run new changes 
-* java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post
-* for i in 1 2 3 4 5
+* java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post -- to start one instance of sending data
+*  ./test_trans.sh 10 --to run as many instances as you want using shell scripts 
 do
    java -Xbootclasspath/p:jpos-2.0.7-SNAPSHOT.jar Test_java_client_post &
 done 

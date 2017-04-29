@@ -135,7 +135,7 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 				Len = lists:sum(LenStr)+?BH,
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->	
-						FlData = yapp_test_ascii:unpack({binary,Rest}),
+						FlData = iso8583_erl:unpack(list,post,Rest),
 						ok = send(AcceptSocket,State_new),	
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
 						Msg_out = msgpack:pack(FlData),
