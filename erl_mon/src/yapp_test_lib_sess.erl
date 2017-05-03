@@ -138,7 +138,7 @@ get_sidebar_links(List_cat)->
 
 %%% @doc for getting a list of only controller/actions from the categorized list 
 %%% have to see if there isnt a better way of doing this ????????? . feels like its iniefficient but have to benchmark to find out
-%%% may have to resort to using the above one but will have to check and see 
+%%% may have to resort to using the above one but will have to check and see .very interesting stuff
 %%%	@end
 get_cont_act(List_cat)->
 	lists:append(lists:foldl(fun({_C,ListEl},Acc)-> [lists:map(fun({Fi,Si,_Ti,_Fti})->{Fi,Si} end,ListEl) | Acc]   end ,[],List_cat)).

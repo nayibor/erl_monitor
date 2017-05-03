@@ -48,17 +48,24 @@ out(Arg,ok,ok) ->
 		outa(Arg,Method,Path).
 
 
-%% @doc	this is for the index_dashboard action get method
+%% @doc	this is for the index_dashboard_view action which is  what they get when they click the view transactions button
 outa(_Arg,'GET',[_,"dashboard","index_dashboard_view"])->
 		Title_Page = "Welcome to Monitor",
 		{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"welcome"}]),
 		{html,UiData};
+
 	
-%% @doc	this is for the index_dashboard action get method
+%% @doc	this is for the index_dashboard action get method. default page users get to see when loggin
 outa(Arg,'GET',[_,"dashboard","index_dashboard"])->
 		Title_Page = "Welcome to Monitor",
 		[{_,Name},{_,Links_Allowd}] = yapp_test_lib_sess:get_user_data(Arg,?COOKIE_VARIABLE),
 		{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"welcome"}]),
+		{html,UiData};
+
+%% @doc	this is for viewing statistics for transactions 
+outa(_Arg,'GET',[_,"dashboard","index_view_stats"])->
+		Title_Page = "View Statistics",
+		{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"}]),
 		{html,UiData};
 
 

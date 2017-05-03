@@ -1,7 +1,7 @@
 {application, erl_mon,
  [{description,"Erl Monitor Web Application"},
   {vsn,"0.1.0"},
-  {modules,[myapp_auth,myapp_dashboard,myapp_inst,myapp_links,myapp_roles,myapp_rules,myapp_sites,myapp_temp,myapp_user,myapp_websocket,myapp_websocket_callback]},
+  {modules,[myapp_auth,myapp_dashboard,myapp_inst,myapp_links,myapp_roles,myapp_rules,myapp_sites,myapp_temp,myapp_user,myapp_websocket,myapp_websocket_callback,yapp_test_lib_sess]},
   {env, [
          {yapp_appmods,
 			[
