@@ -138,7 +138,9 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 						FlData = iso8583_erl:unpack(list,post,Rest),
 						ok = send(AcceptSocket,State_new),	
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
-						Msg_out = msgpack:pack(FlData),
+						%%Msg_out = msgpack:pack(FlData),
+					    Msg_out = erlang:term_to_binary(FlData),
+					    %%io:format("data being sent back to browser is ~p",[Msg_out]),
 					    case Message_send_list of
 							{error,_Reason}->
 								{noreply, S#state{iso_message=[]}};

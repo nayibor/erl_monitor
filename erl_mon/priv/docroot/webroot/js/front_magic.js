@@ -1,18 +1,7 @@
 /* 
 *This file is responsible for translating the messsages that come into forms that can be seen onscreen 
-* will show the messages on screen and parse them and probably give them some color based on the response code 
+*will show the messages on screen and parse them and probably give them some color based on the response code 
 */
-//webs.send(msgpack.encode({"foo": [1,2,3,3,3,3,3,{1:2}]}));
-//webs.send(msgpack.encode({"foo": [1,2,34,5,5,1,21,21,123122,{1:2}]}));
-// encode from JS Object to MessagePack (Buffer)
-//	var buffer = msgpack.encode({"foo": "bar"});
-//	console.log("encoded object is ");
-//	console.log(buffer);
-// decode from MessagePack (Buffer) to JS Object
-//	var data = msgpack.decode(buffer); // => {"foo": "bar"}
-//	console.log("decoded object is ");
-//   console.log(data);
-
 
 $(document).ready(function(){
 
@@ -40,23 +29,15 @@ var front_magic = {
 		
 		});
 		
-		
-		//var strWindowFeatures = "location=yes,height=570,width=520,scrollbars=yes,status=yes";
-		//var URL = "https://www.linkedin.com/cws/share?mini=true&amp;url=" + location.href;
-		//var win = window.open(URL, "_blank", strWindowFeatures);
-		
-		
-
 		webs = new wsClient("localhost", "8004","erl_mon/websock/setup");
-		//callbacks are being used for various printing functionality
+		var arrayBuffer;
+		var view;
 		webs.onMessage=function(data){
-
-		 front_magic.message = msgpack.decode(new Uint8Array(data.data));
-		//console.log(front_magic.message);
+		arrayBuffer = data.data;
+		view = new Uint8Array(arrayBuffer);
+		front_magic.message = Inaka.Jem.decode(arrayBuffer);
 		front_magic.process_message(front_magic.message);
 		};
-		
-		        
 		webs.connect();
 		
 	},	
@@ -65,15 +46,8 @@ var front_magic = {
 	//have to sanitize data before putting in browser
 	build_item:function(message){
 		_this = this ;
-	
-		for (var key in message) {
-		  if (message.hasOwnProperty(key)) {
-		    message[key]= message[key].toString();
-		  }
-		}
 		
 		var tr_all=document.createElement("tr");
-		
 		var pan=document.createElement("td");
         $(pan).html((message[2])? message[2] : "");
      

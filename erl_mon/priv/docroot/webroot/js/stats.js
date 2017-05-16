@@ -47,7 +47,7 @@ stats = {
 	            dataType:'binary',
 	            data:data,
 	            processData: false,
-	           beforeSend:function(){
+	            beforeSend:function(){
 						   myChart.showLoading(); 
 			            },
 	            success:function(data_resp) {
@@ -66,8 +66,8 @@ stats = {
 						var arrayBuffer = this.result;
 						var view = new Uint8Array(arrayBuffer);
 						var jsdata = Inaka.Jem.decode(arrayBuffer);
-						console.log("size of data ret is "+jsdata.length);
-						console.log(jsdata[0]);
+						//console.log("size of data ret is "+jsdata.length);
+						//console.log(jsdata[0]);
 						
 						for (i = 0; i < jsdata.length ; i++)
 						{
@@ -84,8 +84,8 @@ stats = {
 						data_task["downtime_data"] = downtime_data;
 						graph_data[jsdata[i][0]]=data_task;
 						}
-						console.log(categories);
-						console.log(graph_data); 
+						//console.log(categories);
+						//console.log(graph_data); 
 					    legend_data = Object.keys(graph_data);
 					    var stack_num = 1;
 						for (var key in graph_data) {
@@ -94,6 +94,7 @@ stats = {
 							  (stack_num<5)? stack_num++:stack_num=1;
 						  }
 						}
+						/**
 						console.log("finfal data is \n\n\n");
 						console.log("\ncategories is ");
 						console.log(categories.reverse());
@@ -101,6 +102,7 @@ stats = {
 						console.log(legend_data);
 						console.log("\nseries data is ");
 						console.log(series_data);
+						**/
 						chart_data["categories"]=categories.reverse();
 						chart_data["legend"]=legend_data;
 						chart_data["series_data"]=series_data;
@@ -227,4 +229,10 @@ stats = {
 					
 		});
 
+
+//https://ecomfe.github.io/echarts-examples/public/editor.html?c=bar-stack
+//https://ecomfe.github.io/echarts-doc/public/en/tutorial.html#Customerized%20Chart%20Styles
+//https://ecomfe.github.io/echarts-doc/public/en/option.html#yAxis
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
+//http://bert-rpc.org/
 
