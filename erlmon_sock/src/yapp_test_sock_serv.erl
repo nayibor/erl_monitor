@@ -124,7 +124,7 @@ send(Socket, Str) ->
 %% transction data will be also given to a throwaway process whic which will save the data in mnesia for statistics ,if possible do other stuff b4 dying 
 %%this will be done b4 after the message is sent to all involved but in a seperaate process  
 process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_message=Isom})->
-		State_new=Isom++Msg,
+		State_new = lists:flatten([Isom,Msg]), 
 		%%io:format("~nfull snet  message is ~n~s~nlength is ~p~n",[State_new,length(State_new)]),		
 		case length(State_new) of 
 			Size when Size < ?BH -> 

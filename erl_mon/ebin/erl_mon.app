@@ -7,10 +7,10 @@
 			[
 				{"auth",myapp_auth},{"dashboard",myapp_dashboard},{"user",myapp_user},{"links",myapp_links},
 				{"roles",myapp_roles},{"sites",myapp_sites},{"inst",myapp_inst},{"temp",myapp_temp},{"rules",myapp_rules},
-				{"websock",myapp_websocket},{"ymnesia",ymnesia}
+				{"websock",myapp_websocket},{"ymnesia",ymnesia},{"stats",myapp_stats}
 			]
 		 }
         ]
   },
   {registered, []},
-  {applications,[kernel,stdlib,yaws,yapp,erlmon_lib,erlmon_sock,erlydtl]}]}.
+  {applications,[kernel,stdlib,yaws,yapp,erlmon_lib,erlmon_worker_pool,erlmon_sock,erlydtl]}]}.

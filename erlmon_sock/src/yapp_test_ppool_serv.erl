@@ -30,11 +30,10 @@
           [yapp_test_sock_test_gen]}).
 
 
-
-
 -record(state, {limit=0,
                 sup
                 }).
+
 
 -type state() :: #state{}.
 
@@ -57,7 +56,6 @@ increase_limit(Name,Numb) ->
     gen_server:call(Name,{increase_limit,Numb}).
 
 
-
 %% @doc api call which  gets you the number of available websockets/sockets
 -spec get_num_sockets(term())->[tuple()] | {error,any()}.
 get_num_sockets(Name)->
@@ -78,7 +76,6 @@ init({Limit, Sup}) ->
     %%self() ! {start_worker_supervisor, Sup},
     gen_server:cast(self(),{start_worker_supervisor, Sup}),
     {ok, #state{limit=Limit}}.
-
 
 
 %% @doc this call is used for getting the number of  connected sockets,available sockets

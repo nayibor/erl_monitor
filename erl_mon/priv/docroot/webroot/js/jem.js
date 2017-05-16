@@ -54,8 +54,14 @@ if (typeof Inaka.Jem == 'undefined') Inaka.Jem = {};
          return [dv.getInt32(i + 1), i + 5];
        case 100:
          return _decodeAtom(dv, i + 1);
+       case 104:
+         return _decodeTuple(dv, i + 1, 1);
+       case 105:
+         return _decodeTuple(dv, i + 1, 4);
        case 106:
          return [[], i + 2];
+       case 107:
+         return _decodeString(dv, i + 1, 2);
        case 108:
          return _decodeArray(dv, i + 1);
        case 109:
@@ -76,6 +82,29 @@ if (typeof Inaka.Jem == 'undefined') Inaka.Jem = {};
      return [dv, i + 7];
    }
 
+   function _decodeTuple(dv, i, lenBytes)
+   {
+     var l;
+     if(lenBytes == 1)
+     {
+       l = dv.getUint8(i);
+       i += 1;
+     }
+     else
+     {
+       l = dv.getUint32(i);
+       i += 4;
+     }
+
+     var tup = [];
+     for(var k = 0; k < l; k++)
+     {
+       var [el, i] = _decodeValue(dv, i);
+       tup[k] = el;
+     }
+     return [tup, i];
+   }
+
    function _decodeAtom(dv, i)
    {
      var l = dv.getUint16(i);
@@ -91,7 +120,7 @@ if (typeof Inaka.Jem == 'undefined') Inaka.Jem = {};
        case "null":  value = null;  break;
        case "true":  value = true;  break;
        case "false": value = false; break;
-       default: throw "badarg";
+       default: value = str; break;
      }
      return [value, i + k];
    }
@@ -121,7 +150,7 @@ if (typeof Inaka.Jem == 'undefined') Inaka.Jem = {};
      var obj = {};
      for(var k = 0; k < l; k++)
      {
-       var [key, i] = _decodeString(dv, i + 1);
+       var [key, i] = _decodeValue(dv, i);
        var [value, i] = _decodeValue(dv, i);
        obj[key] = value;
      }
@@ -202,10 +231,20 @@ if (typeof Inaka.Jem == 'undefined') Inaka.Jem = {};
      return [dv, i + k];
    }
 
-   function _decodeString(dv, i)
+   function _decodeString(dv, i, lenBytes = 4)
    {
-     var l = dv.getUint32(i);
-     i += 4;
+     var l;
+     if(lenBytes == 2)
+     {
+       l = dv.getUint16(i);
+       i += 2;
+     }
+     else
+     {
+       l = dv.getUint32(i);
+       i += 4;
+     }
+
      var str = "";
      for(var k = 0; k < l; k++)
      {

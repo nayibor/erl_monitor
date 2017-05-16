@@ -9,7 +9,6 @@
 -github("https://bitbucket.com/nameyibor").
 -license("Apache License 2.0").
 -include_lib("yaws/include/yaws_api.hrl").
--include_lib("erlmon_lib/include/yapp_test_lib.hrl").
 
 
 %%%functions for checking user/page permissions
@@ -21,6 +20,9 @@
 		 get_user_websocket/2
 		 ]).
 
+%%type data for storing sessions
+%%% record for storing session information
+-record(session_data,{id,site_id,inst_id,fname,userdata=[],links_allowed=[]}). 
 
 
 %%% @doc for checking whether a user is logged in or not

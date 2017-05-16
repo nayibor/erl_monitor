@@ -62,12 +62,6 @@ outa(Arg,'GET',[_,"dashboard","index_dashboard"])->
 		{ok,UiData} = yapp_sidebar:render([{fname,Name},{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Links_Allowd},{page_type,"welcome"}]),
 		{html,UiData};
 
-%% @doc	this is for viewing statistics for transactions 
-outa(_Arg,'GET',[_,"dashboard","index_view_stats"])->
-		Title_Page = "View Statistics",
-		{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"}]),
-		{html,UiData};
-
 
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		logged in users entering in fake urls	

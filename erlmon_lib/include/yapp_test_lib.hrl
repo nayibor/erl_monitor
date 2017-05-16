@@ -30,9 +30,6 @@
 %%  auto_inc_table
 -record(auto_inc,{name,cvalue}).
 
-%%% record for storing session information
--record(session_data,{id,site_id,inst_id,fname,userdata=[],links_allowed=[]}). 
-
 
 %%% record for storing the site information
 %%	for the mean time the short name will be used for the identtt.should be unique 

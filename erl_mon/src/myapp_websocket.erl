@@ -23,10 +23,11 @@
 
 
 %%% @doc check to see whether use is logged in 
-%%%% temporal change to allow all urls to pass through to aid in testing of mithril 
+%%%% temporal change to allow all urls to pass through to aid in testing of mithril
 out(Arg) ->
-%%%		out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
-		out(Arg,ok,ok).
+    	out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
+    	%%io:format("~n~pcookie::",[Arg]),
+		%%out(Arg,ok,ok).
 		
 		
 %%% @doc for redirecting users not logged in back to login  page  
@@ -62,7 +63,7 @@ outa(Arg,'GET',[_,"websock","setup"])->
 		Data_user = yapp_test_lib_sess:get_user_websocket(Arg,?COOKIE_VARIABLE),
 		CallbackMod = myapp_websocket_callback,
 		Opts = [
-            {origin,"http://" ++ (Arg#arg.headers)#headers.host},
+            {origin,lists:flatten(["http://",(Arg#arg.headers)#headers.host])},
             {callback, {basic, Data_user}}
             %%{keepalive,         KeepAlive},
             %%{keepalive_timeout, Tout},
@@ -80,7 +81,7 @@ outa(Arg,'GET',[_,"websock","mithril"])->
 		
 %% @doc this page is for the mithril.js page which will be used for testing web services 
 %% @doc	this is for the index_dashboard action get method
-outa(Arg,'GET',[_,"websock","mithril_webs"])->
+outa(_Arg,'GET',[_,"websock","mithril_webs"])->
 		
 		%%Json = json2:encode({struct,[{name,"John"},{name,"Mary"}]}),
 		Struct = json2:encode({struct,[{name,"John"},{name,"Mary"}]}),

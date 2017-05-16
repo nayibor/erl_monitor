@@ -54,8 +54,6 @@ out(Arg,ok,ok) ->
 %% @doc	this is for the index_dashboard action get method
 outa(Arg,'GET',[_,"user","get_users"])->
 		Title_Page = "Users",
-		
-		
 		Users = yapp_test_lib_usermod:get_users(),
 		%%io:format("User List is ~p",[Users]),
 		{ok,UiData} = yapp_test_users_list:render([{title,Title_Page},{yapp_prepath,yapp:prepath(Arg)},{data,Users}]),

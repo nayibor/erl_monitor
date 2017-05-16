@@ -20,9 +20,7 @@
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/form.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery.ui.widget.min.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-picklist.min.js"}}"></script>
-        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/datepicker.js"}}"></script>
-        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jquery-ui-timepicker-addon.js"}}"></script>
-        <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
+       <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/settings.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/users.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/links.js"}}"></script>
         <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/roles.js"}}"></script>
@@ -34,8 +32,9 @@
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/reset_pass.js"}}"></script>
 	    <script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/front_magic.js"}}"></script>
 		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/msgpack.min.js"}}"></script>
-
-	
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jem.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/echarts.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/stats.js"}}"></script>
     </head>
     
     <body class="hasInterface hasGradient hasSidebar">   
@@ -64,6 +63,8 @@
 	<input type="hidden" name="save_add_rule" id="save_add_rule" value="{{yapp_prepath|add:"rules/save_add_rule"}}">
 	<input type="hidden" name="save_members_url" id="save_members_url" value="{{yapp_prepath|add:"rules/save_rule_members"}}">
 	<input type="hidden" name="reset_pass_user" id="reset_pass_user" value="{{yapp_prepath|add:"reset_pass.yaws"}}">
+	<input type="hidden" name="get_stats" id="get_stats" value="{{yapp_prepath|add:"stats/get_stats"}}">
+
 
         <div id="oaHeader">
             <div id="oaNavigationExtraTop">
