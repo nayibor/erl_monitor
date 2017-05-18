@@ -94,7 +94,7 @@ outa(_Arg,'GET',[_,"user","get_edit_user",UserId])->
 		case yapp_test_lib_usermod:get_user_id(Intid) of 
 			{_Id,Email,Fname,Lname,Siteid} ->
 				Sites = yapp_test_lib_usermod:get_sites(), 
-				io:format("Sites are ~p",[Sites]),
+				%%io:format("Sites are ~p",[Sites]),
 				{ok,UiData} = yapp_test_add_user:render([{sites_sys,Sites},{siteid,Siteid},{type_user_tran,"edit_user"},{id,Intid},{email,Email},{fname,Fname},{lname,Lname}]),
 				{html,UiData};
 			_ ->

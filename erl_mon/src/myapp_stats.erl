@@ -58,31 +58,44 @@ out(Arg,ok,ok) ->
 %%basic transaction list will have to be obtained here for viewing
 outa(_Arg,'GET',[_,"stats","index_view_stats"])->
 		Title_Page = "View Statistics",
-		{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"}]),
-		{html,UiData};
+		Query = "SELECT task_name FROM realtime_data.dbo.tasks;",
+		Param = [],
+		case erlmon_worker_pool:query(Query,Param) of 
+			{ok,{_,_,Tasks}} ->
+					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"ok"},{task_info,Tasks}]),
+					{html,UiData};
+			{error,_Reason} ->
+					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"error"},{task_info,[]}]),
+					{html,UiData}
+		end;	
 
 
 %% @doc	this is for the getting institutions
 outa(Arg,'GET',[_,"stats","get_stats"])->
 		
-		io:format("data stuff ~p",[yaws_api:parse_query(Arg)]),
-		Start_date = yaws_api:queryvar(Arg,"start_date"),
-		End_date = yaws_api:queryvar(Arg,"end_date"),
-		case  Start_date =:= undefined orelse
-		      End_date =:= undefined of
-					true ->
-						yapp_test_lib_util:message_client(500,"Required Field is Empty");
+		%%io:format("data stuff ~p",[yaws_api:parse_query(Arg)]),
+		{ok,Start_date} = yaws_api:queryvar(Arg,"start_date"),
+		{ok,End_date} = yaws_api:queryvar(Arg,"end_date"),
+		{ok,Task_type} = yaws_api:queryvar(Arg,"task_type"),
+		case Start_date =:= undefined 
+			orelse erlang:length(Start_date) =/= 10 
+			orelse erlang:length(End_date)=/=10 
+			orelse End_date =:= undefined
+			orelse erlang:length(Task_type)>25 
+			orelse Task_type =:= undefined
+			 of
+			 		true ->
+						yapp_test_lib_util:message_client(500,"Required Field is Empty Or Size Is Incorrect");
 					_ ->
-						{_,Sd}=Start_date,
-						{_,Ed}=End_date,
 						 Query = "SELECT * FROM realtime_data.dbo.task_uptime  where  
-								  date_begin >? and date_begin<? 
+								  date_begin >=? and date_begin<=? and task_name=?
 								  order by date_begin DESC;",
-						Param = [{{sql_varchar,10}, [Sd]},{{sql_varchar, 10}, [Ed]}],		  
+						Param = [{{sql_varchar,10}, [Start_date]},{{sql_varchar, 10}, [End_date]},{{sql_varchar, 25}, [Task_type]}],		  
 						case erlmon_worker_pool:query(Query,Param) of 
 							{ok,{_,_,Tasks}} ->
 									%%io:format("~n First Task:~p~nSize:~p",[lists:nth(1,Tasks),erlang:length(Tasks)]),
-									 {content,"application/octet-stream",erlang:term_to_binary(Tasks)};
+									%%yapp_test_lib_util:message_client(500,"There was an error getting the data.<b>Please try again</b>");
+									{content,"application/octet-stream",erlang:term_to_binary(Tasks)};
 							{error,_Reason} ->
 									yapp_test_lib_util:message_client(500,"There was an error getting the data.<b>Please try again</b>")	
 						end
