@@ -40,7 +40,7 @@ stats = {
 		//for performing the ajax to get the data about the stats using the date range 
 		get_stats:function(link){
 			var myChart = echarts.init(document.getElementById('main'));
-			var data = "start_date="+$("#start_date").val()+"&end_date="+$("#end_date").val();
+			var data = "start_date="+$("#start_date").val()+"&end_date="+$("#end_date").val()+"&task_type="+$("#task_type").val();
 			$.ajax({
 	            url: link,
 	            type:"GET",
@@ -61,11 +61,13 @@ stats = {
 						var categories_data=[];
 						var chart_data=[];
 						var series_data =[];
+						var color_series = [];
 						var fileReader = new FileReader();
 						fileReader.onloadend = function() {
 						var arrayBuffer = this.result;
 						var view = new Uint8Array(arrayBuffer);
 						var jsdata = Inaka.Jem.decode(arrayBuffer);
+						var title= "";
 						//console.log("size of data ret is "+jsdata.length);
 						//console.log(jsdata[0]);
 						
@@ -84,14 +86,20 @@ stats = {
 						data_task["downtime_data"] = downtime_data;
 						graph_data[jsdata[i][0]]=data_task;
 						}
-						//console.log(categories);
-						//console.log(graph_data); 
+						console.log(categories);
+						console.log(graph_data); 
 					    legend_data = Object.keys(graph_data);
 					    var stack_num = 1;
 						for (var key in graph_data) {
 						  if (graph_data.hasOwnProperty(key)) {	  
+							  if($("#up_down").val()=="uptime"){
 							  series_data.push({name:key,type:'bar',stack:stack_num,data:graph_data[key]['uptime_data']});
-							  (stack_num<5)? stack_num++:stack_num=1;
+							  title="Uptime Percentage";
+						  }else if($("#up_down").val()=="downtime"){
+						    series_data.push({name:key,type:'bar',stack:stack_num,data:graph_data[key]['downtime_data']});
+							  title="Downtime In Seconds";
+					  } 
+							 (stack_num<3)? stack_num++:stack_num=1;
 						  }
 						}
 						/**
@@ -103,10 +111,26 @@ stats = {
 						console.log("\nseries data is ");
 						console.log(series_data);
 						**/
+						//for color calculation
+						//var hStep = Math.round(300 / (legend_data.length - 1));
+						//for (var i = 0; i < legend_data.length; i++) {
+						//color_series.push(echarts.color.modifyHSL('#5A94DF', hStep * i));    
+				//	}
+						color_series=
+						[ '#000000','#993300','#333300','#003300','#003366','#000080', 	    	  	    
+							'#800000','#FF6600','#808000','#008000','#008080','#0000FF', 	    		    
+							'#FF0000','#FF9900','#99CC00','#339966','#33CCCC','#3366FF', 	    	 	    
+							'#FF00FF','#FFCC00','#FFFF00','#00FF00','#00FFFF','#00CCFF', 	    	    
+							'#FF99CC','#FFCC99','#FFFF99','#CCFFCC','#CCFFFF','#99CCFF'
+						];
+						//console.log(legend_data);
+						//console.log(color_series);
+						
+						chart_data["color"]=color_series;
 						chart_data["categories"]=categories.reverse();
 						chart_data["legend"]=legend_data;
 						chart_data["series_data"]=series_data;
-						chart_data["title"]="Uptime";
+						chart_data["title"]=title;
 						stats.create_chart(myChart,chart_data);
 					
 						};
@@ -125,11 +149,13 @@ stats = {
 		//this is for creating echarts
 		create_chart:function(myChart,chart_data){
 		     myChart.hideLoading();
+		     
         // specify chart configuration item and data
 			 var option = {
+				 //color:chart_data["color"],
 	            title: {
 	                text: chart_data["title"],
-	                show:false
+	                show:true
 	            },
 	           tooltip : {
 			        trigger: 'axis',
@@ -137,14 +163,24 @@ stats = {
 			            type : 'shadow'    
 			        }
 			    },
+			     toolbox:{
+					show : true,
+					feature :{
+					 magicType : {show: true, type: ['line', 'bar']},
+					restore : {show: true},
+					saveAsImage : {show: true}
+				}
+			},
 			   grid: {
+					top:'20%',
 			        left: '0%',
 			        right: '0%',
 			        bottom: '0%',
 			        containLabel: true
 			    },
 	            legend: {
-	                data:chart_data["legend"]
+	                data:chart_data["legend"],
+	                zlevel:9999
 	            },
 	             xAxis : [
 			        {

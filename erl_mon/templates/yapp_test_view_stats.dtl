@@ -12,6 +12,21 @@
 					             <input type="date" class="ca" required name="end_date" id="end_date" placeholder="End Date">
 					        </li>
 					        <li>
+					              <select class="ca" required name="task_type" id="task_type">
+										<option>Please Select Task</option>
+			                            {% for task_name in task_info %}
+												<option value="{{task_name}}">{{task_name}}</option>
+										{% endfor %}
+									</select>
+					        </li>
+							<li>
+					              <select class="ca" required name="up_down" id="up_down">
+										<option>Please Select Availability</option>
+			                           <option value="uptime">Uptime</option>
+									   <option value="downtime">Downtime</option>
+									</select>
+					        </li>
+					        <li>
 					             <input type="button" name="search_stats_butt" id="search_stats_butt" value="Search">
 					        </li>
 					    </ul>
@@ -21,6 +36,6 @@
 					    
 				</div>
 				<div id="table_info" name ="table_info">
-						<div id="main" style="margin:10px;width:100% !important;height:700px !important;overflow:scroll"></div>
+						<div id="main" style="margin:10px;margin-bottom:0px;width:100% !important;height:750px !important;overflow:scroll"></div>
 				</div>			
 		</div>
