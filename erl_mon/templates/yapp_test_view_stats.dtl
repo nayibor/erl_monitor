@@ -5,6 +5,7 @@
 				<div class="tableHeader">
 						
 						<ul class="tableActions">
+					       {% if status == "ok" %}
 					        <li>
 					             <input type="date" class="ca" required name="start_date" id="start_date" placeholder="Start Date">
 					        </li>
@@ -29,7 +30,13 @@
 					        <li>
 					             <input type="button" name="search_stats_butt" id="search_stats_butt" value="Search">
 					        </li>
+					        {% endif %}
+					        {% if status == "error" %}
+					        <li><label>There was a problem connecting to database.Please try again later</label></li>
+					        {% endif %}   
 					    </ul>
+					    
+					    
 					        <div class="clear"></div>
 					        <div class="corner left"></div>
 					        <div class="corner right"></div>

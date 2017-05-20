@@ -78,10 +78,10 @@ outa(Arg,'GET',[_,"stats","get_stats"])->
 		{ok,End_date} = yaws_api:queryvar(Arg,"end_date"),
 		{ok,Task_type} = yaws_api:queryvar(Arg,"task_type"),
 		case Start_date =:= undefined 
-			orelse erlang:length(Start_date) =/= 10 
-			orelse erlang:length(End_date)=/=10 
+			orelse erlang:length(Start_date) >23 
+			orelse erlang:length(End_date)>23 
 			orelse End_date =:= undefined
-			orelse erlang:length(Task_type)>25 
+			orelse erlang:length(Task_type)>30 
 			orelse Task_type =:= undefined
 			 of
 			 		true ->
@@ -90,7 +90,7 @@ outa(Arg,'GET',[_,"stats","get_stats"])->
 						 Query = "SELECT * FROM realtime_data.dbo.task_uptime  where  
 								  date_begin >=? and date_begin<=? and task_name=?
 								  order by date_begin DESC;",
-						Param = [{{sql_varchar,10}, [Start_date]},{{sql_varchar, 10}, [End_date]},{{sql_varchar, 25}, [Task_type]}],		  
+						Param = [{{sql_varchar,23}, [Start_date]},{{sql_varchar, 23}, [End_date]},{{sql_varchar, 30}, [Task_type]}],		  
 						case erlmon_worker_pool:query(Query,Param) of 
 							{ok,{_,_,Tasks}} ->
 									%%io:format("~n First Task:~p~nSize:~p",[lists:nth(1,Tasks),erlang:length(Tasks)]),

@@ -157,6 +157,7 @@ stats = {
 	                text: chart_data["title"],
 	                show:true
 	            },
+	            animationEasing:"elasticOut",
 	           tooltip : {
 			        trigger: 'axis',
 			        axisPointer : {           
