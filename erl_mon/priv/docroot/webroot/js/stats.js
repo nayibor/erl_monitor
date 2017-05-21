@@ -8,10 +8,8 @@ stats = {
 				e.preventDefault();
 				var link = $("#get_stats").val();
 				stats.checkfields(link);
-						}); 
-						
-			stats.add_binary_transport();			
-			
+			}); 
+			stats.add_binary_transport();
 		}, 
 			
 			//for checking the date fields
@@ -93,10 +91,10 @@ stats = {
 						for (var key in graph_data) {
 						  if (graph_data.hasOwnProperty(key)) {	  
 							  if($("#up_down").val()=="uptime"){
-							  series_data.push({name:key,type:'bar',stack:stack_num,data:graph_data[key]['uptime_data']});
+							  series_data.push({name:key,type:'bar',/*stack:stack_num,**/data:graph_data[key]['uptime_data']});
 							  title="Uptime Percentage";
 						  }else if($("#up_down").val()=="downtime"){
-						    series_data.push({name:key,type:'bar',stack:stack_num,data:graph_data[key]['downtime_data']});
+						    series_data.push({name:key,type:'bar',/*stack:stack_num,**/data:graph_data[key]['downtime_data']});
 							  title="Downtime In Seconds";
 					  } 
 							 (stack_num<3)? stack_num++:stack_num=1;
@@ -155,7 +153,7 @@ stats = {
 				 //color:chart_data["color"],
 	            title: {
 	                text: chart_data["title"],
-	                show:true
+	                show:false
 	            },
 	            animationEasing:"elasticOut",
 	           tooltip : {
@@ -181,7 +179,8 @@ stats = {
 			    },
 	            legend: {
 	                data:chart_data["legend"],
-	                zlevel:9999
+	                zlevel:9999,
+	                left:"0%"
 	            },
 	             xAxis : [
 			        {
