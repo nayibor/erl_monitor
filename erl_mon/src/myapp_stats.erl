@@ -65,6 +65,7 @@ outa(_Arg,'GET',[_,"stats","index_view_stats"])->
 					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"ok"},{task_info,Tasks}]),
 					{html,UiData};
 			{error,_Reason} ->
+					io:format("i am here in my life"),
 					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"error"},{task_info,[]}]),
 					{html,UiData}
 		end;	
@@ -77,20 +78,22 @@ outa(Arg,'GET',[_,"stats","get_stats"])->
 		{ok,Start_date} = yaws_api:queryvar(Arg,"start_date"),
 		{ok,End_date} = yaws_api:queryvar(Arg,"end_date"),
 		{ok,Task_type} = yaws_api:queryvar(Arg,"task_type"),
+		%%io:format("task_type is ~p",[Task_type]),
 		case Start_date =:= undefined 
 			orelse erlang:length(Start_date) >23 
 			orelse erlang:length(End_date)>23 
 			orelse End_date =:= undefined
-			orelse erlang:length(Task_type)>30 
 			orelse Task_type =:= undefined
 			 of
 			 		true ->
 						yapp_test_lib_util:message_client(500,"Required Field is Empty Or Size Is Incorrect");
 					_ ->
-						 Query = "SELECT * FROM realtime_data.dbo.task_uptime  where  
-								  date_begin >=? and date_begin<=? and task_name=?
-								  order by date_begin DESC;",
-						Param = [{{sql_varchar,23}, [Start_date]},{{sql_varchar, 23}, [End_date]},{{sql_varchar, 30}, [Task_type]}],		  
+						 Data = lists:filtermap(fun(Task) -> case erlang:length(Task)=<30 of true -> {true,{{sql_varchar, 30}, [Task]}}; _ -> false end end,string:tokens(Task_type,",")),
+						 Query_first = "SELECT * FROM realtime_data.dbo.task_uptime  where date_begin >=? and date_begin<=? and task_name in ", 
+						Rest =" order by date_begin DESC;",		  
+						Query = lists:flatten([Query_first,"(",string:join(lists:duplicate(erlang:length(Data),"?"),","),")",Rest]),
+						%%io:format("~n query is ~p",[Query]),
+						Param = [{{sql_varchar,23}, [Start_date]},{{sql_varchar, 23}, [End_date]}|Data],		  
 						case erlmon_worker_pool:query(Query,Param) of 
 							{ok,{_,_,Tasks}} ->
 									%%io:format("~n First Task:~p~nSize:~p",[lists:nth(1,Tasks),erlang:length(Tasks)]),
