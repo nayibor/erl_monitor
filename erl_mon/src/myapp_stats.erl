@@ -89,9 +89,10 @@ outa(Arg,'GET',[_,"stats","get_stats"])->
 						yapp_test_lib_util:message_client(500,"Required Field is Empty Or Size Is Incorrect");
 					_ ->
 						 Data = lists:filtermap(fun(Task) -> case erlang:length(Task)=<30 of true -> {true,{{sql_varchar, 30}, [Task]}}; _ -> false end end,string:tokens(Task_type,",")),
-						 Query_first = "SELECT * FROM realtime_data.dbo.task_uptime  where date_begin >=? and date_begin<=? and task_name in ", 
-						Rest =" order by date_begin DESC;",		  
-						Query = lists:flatten([Query_first,"(",string:join(lists:duplicate(erlang:length(Data),"?"),","),")",Rest]),
+						Query_first = "SELECT * FROM realtime_data.dbo.task_uptime  where date_begin >=? and date_begin <= cast(? as datetime)+1 and task_name in ",
+						Middle = ["(",string:join(lists:duplicate(erlang:length(Data),"?"),","),")"],
+						Rest =" order by date_begin ASC;",
+						Query = lists:flatten([Query_first,Middle,Rest]),
 						%%io:format("~n query is ~p",[Query]),
 						Param = [{{sql_varchar,23}, [Start_date]},{{sql_varchar, 23}, [End_date]}|Data],		  
 						case erlmon_worker_pool:query(Query,Param) of 

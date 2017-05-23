@@ -84,8 +84,8 @@ stats = {
 						data_task["downtime_data"] = downtime_data;
 						graph_data[jsdata[i][0]]=data_task;
 						}
-						console.log(categories);
-						console.log(graph_data); 
+						//console.log(categories);
+						//console.log(graph_data); 
 					    legend_data = Object.keys(graph_data);
 					    var stack_num = 1;
 						for (var key in graph_data) {
@@ -100,32 +100,8 @@ stats = {
 							 (stack_num<3)? stack_num++:stack_num=1;
 						  }
 						}
-						/**
-						console.log("finfal data is \n\n\n");
-						console.log("\ncategories is ");
-						console.log(categories.reverse());
-						console.log("\nlegend is ");
-						console.log(legend_data);
-						console.log("\nseries data is ");
-						console.log(series_data);
-						**/
-						//for color calculation
-						//var hStep = Math.round(300 / (legend_data.length - 1));
-						//for (var i = 0; i < legend_data.length; i++) {
-						//color_series.push(echarts.color.modifyHSL('#5A94DF', hStep * i));    
-				//	}
-						color_series=
-						[ '#000000','#993300','#333300','#003300','#003366','#000080', 	    	  	    
-							'#800000','#FF6600','#808000','#008000','#008080','#0000FF', 	    		    
-							'#FF0000','#FF9900','#99CC00','#339966','#33CCCC','#3366FF', 	    	 	    
-							'#FF00FF','#FFCC00','#FFFF00','#00FF00','#00FFFF','#00CCFF', 	    	    
-							'#FF99CC','#FFCC99','#FFFF99','#CCFFCC','#CCFFFF','#99CCFF'
-						];
-						//console.log(legend_data);
-						//console.log(color_series);
-						
 						chart_data["color"]=color_series;
-						chart_data["categories"]=categories.reverse();
+						chart_data["categories"]=categories;
 						chart_data["legend"]=legend_data;
 						chart_data["series_data"]=series_data;
 						chart_data["title"]=title;
@@ -137,6 +113,7 @@ stats = {
 	       
 	            },
 	            error:function(Data){
+				   myChart.hideLoading();
 	               settings.enable_okbutt_mgdialg();
 	               settings.show_message("Error<br>"+"Please Try Again");      
 	            }
@@ -153,7 +130,7 @@ stats = {
 				 //color:chart_data["color"],
 	            title: {
 	                text: chart_data["title"],
-	                show:false
+	                show:true
 	            },
 	            animationEasing:"elasticOut",
 	           tooltip : {
@@ -180,7 +157,8 @@ stats = {
 	            legend: {
 	                data:chart_data["legend"],
 	                zlevel:9999,
-	                left:"0%"
+	                top:"10%",
+	                left:"0%",
 	            },
 	             xAxis : [
 			        {
