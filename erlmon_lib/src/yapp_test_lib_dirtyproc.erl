@@ -19,8 +19,7 @@
 		 process_message/1	 
 		]).
 
-
-
+ 
 %% @doc for testing and bringing out statistics		
 test_message(Message)->
 		statistics(wall_clock),
@@ -33,43 +32,31 @@ test_message(Message)->
 %% message processing will either be successful or will generate an error tuple depending on error reason
 -spec process_message(map())-> [pos_integer()] | {error,binary()}.
 process_message(Message) ->
-		 case get_site_message(Message) of
-				undefined ->
-					{error,<<"Index Not Found">>};
-				Site ->
-					case validate_site_index(Site)  of
-						{ok,Id} ->
-							case get_rules_index(Id) of
-								{ok,Rules}->
-									RuleAns = lists:append(process_rules(Rules,Site,Message)),
-									RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew()),
-									lists:foldl(fun(Item,Acc)->
-													case lists:member(Item,Acc) of
-														true ->
-															Acc;
-														false ->
-															[Item|Acc]	
-													 end
-												end,
-									 [],RuleAnsPlusAdmin);
-								{error,Reason}->
-									Reason
-							end;	
-						{error,Reason} ->
-							{error,Reason}
-					end
-		 end.
-	
-	
+		case get_rules_index_new(Message) of
+			{ok,Rules}->
+				RuleAns = lists:append(process_rules(Rules,Message)),
+				RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew()),
+				lists:foldl(fun(Item,Acc)->
+								case lists:member(Item,Acc) of
+									true ->
+										Acc;
+									false ->
+										[Item|Acc]
+								 end
+							end,
+				 [],RuleAnsPlusAdmin);
+			{error,Reason}->
+				Reason
+		end.
+
 	
 %% @doc for getting the admins/superadmins in system
 %%		these group of guys in system get to see all transaction rolling through system
 %%      doesnt matter which site they belong to .they see everything in system
 -spec get_admin_vew()->[pos_integer()].
 get_admin_vew()->
-	View_trans_all_users = mnesia:dirty_index_read(usermod_users_roles,7,#usermod_users_roles.role_id) ,
-	lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],View_trans_all_users).	
-	
+		View_trans_all_users = mnesia:dirty_index_read(usermod_users_roles,7,#usermod_users_roles.role_id) ,
+		lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],View_trans_all_users).	
 	
 	
 %% @doc this is supposed to retrieve the site given a iso message
@@ -86,23 +73,65 @@ get_site_message(Message)->
 %%% @doc get sites by index 
 -spec validate_site_index(Filter::binary()) -> tuple().	
 validate_site_index(Filter) ->
-			case mnesia:dirty_index_read(usermod_sites,Filter,#usermod_sites.site_short_name) of 
-				[#usermod_sites{id=Id}]->
-					{ok,Id};
-				_->
-					{error,<<"No Site">>}
-			end.
-			
-			
+		case mnesia:dirty_index_read(usermod_sites,Filter,#usermod_sites.site_short_name) of 
+			[#usermod_sites{id=Id}]->
+				{ok,Id};
+			_->
+				{error,<<"No Site">>}
+		end.
+		
+						
 %% @doc for getting rules which have a particular index
 -spec get_rules_index(pos_integer())-> {ok,[term()]}|{error,binary()}.
 get_rules_index(Siteid) ->
-			case mnesia:dirty_index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id) of 
-				[]->
-					{error,<<"No Rule">>};
-				S-> 
-					{ok,S}
+			
+			%%find site from here if possible
+			%%add rules for everybody also here 
+		case mnesia:dirty_index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id) of 
+			[]->
+				{error,<<"No Rule">>};
+			S-> 
+				{ok,S}
+		end.
+
+
+%% @doc for getting rules which have a particular index
+-spec get_rules_index_new(pos_integer())-> {ok,[term()]}|{error,binary()}.
+get_rules_index_new(Message) ->			
+			%%find site from here if possible
+			%%add generic rules which is used for sending messes to people if site does not have its own rules
+			%%this ensures that rules for generic stuff for which emails  have to be sent will be returned even if there are no site rules
+		case get_site_message(Message) of 
+			undefined->
+				get_generic_rules();
+			Siteid ->
+				case validate_site_index(Siteid) of 
+					{ok,Id}->
+						Rules_Site = mnesia:dirty_index_read(tempmod_rules_temp,Id,#tempmod_rules_temp.site_id),	
+						Generic_Rules = mnesia:dirty_index_read(tempmod_rules_temp,2,#tempmod_rules_temp.category_rule),
+						List_Rules = lists:flatten(Rules_Site,Generic_Rules),
+						case erlang:length(List_Rules) of
+							Avail when Avail > 0 ->
+								{ok,List_Rules};
+							_ ->
+								{error,<<"No Rule">>}
+						end;
+					 _ ->
+						get_generic_rules()
+				end
 			end.
+
+
+%%this is for returning generic rule list
+-spec get_generic_rules()->{ok,list()}|{error,binary()}.
+get_generic_rules() ->
+		List_Rules = mnesia:dirty_index_read(tempmod_rules_temp,2,#tempmod_rules_temp.category_rule),
+						case erlang:length(List_Rules) of
+							Avail when Avail > 0 ->
+								{ok,List_Rules};
+							_ ->
+								{error,<<"No Site">>}
+						end.
 
 
 %% @doc for getting the template iden for a specific ident
@@ -115,13 +144,14 @@ get_template_ident(Id)->
 				   <<>>
 		    end.
 
+
 %% @doc for processing the actual rules .this will process the rules for a site and bring out a list if users
 %% whom are eligible to view that rule 
--spec process_rules([tuple()],binary(),binary())->[]|[pos_integer()].
-process_rules(Rules,Siteident,Message)->
+-spec process_rules([tuple()],binary())->[]|[pos_integer()].
+process_rules(Rules,Message)->
 		lists:filtermap(
 				fun(#tempmod_rules_temp{template_id=Tid,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus})when Rstat =:= <<"enabled">> -> 
-					case process_rule_inst(get_template_ident(Tid),Siteident,Rule_opt,Message) of 
+					case process_rule_inst(get_template_ident(Tid),Rule_opt,Message) of 
 						true	->
 							{true,Rus};
 						false ->
@@ -132,26 +162,21 @@ process_rules(Rules,Siteident,Message)->
 				end,Rules).
 
 
-%%this is actually used for processing the template
-%%user data as well data from the message are extracted and compared 
--spec process_rule_inst(Template_type::binary(),Site_Rule::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
-process_rule_inst(<<"site_temp">>,_Site_rule,_Options_creator,_Isomessage)->
+%%this rule is for sending a mesage back to members of a site/group etc..
+-spec process_rule_inst(Template_type::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
+process_rule_inst(<<"site_temp">>,_Options_creator,_Isomessage)->
 		true;
 		
-%%this is actually used for processing the template
-%%user data as well data from the message are extracted and compared 
-process_rule_inst(<<"nt">>,Site_rule,_Options_creator,Isomessage)->
-		Inst_iso = proplists:get_value(<<"site">>,Isomessage),
-		case  Inst_iso =:= Site_rule of 
-			true ->
-				true;
-			false ->
-				false
-		end;		
-					 
+		
+%%this is for generic rules 
+%%rules for which  mails will be sent 
+%%this rule will be applied for everybody regardless of site 
+%%can be used for rules which have to be sent regardless of site 
+process_rule_inst(<<"genx">>,_Options_creator,_Isomessage)->
+		true;			 
 
 %%this is actually used for processing the template
 %%user data as well data from the message are extracted and compared 
-process_rule_inst(_,_Site_rule,_Options_creator,_Isomessage)->
+process_rule_inst(_,_Options_creator,_Isomessage)->
 		false.		
 		
