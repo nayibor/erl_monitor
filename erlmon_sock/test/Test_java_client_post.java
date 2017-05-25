@@ -14,7 +14,7 @@ public class Test_java_client_post {
 		logger.addListener (new SimpleLogListener (System.out));
 		PostChannel channel = new PostChannel ("localhost", 8005, new GenericPackager("ecopostpack.xml"));
 		((LogSource)channel).setLogger (logger, "test-channel");
-		channel.connect ();
+		
 		//GenericPackager packager = new GenericPackager("iso93ascii.xml");
 		ISOMsg m = new ISOMsg ();
 		m.setMTI("0200");
@@ -39,7 +39,7 @@ public class Test_java_client_post {
 		m.set(49, "840");
 		m.set(102,"12341234234");
 //01110010001101000100010010000001000010101111000010000000000000000011000100110000001100010011001000110011001100010011001000110011	
-
+		channel.connect ();
 		for (int i=1;i<=10000;i++)
 		{
 		

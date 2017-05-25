@@ -138,15 +138,14 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 						FlData = iso8583_erl:unpack(list,post,Rest),
 						ok = send(AcceptSocket,State_new),	
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
-						%%Msg_out = msgpack:pack(FlData),
-					    Msg_out = erlang:term_to_binary(FlData),
-					    %%io:format("data being sent back to browser is ~p",[Msg_out]),
-					    case Message_send_list of
+						%%io:format("~nmessage to be sent in the future is ~p",[Message_send_list]), 
+						 Msg_out = erlang:term_to_binary(FlData),
+						 case Message_send_list of
 							{error,_Reason}->
 								{noreply, S#state{iso_message=[]}};
-							_ ->
-								%%[{I, (catch gproc:send({n, l, I},{transaction_message,FlData}))} || I <- Message_send_list],
-								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Message_send_list),	 							
+							Send_list ->
+								Socket_list = maps:get(socket_list,Send_list),
+								lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Socket_list),	 							
 								{noreply, S#state{iso_message=[]}}    	
 						end;
 					SizeafterHead when Len < SizeafterHead ->

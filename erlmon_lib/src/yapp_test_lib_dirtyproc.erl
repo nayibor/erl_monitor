@@ -32,19 +32,20 @@ test_message(Message)->
 %% message processing will either be successful or will generate an error tuple depending on error reason
 -spec process_message(map())-> [pos_integer()] | {error,binary()}.
 process_message(Message) ->
-		case get_rules_index_new(Message) of
+		case get_rules(Message) of
 			{ok,Rules}->
-				RuleAns = lists:append(process_rules(Rules,Message)),
-				RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew()),
-				lists:foldl(fun(Item,Acc)->
-								case lists:member(Item,Acc) of
-									true ->
-										Acc;
-									false ->
-										[Item|Acc]
-								 end
-							end,
-				 [],RuleAnsPlusAdmin);
+				process_rules(Rules,Message);
+				%%RuleAns = lists:append(process_rules(Rules,Message));
+				%%RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew());
+				%%lists:foldl(fun(Item,Acc)->
+				%%				case lists:member(Item,Acc) of
+				%%					true ->
+				%%						Acc;
+				%%					false ->
+				%%						[Item|Acc]
+				%%				 end
+				%%			end,
+				 %%[],RuleAnsPlusAdmin);
 			{error,Reason}->
 				Reason
 		end.
@@ -80,24 +81,10 @@ validate_site_index(Filter) ->
 				{error,<<"No Site">>}
 		end.
 		
-						
-%% @doc for getting rules which have a particular index
--spec get_rules_index(pos_integer())-> {ok,[term()]}|{error,binary()}.
-get_rules_index(Siteid) ->
-			
-			%%find site from here if possible
-			%%add rules for everybody also here 
-		case mnesia:dirty_index_read(tempmod_rules_temp,Siteid,#tempmod_rules_temp.site_id) of 
-			[]->
-				{error,<<"No Rule">>};
-			S-> 
-				{ok,S}
-		end.
-
 
 %% @doc for getting rules which have a particular index
--spec get_rules_index_new(pos_integer())-> {ok,[term()]}|{error,binary()}.
-get_rules_index_new(Message) ->			
+-spec get_rules(pos_integer())-> {ok,[term()]}|{error,binary()}.
+get_rules(Message) ->
 			%%find site from here if possible
 			%%add generic rules which is used for sending messes to people if site does not have its own rules
 			%%this ensures that rules for generic stuff for which emails  have to be sent will be returned even if there are no site rules
@@ -149,17 +136,33 @@ get_template_ident(Id)->
 %% whom are eligible to view that rule 
 -spec process_rules([tuple()],binary())->[]|[pos_integer()].
 process_rules(Rules,Message)->
-		lists:filtermap(
-				fun(#tempmod_rules_temp{template_id=Tid,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus})when Rstat =:= <<"enabled">> -> 
+		Map_users = maps:new(),
+		Mail_list = maps:put(mail_list,[],Map_users),
+		List_socket_Mail= maps:put(socket_list,[],Mail_list),
+		lists:foldl(
+			fun(#tempmod_rules_temp{template_id=Tid,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus,category_rule=Ctr},Acc_Map)when Rstat =:= <<"enabled">> andalso (Ctr =:=1  orelse Ctr =:= 2)-> 
+				Mail_or_socket = 
+					case Ctr of 
+					  1 ->socket_list;
+					  2 ->mail_list
+					end,	
 					case process_rule_inst(get_template_ident(Tid),Rule_opt,Message) of 
-						true	->
-							{true,Rus};
-						false ->
-							false
+							true ->
+								Socket_New_list = lists:foldl(fun(SinU,Acc_Map_ls)->
+																case lists:member(SinU,Acc_Map) of 
+																  true -> 
+																	Acc_Map;
+																  false ->
+																	[SinU|Acc_Map_ls]
+																end
+															  end,Rus,maps:get(Mail_or_socket,Acc_Map)),
+								maps:update(Mail_or_socket,Socket_New_list,Acc_Map);
+							false ->
+								Acc_Map
 					end;
-					(#tempmod_rules_temp{rule_status=Rstat})when Rstat =:= <<"disabled">> -> 
-						false
-				end,Rules).
+			(#tempmod_rules_temp{rule_status=Rstat},Acc_Map)when Rstat =:= <<"disabled">> -> 
+					Acc_Map
+			end, List_socket_Mail, Rules).                          
 
 
 %%this rule is for sending a mesage back to members of a site/group etc..
