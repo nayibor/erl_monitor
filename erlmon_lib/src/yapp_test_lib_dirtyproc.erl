@@ -84,17 +84,11 @@ validate_site_index(Filter) ->
 
 %% @doc for getting rules which have a particular index
 -spec get_rules(pos_integer())-> {ok,[term()]}|{error,binary()}.
-get_rules(Message) ->
+get_rules(_Message) ->
 			%%find site from here if possible
 			%%add generic rules which is used for sending messes to people if site does not have its own rules
 			%%this ensures that rules for generic stuff for which emails  have to be sent will be returned even if there are no site rules
-		case get_site_message(Message) of 
-			undefined->
-				get_generic_rules();
-			Siteid ->
-				case validate_site_index(Siteid) of 
-					{ok,Id}->
-						Rules_Site = mnesia:dirty_index_read(tempmod_rules_temp,Id,#tempmod_rules_temp.site_id),	
+						Rules_Site = mnesia:dirty_index_read(tempmod_rules_temp,1,#tempmod_rules_temp.category_rule),	
 						Generic_Rules = mnesia:dirty_index_read(tempmod_rules_temp,2,#tempmod_rules_temp.category_rule),
 						List_Rules = lists:flatten(Rules_Site,Generic_Rules),
 						case erlang:length(List_Rules) of
@@ -102,12 +96,7 @@ get_rules(Message) ->
 								{ok,List_Rules};
 							_ ->
 								{error,<<"No Rule">>}
-						end;
-					 _ ->
-						get_generic_rules()
-				end
-			end.
-
+						end.
 
 %%this is for returning generic rule list
 -spec get_generic_rules()->{ok,list()}|{error,binary()}.
@@ -138,7 +127,7 @@ get_template_ident(Id)->
 process_rules(Rules,Message)->
 		Map_users = maps:new(),
 		Mail_list = maps:put(mail_list,[],Map_users),
-		List_socket_Mail= maps:put(socket_list,[],Mail_list),
+		List_socket_mail= maps:put(socket_list,[],Mail_list),
 		lists:foldl(
 			fun(#tempmod_rules_temp{template_id=Tid,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus,category_rule=Ctr},Acc_Map)when Rstat =:= <<"enabled">> andalso (Ctr =:=1  orelse Ctr =:= 2)-> 
 				Mail_or_socket = 
@@ -162,7 +151,7 @@ process_rules(Rules,Message)->
 					end;
 			(#tempmod_rules_temp{rule_status=Rstat},Acc_Map)when Rstat =:= <<"disabled">> -> 
 					Acc_Map
-			end, List_socket_Mail, Rules).                          
+			end, List_socket_mail, Rules).
 
 
 %%this rule is for sending a mesage back to members of a site/group etc..
