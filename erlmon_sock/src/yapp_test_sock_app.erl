@@ -21,9 +21,12 @@
 -spec start(term(), term()) -> {error, term()} | {ok, pid()}.
 start(normal, []) ->
     {ok, Name} = application:get_env(name),
-    {ok, Limit} = application:get_env(limit),  
+    {ok, _Limit} = application:get_env(limit),  
     {ok, Port} = application:get_env(port),  
-    yapp_test_sock_supersup:start_link(Name,Limit,Port).
+    {ok, _} = ranch:start_listener(Name, 100,
+        ranch_tcp, [{port, Port}, {max_connections, infinity}],
+        yapp_test_sock_serv, []),
+    yapp_test_sock_supersup:start_link([]).
 
 -spec stop(term()) -> ok.	
 stop(_) ->

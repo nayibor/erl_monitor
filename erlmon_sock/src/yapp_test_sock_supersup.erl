@@ -5,19 +5,15 @@
 %%% @copyright Nuku Ameyibor <nayibor@startmail.com>
 -module(yapp_test_sock_supersup).
 -behaviour(supervisor).
--export([start_link/3]).
+-export([start_link/1]).
 -export([init/1]).
 
-start_link(Name, Limit,Port) ->
-	    supervisor:start_link(?MODULE,{Name, Limit,Port}).
+start_link([]) ->
+	    supervisor:start_link(?MODULE,[]).
 
 %%% @doc this where supervisor for the tester process ,socket counter process,socket supervisor process is started 
--spec init({atom(),pos_integer()}) ->
-  {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}. 
-init({Name,_Limit,Port}) ->
-	    {ok, _} = ranch:start_listener(Name, 100,
-        ranch_tcp, [{port, Port}, {max_connections, infinity}],
-        yapp_test_sock_serv, []),
+-spec init({atom(),pos_integer()}) -> {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}. 
+init([]) ->
 		{ok, {{one_for_one, 10, 10}, []}}.
 	    %%MaxRestart = 100,
 	    %%MaxTime = 3600,
