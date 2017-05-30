@@ -65,7 +65,7 @@ outa(_Arg,'GET',[_,"stats","index_view_stats"])->
 					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"ok"},{task_info,Tasks}]),
 					{html,UiData};
 			{error,_Reason} ->
-					io:format("i am here in my life"),
+					%%io:format("i am here in my life"),
 					{ok,UiData} = yapp_test_content_insert:render([{title,Title_Page},{page_type,"view_stats"},{status,"error"},{task_info,[]}]),
 					{html,UiData}
 		end;	
