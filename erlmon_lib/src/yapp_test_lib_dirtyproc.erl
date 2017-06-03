@@ -98,6 +98,7 @@ get_rules(_Message) ->
 								{error,<<"No Rule">>}
 						end.
 
+
 %%this is for returning generic rule list
 -spec get_generic_rules()->{ok,list()}|{error,binary()}.
 get_generic_rules() ->
@@ -161,10 +162,8 @@ process_rule_inst(<<"site_temp">>,_Options_creator,_Isomessage)->
 		
 		
 %%this is for generic rules 
-%%rules for which  mails will be sent 
-%%this rule will be applied for everybody regardless of site 
-%%can be used for rules which have to be sent regardless of site 
-process_rule_inst(<<"genx">>,_Options_creator,_Isomessage)->
+%%this rule is for declines
+process_rule_inst(<<"decl">>,_Options_creator,_Isomessage)->
 		true;			 
 
 %%this is actually used for processing the template
