@@ -9,12 +9,18 @@ Main purpose of this application is to receive real time feedback on status of  
 
 ##Components##
 
-   Backend web application/mis system for:
+Backend web application/mis system for:
 
 * creating,reading,updating users
 * performing access management for users
 * for creating rules which represent a filter for messages
 * for adding and removing users from the rules 
+
+Tcp Server for 
+
+* receiving and parsing iso messages
+* pass message through rule system to find if message matches rule .eg. is it a decline,balance enquiry,etc..
+* sending parsed messages to websocket/email user channel for distribution based on active rule which match 
 
 
 Web application and tcp server built on erlang stack(yaws,mnesia,erlydtl):  
