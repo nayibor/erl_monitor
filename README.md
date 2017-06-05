@@ -8,7 +8,8 @@ It forwards it to a websocket server for distrubition to user browsers whom are 
 Main purpose of this application is to receive real time feedback on status of  transactions so that quick actions can be taken as opposed to polling of the database or other non real time means of monitoring.
 
 ##Components##
-   There is also a backend web application/mis system for:
+
+   Backend web application/mis system for:
 
 * creating,reading,updating users
 * performing access management for users
@@ -18,15 +19,16 @@ Main purpose of this application is to receive real time feedback on status of  
 
 Web application and tcp server built on erlang stack(yaws,mnesia,erlydtl):  
 
-* yaws is erlang web server
-* mnesia is database management system packaged with erlang
-* erlydtl is django templating done using erlang  
-* messagepack,djnago templates for message format,templating
+* [yaws](yaws.hyber.org) is erlang web server
+* [mnesia](http://erlang.org/doc/man/mnesia.html) is database management system packaged with erlang
+* [erlydtl](https://github.com/erlydtl/erlydtl) erlang templating system based on django  
+* [ranch](https://github.com/ninenines/ranch) socket library used for the tcp server
+* [jem.js](https://github.com/inaka/jem.js/tree/master) used for the serialization of js data to erlang term format when communicating with websocket
 
 
 The ```erl_mon application``` is the web application.
 
-The ```erlmon_sock``` is for now the tcp server.
+The ```erlmon_sock``` is the the tcp server.
 
 The ```erlmon_lib``` contains libraries used by ```erlmon_sock``` and ```erl_mon```.
 
