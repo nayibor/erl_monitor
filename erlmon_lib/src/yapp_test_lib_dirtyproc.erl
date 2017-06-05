@@ -16,7 +16,8 @@
 
 %%this part is for templates
 -export([
-		 process_message/1	 
+		 process_message/1,
+		 get_email_address/1	 
 		]).
 
  
@@ -35,30 +36,10 @@ process_message(Message) ->
 		case get_rules(Message) of
 			{ok,Rules}->
 				process_rules(Rules,Message);
-				%%RuleAns = lists:append(process_rules(Rules,Message));
-				%%RuleAnsPlusAdmin = lists:append(RuleAns,get_admin_vew());
-				%%lists:foldl(fun(Item,Acc)->
-				%%				case lists:member(Item,Acc) of
-				%%					true ->
-				%%						Acc;
-				%%					false ->
-				%%						[Item|Acc]
-				%%				 end
-				%%			end,
-				 %%[],RuleAnsPlusAdmin);
 			{error,Reason}->
 				Reason
 		end.
 
-	
-%% @doc for getting the admins/superadmins in system
-%%		these group of guys in system get to see all transaction rolling through system
-%%      doesnt matter which site they belong to .they see everything in system
--spec get_admin_vew()->[pos_integer()].
-get_admin_vew()->
-		View_trans_all_users = mnesia:dirty_index_read(usermod_users_roles,7,#usermod_users_roles.role_id) ,
-		lists:foldl(fun(#usermod_users_roles{user_id=UserId},Acc)->[UserId|Acc]  end ,[],View_trans_all_users).	
-	
 	
 %% @doc this is supposed to retrieve the site given a iso message
 -spec get_site_message(map())->binary() | undefined.
@@ -70,15 +51,26 @@ get_site_message(Message)->
 				Site
 		end. 
 		
-			
-%%% @doc get sites by index 
--spec validate_site_index(Filter::binary()) -> tuple().	
-validate_site_index(Filter) ->
-		case mnesia:dirty_index_read(usermod_sites,Filter,#usermod_sites.site_short_name) of 
-			[#usermod_sites{id=Id}]->
-				{ok,Id};
+		
+%% @doc get user email for sending mails 
+-spec get_email_address(pos_integer()) -> string()|binary().
+get_email_address(Id)->
+	case mnesia:dirty_read(usermod_users,Id) of 
+			[#usermod_users{user_email=Email}]->
+				Email;
 			_->
-				{error,<<"No Site">>}
+				<<>>
+	end.	
+		
+			
+%%% @doc get sites by id 
+-spec get_site_ident(Siteid::binary()) -> tuple().	
+get_site_ident(Siteid) ->
+		case mnesia:dirty_read(usermod_sites,Siteid) of 
+			[#usermod_sites{site_short_name=Short_name}]->
+				Short_name;
+			_->
+				<<>>
 		end.
 		
 
@@ -96,18 +88,6 @@ get_rules(_Message) ->
 								{ok,List_Rules};
 							_ ->
 								{error,<<"No Rule">>}
-						end.
-
-
-%%this is for returning generic rule list
--spec get_generic_rules()->{ok,list()}|{error,binary()}.
-get_generic_rules() ->
-		List_Rules = mnesia:dirty_index_read(tempmod_rules_temp,2,#tempmod_rules_temp.category_rule),
-						case erlang:length(List_Rules) of
-							Avail when Avail > 0 ->
-								{ok,List_Rules};
-							_ ->
-								{error,<<"No Site">>}
 						end.
 
 
@@ -130,13 +110,13 @@ process_rules(Rules,Message)->
 		Mail_list = maps:put(mail_list,[],Map_users),
 		List_socket_mail= maps:put(socket_list,[],Mail_list),
 		lists:foldl(
-			fun(#tempmod_rules_temp{template_id=Tid,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus,category_rule=Ctr},Acc_Map)when Rstat =:= <<"enabled">> andalso (Ctr =:=1  orelse Ctr =:= 2)-> 
+			fun(#tempmod_rules_temp{template_id=Tid,site_id=Site_id,rule_options=Rule_opt,rule_status=Rstat,rule_users=Rus,category_rule=Ctr},Acc_Map)when Rstat =:= <<"enabled">> andalso (Ctr =:=1  orelse Ctr =:= 2)-> 
 				Mail_or_socket = 
 					case Ctr of 
 					  1 ->socket_list;
 					  2 ->mail_list
 					end,	
-					case process_rule_inst(get_template_ident(Tid),Rule_opt,Message) of 
+					case process_rule_inst(get_template_ident(Tid),Site_id,Rule_opt,Message) of 
 							true ->
 								Socket_New_list = lists:foldl(fun(SinU,Acc_Map_ls)->
 																case lists:member(SinU,Acc_Map) of 
@@ -156,18 +136,32 @@ process_rules(Rules,Message)->
 
 
 %%this rule is for sending a mesage back to members of a site/group etc..
--spec process_rule_inst(Template_type::binary(),Options_creator::[tuple()],Isomessage::binary())->true|false.
-process_rule_inst(<<"site_temp">>,_Options_creator,_Isomessage)->
-		true;
+%%generic rules 
+-spec process_rule_inst(Template_type::binary(),Siteid::pos_integer(),Options_creator::[tuple()],Isomessage::binary())->true|false.
+process_rule_inst(<<"site_temp">>,Siteid,_Options_creator,Isomessage)->
+		case get_site_ident(Siteid)  of
+			 <<"gen_site">>->
+				true;
+			Site_Ident->
+				maps:get(32,Isomessage,<<"_fuck_">>) =:= Site_Ident
+		end;
 		
 		
 %%this is for generic rules 
 %%this rule is for declines
-process_rule_inst(<<"decl">>,_Options_creator,_Isomessage)->
-		true;			 
+process_rule_inst(<<"decl">>,Siteid,_Options_creator,Isomessage)->
+		Decline_code = maps:get(39,Isomessage,<<"_fuck_">>),
+		case get_site_ident(Siteid)  of
+			<<"gen_site">> ->
+				binary:match(Decline_code,<<"9">>)	=/= nomatch;
+			Site_Ident ->
+				maps:get(32,Isomessage,<<"_fuck_">>) =:= Site_Ident andalso binary:match(Decline_code,<<"9">>)	=/= nomatch 
+		end;
 
 %%this is actually used for processing the template
 %%user data as well data from the message are extracted and compared 
-process_rule_inst(_,_Options_creator,_Isomessage)->
+process_rule_inst(_,_,_,_)->
 		false.		
 		
+		
+
