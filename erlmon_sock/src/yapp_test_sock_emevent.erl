@@ -8,9 +8,26 @@ init([]) ->
     {ok, []}.
 
 
-%% @doc this event will send the received message to email addresses
-handle_event({trans,_FlData,_Send_list}, State) ->
-   {ok, State}.
+%% @doc this event will send to the list of email addresses specified 
+handle_event({trans,_FlData,Send_list}, State) ->
+	Mail_list = maps:get(mail_list,Send_list),
+	 case erlang:length(Mail_list) of 
+		Size_send when Size_send > 0 ->
+			Emails = lists:filtermap(fun(Id) -> 
+								case yapp_test_lib_dirtyproc:get_email_address(Id) of 
+									<<>>-> 
+										false;
+									 Email-> 
+										{true,Email}
+								end 
+							end, Mail_list),
+			%%io:format("~nemail addresses are ~p ",[Emails]),
+			ok = erlmon_worker_pool:send_mail("Transaction Decline Notification","Nuku Ameyibor","Notifier List","test-transaction-body",Emails),
+			{ok, State};
+		_ ->
+			{ok, State}
+	end.
+  
 
 handle_call(_, State) ->
     {ok, ok, State}.
@@ -23,3 +40,5 @@ code_change(_OldVsn, State, _Extra) ->
 
 terminate(_Reason, _State) ->
     ok.
+
+

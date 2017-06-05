@@ -31,33 +31,24 @@
 
 %% @doc this is used for starting up the ranch accepting socket 
 start_link(Ref, Socket, Transport, Opts) ->
-	{ok, proc_lib:spawn_link(?MODULE, init, [{Ref, Socket, Transport, Opts}])}.
+		{ok, proc_lib:spawn_link(?MODULE, init, [{Ref, Socket, Transport, Opts}])}.
 
 
 %% @doc this is the init for starting up the socket using ranch
 init({Ref, Socket, Transport, _Opts = []}) ->
-	process_flag(trap_exit, true),
-	 {ok, Pid} = gen_event:start_link(),
-    ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
-    ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
-	ok = ranch:accept_ack(Ref),
-	ok = Transport:setopts(Socket,[list, {packet, 0}, {active, once}]),
-	(catch gproc:reg({p, l,<<"conn_sock">>}, ignored)),
-	gen_server:enter_loop(?MODULE, [],#state{socket=Socket,iso_message=[],transport=Transport,event_handler=Pid},?TIMEOUT).
+		process_flag(trap_exit, true),
+		{ok, Pid} = gen_event:start_link(),
+		ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
+		ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
+		ok = ranch:accept_ack(Ref),
+		ok = Transport:setopts(Socket,[list, {packet, 0}, {active, once}]),
+		(catch gproc:reg({p, l,<<"conn_sock">>}, ignored)),
+		gen_server:enter_loop(?MODULE, [],#state{socket=Socket,iso_message=[],transport=Transport,event_handler=Pid},?TIMEOUT).
 
 %% @doc this call is for all call messages 
 -spec handle_call(term(),pid(),state()) -> term().
 handle_call(_E, _From, State) ->
 		{noreply, State}.
-
-
-%% @doc Accepting a connection
-%%counter application is notified of connected clientt
--spec handle_cast(term(),state()) -> {term(),state()}.    
-handle_cast(accept, S = #state{socket=ListenSocket}) ->
-		{ok, AcceptSocket} = gen_tcp:accept(ListenSocket),	
-		(catch gproc:reg({p, l,<<"conn_sock">>}, ignored)),
-		{noreply, S#state{socket=AcceptSocket}};
 		
 		
 %% unknown casts
@@ -95,11 +86,11 @@ handle_info({tcp_error, _Socket, _}, S) ->
   
 %%for when the down procoess is sent from the gen_event  process
 handle_info({'EXIT', _Pid, Reason},State) ->
-	error_logger:error_msg("~n Event handle is dead cuz of  ~p.~nResurect him",[Reason]),
-	{ok, Pid} = gen_event:start_link(),
-    ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
-    ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
-	{noreply,State#state{event_handler=Pid}};  
+		error_logger:error_msg("~n Event handle is dead cuz of  ~p.~nRise from your graves",[Reason]),
+		{ok, Pid} = gen_event:start_link(),
+		ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
+		ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
+		{noreply,State#state{event_handler=Pid}};  
 
 
 %% @doc info coming in from as a result of messages received maybe from othe processes 
@@ -115,7 +106,7 @@ code_change(_OldVsn, State, _Extra) ->
 %% @doc ranch termination
 terminate(_Reason, #state{socket=AcceptSocket_process,transport=Transport}) ->
 		ok = Transport:close(AcceptSocket_process),
-		io:format("~nterminate reason: ~p", [_Reason]),
+		error_logger:error_msg("~nterminate reason: ~p", [_Reason]),
 		ok.
 		
 
