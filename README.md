@@ -25,7 +25,7 @@ Tcp Server for
 
 Web application and tcp server built on erlang stack(yaws,mnesia,erlydtl):  
 
-* [yaws](yaws.hyber.org) is erlang web server
+* [yaws](http://yaws.hyber.org) is erlang web server
 * [mnesia](http://erlang.org/doc/man/mnesia.html) is database management system packaged with erlang
 * [erlydtl](https://github.com/erlydtl/erlydtl) erlang templating system based on django  
 * [ranch](https://github.com/ninenines/ranch) socket library used for the tcp server
