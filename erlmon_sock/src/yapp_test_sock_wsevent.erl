@@ -11,7 +11,7 @@ init([]) ->
 handle_event({trans,FlData,Send_list}, State) ->
     Msg_out = erlang:term_to_binary(FlData),
 	Socket_list = maps:get(socket_list,Send_list),
-	lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Socket_list),
+	_List_send = lists:map(fun(I)-> (catch gproc:send({p, l, I},{<<"tdata">>,Msg_out})) end,Socket_list),
     {ok, State}.
 
 handle_call(_, State) ->
@@ -24,4 +24,4 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 terminate(_Reason, _State) ->
-    ok.
+	ok.

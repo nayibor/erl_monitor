@@ -13,7 +13,7 @@
 -behaviour(application).
 
 %%% API
--export([start/2,stop/1]).
+-export([start/2,stop/1,send_mail/6]).
 
 %%%=============================================================================
 %%% API
@@ -26,4 +26,20 @@ start(normal, []) ->
 -spec stop(term()) -> ok.	
 stop(_) -> ok.
 
+
+%% @doc used for sending emails
+-spec send_mail(Subject_email::binary()|string(),From_label::binary()|string(),To_label::binary()|string(),Mail_body::binary()|string(),Send_list::[string()],Callback::fun())->{ok,pid()}|{error,term()|any()}.
+send_mail(Subject_email,From_label,To_label,Mail_body,Send_list,Callback)->
+	{ok,Settings} = application:get_env(erlmon_lib,mail_settings),
+	Host = proplists:get_value(host,Settings),
+	Username = proplists:get_value(username,Settings),
+	Password = proplists:get_value(password,Settings),
+	From_address = proplists:get_value(from_email_address,Settings),
+	Subject = ["Subject: ",Subject_email,"\r\n"],
+	From = ["From: ",From_label,"\r\n"],
+	To = ["To: ",To_label,"\r\n\r\n"],
+	Mail_send_body = lists:flatten([Subject,From,To,Mail_body]),
+	Tuple_email_send = {From_address,Send_list,Mail_send_body},
+	Options_email = [{relay, Host}, {username, Username}, {password, Password},{auth,always},{tls,always},{hostname,Host}],
+	gen_smtp_client:send(Tuple_email_send,Options_email,Callback).
 

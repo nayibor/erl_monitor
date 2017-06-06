@@ -37,7 +37,8 @@ start_link(Ref, Socket, Transport, Opts) ->
 %% @doc this is the init for starting up the socket using ranch
 init({Ref, Socket, Transport, _Opts = []}) ->
 		process_flag(trap_exit, true),
-		{ok, Pid} = gen_event:start_link(),
+		{ok, Pid} = gen_event:start(),
+		link(Pid),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
 		ok = ranch:accept_ack(Ref),
@@ -86,8 +87,8 @@ handle_info({tcp_error, _Socket, _}, S) ->
   
 %%for when the down procoess is sent from the gen_event  process
 handle_info({'EXIT', _Pid, Reason},State) ->
-		error_logger:error_msg("~n Event handle is dead cuz of  ~p.~nRise from your graves",[Reason]),
-		{ok, Pid} = gen_event:start_link(),
+		error_logger:error_msg("~n Event manager is dead cuz of  ~p.~nRise from your graves",[Reason]),
+		{ok, Pid} = gen_event:start(),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
 		{noreply,State#state{event_handler=Pid}};  
@@ -104,8 +105,10 @@ code_change(_OldVsn, State, _Extra) ->
 		{ok, State}.
 
 %% @doc ranch termination
-terminate(_Reason, #state{socket=AcceptSocket_process,transport=Transport}) ->
+%% the gen event will have to be terminated here also 
+terminate(_Reason, #state{socket=AcceptSocket_process,transport=Transport,event_handler=Pid}) ->
 		ok = Transport:close(AcceptSocket_process),
+		ok = gen_event:stop(Pid),
 		error_logger:error_msg("~nterminate reason: ~p", [_Reason]),
 		ok.
 		

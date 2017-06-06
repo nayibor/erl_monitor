@@ -103,8 +103,6 @@ outa(_Arg,'GET',[_,"user","get_edit_user",UserId])->
 
 
 %% @doc for inserting a new user/updating a new user .
-%%		insertion part
-%% 		returns a messagpack object showing status 
 %%  	validation has not been done here but will be done later 
 outa(Arg,'POST',[_,"user","save_add_user"])->
 		
