@@ -4,7 +4,7 @@
 -export([init/1, handle_event/2, handle_call/2, handle_info/2, code_change/3,
          terminate/2]).
 
--record(state, {callback_email}). % the current socket
+-record(state, {callback_email,fun_convert}). % the current socket
 
 
 init([]) ->
@@ -15,11 +15,16 @@ init([]) ->
 								  ({exit, _Error}) ->
 										ok%%error_logger:error_msg("~nError With Email Process is ~p",Error)
 							end,
-    {ok,#state{callback_email=Callback_email}}.
+	Fun = fun(Key,Value,Acc) when is_integer(Key) -> 
+						[{lists:flatten(["fld",erlang:integer_to_list(Key)]),Value}|Acc];
+					 (Key,Value,Acc)->
+						[{Key,Value}|Acc]
+				end,
+    {ok,#state{callback_email=Callback_email,fun_convert=Fun}}.
 
 
 %% @doc this event will send to the list of email addresses specified 
-handle_event({trans,FlData,Send_list},State=#state{callback_email=Callback_email}) ->
+handle_event({trans,FlData,Send_list},State=#state{callback_email=Callback_email,fun_convert=Fun}) ->
 	Mail_list = maps:get(mail_list,Send_list),
 	 case erlang:length(Mail_list) of 
 		Size_send when Size_send > 0 ->
@@ -32,12 +37,6 @@ handle_event({trans,FlData,Send_list},State=#state{callback_email=Callback_email
 								end 
 							end, Mail_list),
 			%%io:format("~nemail addresses are ~p ",[Emails]),
-			
-			Fun = fun(Key,Value,Acc) when is_integer(Key) -> 
-						[{lists:flatten(["fld",erlang:integer_to_list(Key)]),Value}|Acc];
-					 (Key,Value,Acc)->
-						[{Key,Value}|Acc]
-				end,
 			Data_render = maps:fold(Fun,[],FlData),
 			{ok,UiData} = yapp_test_sock_not_template:render(Data_render),
 			%%io:format("~ndata to render is ~p",[UiData]),
