@@ -13,14 +13,13 @@ init([]) ->
 								  ({ok, _Receipt}) ->
 										error_logger:info_msg("~nEmail Sent Succesfully ~p");
 								  ({exit, _Error}) ->
-										ok
-										%%error_logger:error_msg("~nError With Email Process is ~p",Error)
+										ok%%error_logger:error_msg("~nError With Email Process is ~p",Error)
 							end,
     {ok,#state{callback_email=Callback_email}}.
 
 
 %% @doc this event will send to the list of email addresses specified 
-handle_event({trans,_FlData,Send_list},State=#state{callback_email=Callback_email}) ->
+handle_event({trans,FlData,Send_list},State=#state{callback_email=Callback_email}) ->
 	Mail_list = maps:get(mail_list,Send_list),
 	 case erlang:length(Mail_list) of 
 		Size_send when Size_send > 0 ->
@@ -33,7 +32,16 @@ handle_event({trans,_FlData,Send_list},State=#state{callback_email=Callback_emai
 								end 
 							end, Mail_list),
 			%%io:format("~nemail addresses are ~p ",[Emails]),
-			_Pid = yapp_test_lib:send_mail("Transaction Notification","Notification System","Notifier List","test-transaction-body",Emails,Callback_email),
+			
+			Fun = fun(Key,Value,Acc) when is_integer(Key) -> 
+						[{lists:flatten(["fld",erlang:integer_to_list(Key)]),Value}|Acc];
+					 (Key,Value,Acc)->
+						[{Key,Value}|Acc]
+				end,
+			Data_render = maps:fold(Fun,[],FlData),
+			{ok,UiData} = yapp_test_sock_not_template:render(Data_render),
+			%%io:format("~ndata to render is ~p",[UiData]),
+			_Pid = yapp_test_lib:send_mail("Transaction Notification","Notification System","Notifier List",UiData,Emails,Callback_email),
 			{ok, State};
 		_ ->
 			{ok, State}
