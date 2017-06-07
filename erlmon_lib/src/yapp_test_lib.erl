@@ -37,8 +37,9 @@ send_mail(Subject_email,From_label,To_label,Mail_body,Send_list,Callback)->
 	From_address = proplists:get_value(from_email_address,Settings),
 	Subject = ["Subject: ",Subject_email,"\r\n"],
 	From = ["From: ",From_label,"\r\n"],
+	Headers = ["MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1\r\nX-Priority: 1\r\n"],
 	To = ["To: ",To_label,"\r\n\r\n"],
-	Mail_send_body = lists:flatten([Subject,From,To,Mail_body]),
+	Mail_send_body = lists:flatten([Subject,From,Headers,To,Mail_body]),
 	Tuple_email_send = {From_address,Send_list,Mail_send_body},
 	Options_email = [{relay, Host}, {username, Username}, {password, Password},{auth,always},{tls,always},{hostname,Host}],
 	gen_smtp_client:send(Tuple_email_send,Options_email,Callback).
