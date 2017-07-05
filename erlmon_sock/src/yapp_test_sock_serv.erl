@@ -89,6 +89,7 @@ handle_info({tcp_error, _Socket, _}, S) ->
 handle_info({'EXIT', _Pid, Reason},State) ->
 		error_logger:error_msg("~n Event manager is dead cuz of  ~p.~nRise from your graves",[Reason]),
 		{ok, Pid} = gen_event:start(),
+		link(Pid),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_wsevent, []),
 		ok = gen_event:add_handler(Pid, yapp_test_sock_emevent, []),
 		{noreply,State#state{event_handler=Pid}};  
@@ -133,14 +134,15 @@ process_transaction({_tcp,_Port_Numb,Msg}, S = #state{socket=AcceptSocket,iso_me
 				case length(State_new) of 
 					SizeafterHead when Len =:= SizeafterHead ->	
 						FlData = iso8583_erl:unpack(list,post,Rest),
-						ok = send(AcceptSocket,State_new,Transport),	
 						Message_send_list = yapp_test_lib_dirtyproc:process_message(FlData),
 						%%io:format("~nmessage to be sent in the future is ~p",[Message_send_list]), 
 						 case Message_send_list of
 							{error,_Reason}->
+								ok = send(AcceptSocket,State_new,Transport),	
 								{noreply, S#state{iso_message=[]}};
 							Send_list ->
 								ok = gen_event:notify(Epid,{trans,FlData,Send_list}),
+								ok = send(AcceptSocket,State_new,Transport),	
 								{noreply, S#state{iso_message=[]}}    	
 						end;
 					SizeafterHead when Len < SizeafterHead ->

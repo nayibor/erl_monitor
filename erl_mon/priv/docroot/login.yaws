@@ -1,10 +1,20 @@
+
 <erl>
 -include_lib("erl_mon/include/yapp_test.hrl").
 
 %%% @doc check to see whether use is logged in 
 out(Arg) ->
-		{ok,UiData} = yapp_test_login:render([{yapp_prepath,yapp:prepath(Arg)}]),
-		{html,UiData}.
+	out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
+
+	
+%%% @doc users not logged in are shown the login page  
+out(Arg,error)->
+	{ok,UiData} = yapp_test_login:render([{yapp_prepath,yapp:prepath(Arg)}]),
+	{html,UiData};
+
+
+%%% @doc already logged in users are taken to the dashboard
+out(Arg,ok) ->
+	{redirect_local, yapp:prepath(Arg)++?PG_DASHBOARD}.
+
 </erl>
-
-

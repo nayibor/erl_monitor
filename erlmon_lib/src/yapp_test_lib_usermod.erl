@@ -621,7 +621,6 @@ add_site(Short_name,Long_name,Instid)->
 -spec update_site(pos_integer(),binary(),binary(),pos_integer())-> ok | {error,inst_none_exist}  |  term() .
 update_site(Id,Short_name,Long_name,Instid)->
 		F = fun() ->
-		
 			case mnesia:read({usermod_inst, Instid}) =:= [] orelse check_site(Short_name,edit_site,Id) =:= exists  of
 					true ->
 						{error,inst_none_exist_check_site_ident};
@@ -1155,7 +1154,7 @@ find_link_details(Linkid)->
 							  link_controller=Link_controller,link_action=Link_action,
 							  link_category=Link_category,link_name=Link_name,link_type=Link_type
 							  } <- mnesia:table(usermod_links),
-				Linkid =:=RcLinkid andalso Link_allow =:= true]))
+				Linkid =:=RcLinkid]))
 		end,
 	    case mnesia:activity(transaction, F) of
 	        [] ->undefined;

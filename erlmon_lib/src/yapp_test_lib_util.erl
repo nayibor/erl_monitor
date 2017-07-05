@@ -34,6 +34,8 @@
 compile_temp() ->
 		compile_templates([
 							{"/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erl_mon/templates","/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erl_mon/ebin"
+							},
+							{"/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erlmon_sock/templates","/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/erlmon_sock/ebin"
 							}
 						  ]
 						 ).
