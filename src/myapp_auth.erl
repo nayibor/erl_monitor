@@ -104,8 +104,9 @@ out401(Arg,_Auth, _Realm) ->
 	    {page,yapp:prepath(Arg)++?PG_401}.
 	   
 %%% @doc for crashes which occur	   
-crashmsg(Arg,_Auth, _Realm) ->
-
+crashmsg(_Arg, _SC, Str)->
+		error_logger:error_msg("~nError is ~p ~ nStacktrace is ~p",[Str,erlang:get_stacktrace()]),
+		{html,"Crashed Page"}.
 	%%  {html,"<h1>pg unauth</h1>"}.
-	    {page,yapp:prepath(Arg)++?PG_CRASH}.	  
+	%%    {page,yapp:prepath(Arg)++?PG_CRASH}.	  
 

@@ -1,0 +1,23 @@
+version: "3"
+services:
+  web:
+    image: ghudmusic/ghudmusic_erlang_yaws:0.1.0
+    ports:
+      - "8002:8002"
+      - "8003:8003"
+      - "8004:8004"
+    volumes:
+      - "../../rebar_erlmon/:/opt/erlang/erl_mon"
+      - "/tmp/.X11-unix:/tmp/.X11-unix"
+    stdin_open: true
+    tty: true
+  mssql:
+    image: microsoft/mssql-server-linux
+    ports:
+      - "1433:1433"
+    volumes:
+      - "/opt/mssql_data_dir/:/var/opt/mssql"
+    environment:
+      SA_PASSWORD: "$uP3RC0mpl3Xp@$$w0rD"
+      ACCEPT_EULA: "Y"
+  
