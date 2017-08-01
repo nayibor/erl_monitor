@@ -1,6 +1,0 @@
-%% encoding: UTF-8
-{application,yapp_test_lib}.
-{modules,[band_supervisor,kitty_gen_server,musicians,yapp_test_lib,
-          yapp_test_lib_dirtyproc,yapp_test_lib_isoproc,yapp_test_lib_rules,
-          yapp_test_lib_sess,yapp_test_lib_sup,yapp_test_lib_temp,
-          yapp_test_lib_usermod,yapp_test_lib_util]}.

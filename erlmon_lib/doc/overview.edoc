@@ -1,7 +1,0 @@
-** this is the overview.doc file for the library application 'yapp_test_lib' **
-@author Nuku Ameyibor <nayibor@startmail.com>
-@copyright 2016  Nuku Ameyibor
-@version 0.1.0
-@title Welcome to the yapp_test_lib application!
-@doc this contains libraries for use by the applications for session management,dealing with rules,templates,usermanagement,utility functions
-

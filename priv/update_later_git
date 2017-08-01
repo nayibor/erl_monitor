@@ -1,9 +1,0 @@
-created backup for database
-transformed user table to add extra field(reset_time_max,reset_status=false::true|false)
-edited the function that verifies users .paradoxically slower althougher shorter ? will refactor 
-added function to retrieve all user data from user table
-verification function modified to allow password reset 
-template created for password reset 
-yapp_test_content_insert modified to allow for password resets 
-flag added  which sets  reset_status=true when user password is reset
-
