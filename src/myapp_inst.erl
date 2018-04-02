@@ -51,6 +51,7 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "inst", "get_inst"]) ->
     Title_Page = "Institutions",
     Inst = yapp_test_lib_usermod:get_inst(),
+    error_logger:info_msg("~ninst list is ~p ",[Inst]),
     {ok, UiData} = yapp_test_inst_list:render([{title,
 						Title_Page},
 					       {yapp_prepath,

@@ -13,4 +13,4 @@
         ]
   },
   {registered, []},
-  {applications,[kernel,stdlib,yapp,erlmon_lib,erlmon_worker_pool,erlmon_sock,erlydtl]}]}.
+  {applications,[kernel,stdlib,yapp,erlmon_lib,erlmon_worker_pool,erlmon_sock,erlydtl,sasl]}]}.
