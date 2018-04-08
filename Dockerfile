@@ -1,19 +1,28 @@
-FROM ghudmusic/ghudmusic_erlang_yaws:0.1.0 as builder
+FROM nayibor/erl_yaws:0.1.0 as builder
 
 WORKDIR /usr/src/app
 COPY . /usr/src/app
+#RUN rebar3 get-deps
+#RUN rebar3 compile
+#WORKDIR /usr/src/app/_build/default/lib/yaws/
+#autoreconf -fi 
+#./configure --disable-pam
+#make
+#WORKDIR /usr/src/app
 RUN rebar3 release -n erlmon_docker tar
 RUN mkdir -p /opt/rel
-RUN ls -al /usr/src/app/_build/default/rel/erlmon_docker/
 RUN tar -xzf /usr/src/app/_build/default/rel/*/erlmon_docker*.tar.gz -C /opt/rel
 #RUN tar -xzf /usr/src/app/_build/default/rel/*/*.tar.gz -C /opt/rel
 
 FROM ubuntu:16.04
 
-#RUN apt-get update; exit 0
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends openssl unixodbc unixodbc-dev freetds-dev tdsodbc telnet
+RUN apt-get install -y --no-install-recommends openssl unixodbc unixodbc-dev freetds-dev tdsodbc telnet freetds-bin net-tools
 WORKDIR /opt/erl_monitor
+COPY odbcinst.ini /etc
+COPY odbc.ini /etc
+COPY freetds.conf /etc/freetds/
+#iptables -A INPUT -i mssql_server -j ACCEPT
 ENV RELX_REPLACE_OS_VARS true
 ENV EMAIL_HOST=""
 ENV EMAIL_USER=""
@@ -28,10 +37,3 @@ EXPOSE 8002 8002
 
 ENTRYPOINT ["/opt/erl_monitor/bin/erlmon_docker"]
 
-#TO OD
-#docker build -t nayibor/erlmonweb:0.0.4 .
-#docker run --network=host -ti nayibor/erlmonweb:0.0.4 console -sname nonode@nohost
-# tag erlang_yaws and push it up into docker repo
-# ADD FREDDTDS TO BUILD
-# YAWS COMPILE SHOULD BE DONE USING AUTORECON/# MAKE BUILD MORE STATELESS
-#use continous integration server 
