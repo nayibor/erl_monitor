@@ -6,8 +6,8 @@ RUN rebar3 get-deps
 RUN rebar3 compile
 WORKDIR /usr/src/app/_build/default/lib/yaws/
 RUN autoreconf -fi 
-./configure --disable-pam
-make
+RUN ./configure --disable-pam
+RUN make
 WORKDIR /usr/src/app
 RUN rebar3 release -n erlmon_docker tar
 RUN mkdir -p /opt/rel
