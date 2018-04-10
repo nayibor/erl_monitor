@@ -1,4 +1,4 @@
-FROM nayibor/erl_yaws:0.1.0 as builder
+FROM nayibor/yaws_docker:0.1.0 as builder
 
 WORKDIR /usr/src/app
 COPY . /usr/src/app
