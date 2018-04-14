@@ -1,6 +1,6 @@
 FROM nayibor/yaws_docker:0.1.0 as builder
 RUN apt-get update
-RUN  apt-get install -y -no-install-recommends autoconf build-essential
+RUN  apt-get install -y  autoconf build-essential
 
 WORKDIR /usr/src/app
 COPY . /usr/src/app
