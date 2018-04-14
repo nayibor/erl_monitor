@@ -7,7 +7,7 @@ COPY . /usr/src/app
 RUN rebar3 get-deps
 RUN rebar3 compile
 RUN ls -al
-CD /usr/src/app/_build/default/lib/yaws
+WORKDIR /usr/src/app/_build/default/lib/yaws
 RUN /usr/bin/autoreconf -fi 
 RUN ./configure --disable-pam
 RUN make
