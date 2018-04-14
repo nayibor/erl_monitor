@@ -6,7 +6,8 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 RUN rebar3 get-deps
 RUN rebar3 compile
-WORKDIR /usr/src/app/_build/default/lib/yaws/
+RUN ls -al
+CD /usr/src/app/_build/default/lib/yaws
 RUN /usr/bin/autoreconf -fi 
 RUN ./configure --disable-pam
 RUN make
