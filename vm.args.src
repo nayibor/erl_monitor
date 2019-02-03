@@ -1,0 +1,4 @@
+-pa releases/${REL_VSN}/consolidated
+## Name of the node
+-name erl_mon_web_release@${NODE_NAME}
+

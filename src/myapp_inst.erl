@@ -16,8 +16,8 @@
 -export([out/1]).
 
 -include_lib("yaws/include/yaws_api.hrl").
-
 -include_lib("erl_mon/include/yapp_test.hrl").
+
 
 %%% @doc check to see whether use is logged in
 out(Arg) ->
@@ -51,32 +51,34 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "inst", "get_inst"]) ->
     Title_Page = "Institutions",
     Inst = yapp_test_lib_usermod:get_inst(),
-    error_logger:info_msg("~ninst list is ~p ",[Inst]),
+	Inst_sites = myapp_util:convert_data(Inst),
+    %%error_logger:info_msg("~ninst list is ~p ",[Inst]),
     {ok, UiData} = yapp_test_inst_list:render([{title,
 						Title_Page},
 					       {yapp_prepath,
 						yapp:prepath(Arg)},
-					       {data, Inst}]),
+					       {data, Inst_sites}]),
     {html, UiData};
 %% @doc this is for getting the sites but using a filter
 outa(Arg, 'GET', [_, "inst", "search_inst"]) ->
     %%io:format("query string is ~n~p ",[Search_query]),
     case yaws_api:queryvar(Arg, "filter") of
       {ok, Filter} ->
-	  Inst =
-	      yapp_test_lib_usermod:get_inst_filter(list_to_binary(Filter)),
-	  {ok, UiData} =
-	      yapp_test_inst_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Inst}]),
-	  {html, UiData};
+		  Inst = yapp_test_lib_usermod:get_inst_filter(list_to_binary(Filter)),
+		  Inst_list_filtered =  myapp_util:convert_data(Inst),
+		  {ok, UiData} =
+		      yapp_test_inst_search:render([{yapp_prepath,
+						     yapp:prepath(Arg)},
+						    {data, Inst_list_filtered}]),
+		  {html, UiData};
       undefined ->
-	  Inst = yapp_test_lib_usermod:get_inst(),
-	  {ok, UiData} =
-	      yapp_test_inst_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Inst}]),
-	  {html, UiData}
+		  Inst = yapp_test_lib_usermod:get_inst(),
+		  Dict_records = myapp_util:convert_data(Inst),
+		  {ok, UiData} =
+		      yapp_test_inst_search:render([{yapp_prepath,
+						     yapp:prepath(Arg)},
+						    {data, Dict_records}]),
+		  {html, UiData}
     end;
 %% @doc this is used for adding a new insittution
 %%		returns an erlydtl html page afer filter and query		
@@ -95,10 +97,11 @@ outa(_Arg, 'GET',
 	  yapp_test_lib_util:message_client(500,
 					    "Inst Does Not Exist");
       S ->
-	  {ok, UiData} =
+		[Inst_dict] = myapp_util:convert_data([S]),
+		{ok, UiData} =
 	      yapp_test_add_inst:render([{type_user_tran,
 					  "edit_inst"},
-					 {data, S}]),
+					 {data, Inst_dict}]),
 	  {html, UiData}
     end;
 %% @doc this is used for adding a new insittution

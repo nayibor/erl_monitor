@@ -51,63 +51,65 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "rules", "get_rules"]) ->
     Title_Page = "Rules",
     Rules = yapp_test_lib_rules:get_rules(),
+	New_rules = myapp_util:convert_data(Rules),
     {ok, UiData} = yapp_test_rules_list:render([{title,
 						 Title_Page},
 						{yapp_prepath,
 						 yapp:prepath(Arg)},
-						{data, Rules}]),
+						{data, New_rules}]),
     {html, UiData};
 %% @doc this is for getting the sites but using a filter
 outa(Arg, 'GET', [_, "rules", "search_rules"]) ->
     case yaws_api:queryvar(Arg, "filter") of
       {ok, Filter} ->
-	  Rules =
-	      yapp_test_lib_rules:get_rules_filter(list_to_binary(Filter)),
-	  {ok, UiData} =
-	      yapp_test_rules_search:render([{yapp_prepath,
-					      yapp:prepath(Arg)},
-					     {data, Rules}]),
-	  {html, UiData};
+		  Rules = yapp_test_lib_rules:get_rules_filter(list_to_binary(Filter)),
+		  New_rules = myapp_util:convert_data(Rules),		  
+		  {ok, UiData} = yapp_test_rules_search:render([{yapp_prepath,
+						      yapp:prepath(Arg)},
+						     {data, New_rules}]),
+		  {html, UiData};
       undefined ->
-	  Rules = yapp_test_lib_rules:get_rules(),
-	  {ok, UiData} =
-	      yapp_test_rules_search:render([{yapp_prepath,
-					      yapp:prepath(Arg)},
-					     {data, Rules}]),
-	  {html, UiData}
+		  Rules = yapp_test_lib_rules:get_rules(),
+		  New_rules = myapp_util:convert_data(Rules),		  
+		  {ok, UiData} = yapp_test_rules_search:render([{yapp_prepath,
+						      yapp:prepath(Arg)},
+						     {data, New_rules}]),
+		  {html, UiData}
     end;
 %% @doc this is used for adding a new rule
 %%		returns an erlydtl html page afer filter and query		
 outa(_Arg, 'GET', [_, "rules", "get_add_rule"]) ->
     Sites = yapp_test_lib_usermod:get_sites(),
     Temps = yapp_test_lib_isoproc:get_templates(),
+	Temps_new = myapp_util:convert_data(Temps),
     Categories = yapp_test_lib_rules:get_rule_cats(),
+    NewCats = myapp_util:convert_data(Categories),
     {ok, UiData} = yapp_test_add_rule:render([{sites,
 					       Sites},
-					      {templates, Temps},
-					      {cats, Categories},
+					      {templates,Temps_new},
+					      {cats, NewCats},
 					      {type_user_tran, "add_rules"}]),
     {html, UiData};
 %% @doc this is used for adding a new rule
 outa(_Arg, 'GET',
      [_, "rules", "get_edit_rule", RuleId]) ->
-    case
-      yapp_test_lib_rules:get_rule_id(list_to_integer(RuleId))
-	of
+    case yapp_test_lib_rules:get_rule_id(list_to_integer(RuleId)) of
       {ok, S} ->
+      [Rule_single] = myapp_util:convert_data([S]),
 	  Sites = yapp_test_lib_usermod:get_sites(),
 	  Temps = yapp_test_lib_isoproc:get_templates(),
-	  Categories = yapp_test_lib_rules:get_rule_cats(),
-	  {ok, UiData} = yapp_test_add_rule:render([{data, S},
+	  Temps_new = myapp_util:convert_data(Temps),
+      Categories = yapp_test_lib_rules:get_rule_cats(),
+      NewCats = myapp_util:convert_data(Categories),
+	  {ok, UiData} = yapp_test_add_rule:render([{data, Rule_single},
 						    {sites, Sites},
-						    {templates, Temps},
-						    {cats, Categories},
+						    {templates, Temps_new},
+						    {cats, NewCats},
 						    {type_user_tran,
 						     "edit_rules"}]),
-	  {html, UiData};
+		{html, UiData};
       _ ->
-	  yapp_test_lib_util:message_client(500,
-					    "Rule Does Not Exist")
+		yapp_test_lib_util:message_client(500,"Rule Does Not Exist")
     end;
 %% @doc this is used for adding a new template
 %%		returns an erlydtl html page afer filter and query		

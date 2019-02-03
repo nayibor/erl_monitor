@@ -1,0 +1,26 @@
+<div id="role_div" name="role_div">
+    <select id="user_roles" name="user_roles" multiple="multiple">
+        	{% for id,role_short_name,role_long_name in roles %}
+	            <option value="{{id}}"
+					{%  if id in useroles  %}
+	                        selected="selected"
+					{%	endif	%}
+	            >
+	                       {{role_long_name}}
+	            </option>
+			{% endfor %}
+    </select>
+
+</div>
+
+
+<ul  id="roles_sys" name="roles_sys" style="visibility: hidden;" >
+        	{% for id,role_short_name,role_long_name in roles %}
+				<li value="{{id}}">{{role_long_name}}</li>
+			{% endfor%}
+</ul>
+<ul  id="roles_sys_user" name="roles_sys_user" style="visibility: hidden;" >
+        	{% for id,role_short_name,role_long_name in roles %}
+		        <li value="{{id}}"></li>
+		    {% endfor%}
+</ul>

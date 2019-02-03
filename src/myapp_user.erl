@@ -17,8 +17,8 @@
 -export([out/1]).
 
 -include_lib("yaws/include/yaws_api.hrl").
-
 -include_lib("erl_mon/include/yapp_test.hrl").
+
 
 %%% @doc check to see whether use is logged in
 out(Arg) ->
@@ -152,17 +152,19 @@ outa(Arg, 'POST', [_, "user", "save_add_user"]) ->
 						  atom_to_list(Reason))
 	  end
     end;
+
+
 %% @doc this is used for getting roles for a particular user
 %% 		returns an erlydtl html page
 outa(_Arg, 'GET',
      [_, "user", "get_roles_user", UserId]) ->
-    Userrole =
-	yapp_test_lib_usermod:get_user_roles(list_to_integer(UserId)),
+    Userrole = yapp_test_lib_usermod:get_user_roles(list_to_integer(UserId)),
     Roles = yapp_test_lib_usermod:get_roles(),
-    {ok, UiData} = yapp_test_edit_roles:render([{useroles,
-						 Userrole},
-						{roles, Roles}]),
+	Tuple_roles = myapp_util:convert_data(Roles), 
+    {ok, UiData} = yapp_test_edit_roles:render([{useroles,Userrole},{roles, Tuple_roles}]),
     {html, UiData};
+
+
 %% @doc this is for updating roles
 %%		insertion part
 %% 		returns a messagpack object showing status
@@ -190,6 +192,7 @@ outa(Arg, 'POST', [_, "user", "save_roles_user"]) ->
 						  "Save Successful")
 	  end
     end;
+
 %% @doc this is used for resetting the password of the user
 %% 		insertion part
 %%		return a messagepack object showing status

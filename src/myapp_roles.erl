@@ -51,11 +51,12 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "roles", "get_roles"]) ->
     Title_Page = "Roles",
     Roles = yapp_test_lib_usermod:get_roles(),
+	Tuple_roles = myapp_util:convert_data(Roles), 
     {ok, UiData} = yapp_test_roles_list:render([{title,
 						 Title_Page},
 						{yapp_prepath,
 						 yapp:prepath(Arg)},
-						{data, Roles}]),
+						{data, Tuple_roles}]),
     {html, UiData};
 %% @doc this is used for filtering list . query strings will be used here
 %% 		returns a messagpack object for efficiency purposes
@@ -64,20 +65,21 @@ outa(Arg, 'GET', [_, "roles", "search_roles"]) ->
     %%io:format("query string is ~n~p ",[Search_query]),
     case yaws_api:queryvar(Arg, "filter") of
       {ok, Filter} ->
-	  Roles =
-	      yapp_test_lib_usermod:get_roles_filter(list_to_binary(Filter)),
-	  {ok, UiData} =
-	      yapp_test_roles_search:render([{yapp_prepath,
-					      yapp:prepath(Arg)},
-					     {data, Roles}]),
-	  {html, UiData};
+		   Roles = yapp_test_lib_usermod:get_roles_filter(list_to_binary(Filter)),
+		   Tuple_roles = myapp_util:convert_data(Roles), 
+		  {ok, UiData} =
+		      yapp_test_roles_search:render([{yapp_prepath,
+						      yapp:prepath(Arg)},
+						     {data, Tuple_roles}]),
+		  {html, UiData};
       undefined ->
-	  Roles = yapp_test_lib_usermod:get_roles(),
-	  {ok, UiData} =
-	      yapp_test_roles_search:render([{yapp_prepath,
-					      yapp:prepath(Arg)},
-					     {data, Roles}]),
-	  {html, UiData}
+		  Roles = yapp_test_lib_usermod:get_roles(),
+		  Tuple_roles = myapp_util:convert_data(Roles), 
+		  {ok, UiData} =
+		      yapp_test_roles_search:render([{yapp_prepath,
+						      yapp:prepath(Arg)},
+						     {data, Tuple_roles}]),
+		  {html, UiData}
     end;
 %% @doc this is used for adding a new role
 %% 		should returns a messagpack object for efficiency purposes
@@ -89,13 +91,11 @@ outa(_Arg, 'GET', [_, "roles", "get_add_role"]) ->
     {html, UiData};
 %% @doc for editing roles
 %% 		
-outa(_Arg, 'GET',
-     [_, "roles", "get_edit_roles", Roleid]) ->
-    case
-      yapp_test_lib_usermod:get_roles_id(list_to_integer(Roleid))
-	of
+outa(_Arg, 'GET',[_, "roles", "get_edit_roles", Roleid]) ->
+    case yapp_test_lib_usermod:get_roles_id(list_to_integer(Roleid)) of
       {ok, S} ->
-	  {ok, UiData} = yapp_test_add_role:render([{data, S},
+      [Role_single] = myapp_util:convert_data([S]), 
+	  {ok, UiData} = yapp_test_add_role:render([{data,Role_single},
 						    {type_user_tran,
 						     "edit_role"}]),
 	  {html, UiData};

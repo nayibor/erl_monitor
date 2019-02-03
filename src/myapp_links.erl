@@ -52,11 +52,12 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "links", "get_links"]) ->
     Title_Page = "Links",
     Links = yapp_test_lib_usermod:get_links(),
+	Links_new = myapp_util:convert_data(Links),
     {ok, UiData} = yapp_test_links_list:render([{title,
 						 Title_Page},
 						{yapp_prepath,
 						 yapp:prepath(Arg)},
-						{data, Links}]),
+						{data, Links_new}]),
     {html, UiData};
 %% @doc	this is for searching for a link		
 outa(Arg, 'GET', [_, "links", "search_links"]) ->
@@ -64,47 +65,43 @@ outa(Arg, 'GET', [_, "links", "search_links"]) ->
     %%io:format("get data is ~p,~n",[yaws_api:parse_query(Arg)]),
     case yaws_api:queryvar(Arg, "filter") of
       {ok, Filter} ->
-	  Links = yapp_test_lib_usermod:get_links_filter(Filter),
-	  {ok, UiData} =
-	      yapp_test_link_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Links}]),
-	  {ehtml, UiData};
+		  Links = yapp_test_lib_usermod:get_links_filter(Filter),
+		  New_links = myapp_util:convert_data(Links),
+		  {ok, UiData} =
+	      yapp_test_link_search:render([{yapp_prepath,yapp:prepath(Arg)},{data, New_links}]),
+		  {ehtml, UiData};
       undefined ->
-	  Links = yapp_test_lib_usermod:get_links(),
-	  {ok, UiData} =
-	      yapp_test_link_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Links}]),
-	  {ehtml, UiData}
+		  Links = yapp_test_lib_usermod:get_links(),
+		  New_links = myapp_util:convert_data(Links),
+		  {ok, UiData} =
+		      yapp_test_link_search:render([{yapp_prepath,
+						     yapp:prepath(Arg)},
+						    {data, New_links}]),
+		  {ehtml, UiData}
     end;
 %% @doc for adding a new link
 %% 		retrieving user interface partt
 %% 		returns an erlydtl html page
 outa(_Arg, 'GET', [_, "links", "get_add_link"]) ->
     Categories = yapp_test_lib_usermod:get_cats(),
-    {ok, UiData} = yapp_test_add_link:render([{cats,
-					       Categories},
-					      {type_user_tran, "add_link"}]),
+	Categories_new = myapp_util:convert_data(Categories),
+    {ok, UiData} = yapp_test_add_link:render([{cats,Categories_new},{type_user_tran, "add_link"}]),
     {html, UiData};
 %% @doc this is used for getting for getting user info/perhaps for editing
 %%		query string part of url may have to be further parsed
 %% 		retrieving user interface part
 outa(_Arg, 'GET',
      [_, "links", "get_edit_link", Linkid]) ->
-    case
-      yapp_test_lib_usermod:get_links_id(list_to_integer(Linkid))
-	of
+    case yapp_test_lib_usermod:get_links_id(list_to_integer(Linkid)) of
       {ok, S} ->
-	  Cats = yapp_test_lib_usermod:get_cats(),
-	  {ok, UiData} =
-	      yapp_test_add_link:render([{type_user_tran,
-					  "edit_link"},
-					 {data, S}, {cats, Cats}]),
-	  {html, UiData};
+		  [Cat_dict] = myapp_util:convert_data([S]),
+		  Cats = yapp_test_lib_usermod:get_cats(),
+		  Categories_new = myapp_util:convert_data(Cats),
+		  {ok, UiData} =
+		      yapp_test_add_link:render([{type_user_tran,"edit_link"},{data, Cat_dict}, {cats, Categories_new}]),
+		  {html, UiData};
       _ ->
-	  yapp_test_lib_util:message_client(500,
-					    "Link Does Not Exist")
+		yapp_test_lib_util:message_client(500,"Link Does Not Exist")
     end;
 %% @doc for inserting a new user/updating a new user .
 %%		insertion part

@@ -51,54 +51,57 @@ out(Arg, ok, ok) ->
 outa(Arg, 'GET', [_, "temp", "get_temp"]) ->
     Title_Page = "Templates",
     Temps = yapp_test_lib_isoproc:get_templates(),
+	New_temps = myapp_util:convert_data(Temps),    
     {ok, UiData} = yapp_test_temp_list:render([{title,
 						Title_Page},
 					       {yapp_prepath,
 						yapp:prepath(Arg)},
-					       {data, Temps}]),
+					       {data, New_temps}]),
     {html, UiData};
 %% @doc this is for getting the sites but using a filter
 outa(Arg, 'GET', [_, "temp", "search_temp"]) ->
     case yaws_api:queryvar(Arg, "filter") of
       {ok, Filter} ->
-	  Temp =
-	      yapp_test_lib_isoproc:get_template_filter(list_to_binary(Filter)),
-	  {ok, UiData} =
-	      yapp_test_temp_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Temp}]),
-	  {html, UiData};
+		  Temp = yapp_test_lib_isoproc:get_template_filter(list_to_binary(Filter)),
+		  New_temps = myapp_util:convert_data(Temp),
+		  {ok, UiData} =
+		      yapp_test_temp_search:render([{yapp_prepath,
+						     yapp:prepath(Arg)},
+						    {data, New_temps}]),
+		  {html, UiData};
       undefined ->
-	  Temps = yapp_test_lib_isoproc:get_templates(),
-	  {ok, UiData} =
-	      yapp_test_temp_search:render([{yapp_prepath,
-					     yapp:prepath(Arg)},
-					    {data, Temps}]),
-	  {html, UiData}
+		  Temps = yapp_test_lib_isoproc:get_templates(),
+		  New_temps = myapp_util:convert_data(Temps), 
+		  {ok, UiData} =
+		      yapp_test_temp_search:render([{yapp_prepath,
+						     yapp:prepath(Arg)},
+						    {data, New_temps}]),
+		  {html, UiData}
     end;
 %% @doc this is used for adding a new template
 %%		returns an erlydtl html page afer filter and query		
 outa(_Arg, 'GET', [_, "temp", "get_add_temp"]) ->
     Cats = yapp_test_lib_isoproc:get_templates_cats(),
-    {ok, UiData} = yapp_test_add_temp:render([{cats, Cats},
+    Cats_new = myapp_util:convert_data(Cats),
+    {ok, UiData} = yapp_test_add_temp:render([{cats, Cats_new},
 					      {type_user_tran, "add_temp"}]),
     {html, UiData};
 %% @doc this is used for editing a template
 outa(_Arg, 'GET',
      [_, "temp", "get_edit_temp", TempId]) ->
-    case
-      yapp_test_lib_isoproc:get_template_id(list_to_integer(TempId))
-	of
+    case yapp_test_lib_isoproc:get_template_id(list_to_integer(TempId)) of
       {ok, S} ->
-	  Cats = yapp_test_lib_isoproc:get_templates_cats(),
-	  {ok, UiData} = yapp_test_add_temp:render([{data, S},
-						    {cats, Cats},
-						    {type_user_tran,
-						     "edit_temp"}]),
-	  {html, UiData};
-      {error, Reason} ->
-	  yapp_test_lib_util:message_client(500,
-					    atom_to_list(Reason))
+		  [Temp_single] = myapp_util:convert_data([S]),
+		  Cats = yapp_test_lib_isoproc:get_templates_cats(),
+		  Cats_new = myapp_util:convert_data(Cats),
+		  {ok, UiData} = yapp_test_add_temp:render([{data, Temp_single},
+							    {cats, Cats_new},
+							    {type_user_tran,
+							     "edit_temp"}]),
+		  {html, UiData};
+	  {error, Reason} ->
+		  yapp_test_lib_util:message_client(500,
+						    atom_to_list(Reason))
     end;
 %% @doc this is used for adding a new template
 %%		returns an erlydtl html page afer filter and query		

@@ -1,31 +1,27 @@
-
-
-
 <div id="role_div" name="role_div">
 
     <select id="user_roles" name="user_roles" multiple="multiple">
-        	{% for iterator in roles %}
-	            <option value="{{iterator.id}}"
-					{%  if iterator.id in useroles  %}
-	                        selected="selected"
-					{%	endif	%}
-	            >
-	                       {{iterator.role_long_name}}
-	            </option>
-			{% endfor %}
+               {% for iterator in roles %}
+                   <option value="{{iterator.id}}"
+                                       {%  if iterator.id in useroles  %}
+                               selected="selected"
+                                       {%      endif   %}
+                   >
+                              {{iterator.role_long_name}}
+                   </option>
+                       {% endfor %}
     </select>
 
 </div>
 
 
 <ul  id="roles_sys" name="roles_sys" style="visibility: hidden;" >
-        	{% for iterator in roles %}
-				<li value="{{iterator.id}}">{{iterator.role_long_name}}</li>
-			{% endfor%}
+               {% for iterator in roles %}
+                               <li value="{{iterator.id}}">{{iterator.role_long_name}}</li>
+                       {% endfor%}
 </ul>
 <ul  id="roles_sys_user" name="roles_sys_user" style="visibility: hidden;" >
-		   	{% for iterator in roles %}
-		        <li value="{{iterator.id}}"></li>
-		    {% endfor%}
+                       {% for iterator in roles %}
+                       <li value="{{iterator.id}}"></li>
+                   {% endfor%}
 </ul>
-

@@ -16,8 +16,8 @@
 -export([out/1]).
 
 -include_lib("yaws/include/yaws_api.hrl").
-
 -include_lib("erl_mon/include/yapp_test.hrl").
+
 
 %%% @doc check to see whether use is logged in
 out(Arg) ->
@@ -82,26 +82,26 @@ outa(Arg, 'GET', [_, "sites", "search_sites"]) ->
 %%		returns an erlydtl html page afer filter and query		
 outa(_Arg, 'GET', [_, "sites", "get_add_site"]) ->
     Inst = yapp_test_lib_usermod:get_inst(),
-    {ok, UiData} = yapp_test_add_site:render([{inst, Inst},
-					      {type_user_tran, "add_site"}]),
+	Inst_sites = Inst_sites = myapp_util:convert_data(Inst),
+	 {ok, UiData} = yapp_test_add_site:render([{inst, Inst_sites},
+			      {type_user_tran, "add_site"}]),
     {html, UiData};
 %%% @doc this is for getting a site so it can be edited		
 outa(_Arg, 'GET',
      [_, "sites", "get_edit_site", Siteid]) ->
     Inst = yapp_test_lib_usermod:get_inst(),
-    case
-      yapp_test_lib_usermod:get_site_id(list_to_integer(Siteid))
-	of
-      {ok, S} ->
-	  %%	io:format("~p",[S]),
-	  {ok, UiData} = yapp_test_add_site:render([{inst, Inst},
-						    {data, S},
+	Inst_sites = Inst_sites = myapp_util:convert_data(Inst),
+	%%io:format("~nsites are ~p",[Inst_sites]),
+    case yapp_test_lib_usermod:get_site_id(list_to_integer(Siteid)) of
+		{ok, S} ->		
+		[Site_dict] = myapp_util:convert_data([S]), 				
+		{ok, UiData} = yapp_test_add_site:render([{inst,Inst_sites},
+						    {data, Site_dict},
 						    {type_user_tran,
 						     "edit_site"}]),
-	  {html, UiData};
+		{html, UiData};
       _ ->
-	  yapp_test_lib_util:message_client(500,
-					    "Site does Not exist")
+		yapp_test_lib_util:message_client(500,"Site does Not exist")
     end;
 %%% @doc this is for saving a site
 outa(Arg, 'POST', [_, "sites", "save_add_site"]) ->
