@@ -1,0 +1,5 @@
+_build/
+_build_docker_release/
+doc/
+.git/
+.dockerignore

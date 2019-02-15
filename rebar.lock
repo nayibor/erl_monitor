@@ -1,13 +1,12 @@
 {"1.1.0",
-[{<<"ale8583">>,{pkg,<<"ale8583">>,<<"0.1.1">>},0},
- {<<"bcrypt">>,{pkg,<<"bcrypt">>,<<"1.0.2">>},2},
+[{<<"bcrypt">>,{pkg,<<"bcrypt">>,<<"1.0.2">>},2},
  {<<"erlmon_lib">>,
   {git,"https://github.com/nayibor/erlmon_lib.git",
        {ref,"bfd2d535c5daa1d83f290d66432d4af30c440b19"}},
   0},
  {<<"erlmon_sock">>,
   {git,"https://github.com/nayibor/erlmon_sock.git",
-       {ref,"7cccb6f9873b7466ba619a3018cd16aadf5e4cc5"}},
+       {ref,"1cf82f5b41171293ab104a4b2c0ffecca0267421"}},
   0},
  {<<"erlmon_worker_pool">>,
   {git,"https://github.com/nayibor/erlmon_worker_pool.git",
@@ -51,6 +50,5 @@
   0}]}.
 [
 {pkg_hash,[
- {<<"ale8583">>, <<"B36FF0C124D41D8387BD8E0DDD8517A31BB579C7392EF028BBEEF18BAF4D254F">>},
  {<<"bcrypt">>, <<"6735F66D3A7309AF166CE660161009B7D9B9216508B8B2E6A0A9090AF35CB757">>}]}
 ].

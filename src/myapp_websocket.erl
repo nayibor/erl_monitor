@@ -26,7 +26,7 @@
 %%%% temporal change to allow all urls to pass through to aid in testing of mithril
 out(Arg) ->
     	out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)),
-    	io:format("~n~pcookie::",[Arg]),
+    	%%io:format("~n~pcookie::",[Arg]),
 		out(Arg,ok,ok).
 		
 		

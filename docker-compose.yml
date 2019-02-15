@@ -1,7 +1,7 @@
 version: "3"
 services:
   web:
-    image: nayibor/erl_yaws:0.1.0
+    image: elixir:1.7.4
     ports:
       - "8002:8002"
       - "8003:8003"
