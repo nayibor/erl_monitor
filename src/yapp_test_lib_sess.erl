@@ -128,8 +128,7 @@ setup_session(Userid, Fname, Site_id, Inst_id,
 %%check_link(Key,List)->check_link(Key,List,false).
 %%check_link(_Key,_List,true)->ok;
 %%check_link(_Key,[],_) ->error;
-%%check_link(Key,[H|T],false)->
-%%check_link(Key,T,lists:member(Key,H)).
+%%check_link(Key,[H|T],false)->check_link(Key,T,lists:member(Key,H)).
 
 %%	@doc for filtering to show only sidebar links at the side of the page
 %%	ajax link types can also be checked although they dont appear in the sidebar 			

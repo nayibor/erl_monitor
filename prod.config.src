@@ -1,0 +1,47 @@
+[
+		{mnesia, 
+			[
+				{dir,"mnesia/mnesia_install/"}
+			]
+		},
+		{yapp,
+			[
+				{yapp_registry_impl, yapp_ets_server}
+			]
+		},
+		{erlmon_lib,
+			[
+				{mail_settings,
+					[
+						{host,"${EMAIL_HOST}"},
+						{username,"${EMAIL_USER}"},
+						{password,"${EMAIL_PASS}"},
+						{from_email_address,"${EMAIL_FROM_ADDRESS}"}
+					]
+				}
+			]	
+		},
+		{erlmon_worker_pool,
+			[
+				{
+					odbc_cs,
+						[	
+							{host,"${DB_HOST}"},
+							{username,"${DB_USER}"},
+							{password,"${DB_PASS}"},
+							{pool_name,db_pool},
+							{timeout_query,5000},
+							{number_workers,5},
+							{worker_strategy,best_worker},
+							{timeout_request,5000}
+						]
+				}	
+			]
+		},
+		{erlmon_sock,
+			[{port, 8002},{name,counter},{limit,10},{byte_header_size,2}]
+		},
+		{yaws,
+			[{conf, "conf/yaws.conf"}]
+		}
+].

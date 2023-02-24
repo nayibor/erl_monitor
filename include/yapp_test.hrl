@@ -16,7 +16,7 @@
 -define(PG_DASHBOARD,"dashboard/index_dashboard").
 -define(PG_RESET_PASS,"reset_pass.yaws").
 -define(PG_CRASH,"crash.yaws").
--define(SESSION_MAX_TIME, 5).
+-define(SESSION_MAX_TIME, 600).
 -define(COOKIE_VARIABLE,"AZY65UYNYALKSDJ").
 
 

@@ -1,0 +1,44 @@
+# User specific & automatically generated files #
+#################################################
+_build
+*.pdf
+*.rar
+/yapp_test/*.beam
+/yapp_test_lib/*.beam
+/yapp_test/logs/*
+/yapp_test_lib/logs/*
+logs/*
+*/logs/*
+*.beam
+*.class
+docker_run
+*~
+*.goutputstream-VMO1MY
+# IDE and editor specific files #
+#################################
+/nbproject
+nbproject/project.*
+.idea
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+	
+erl_mon/priv/docroot/webroot/js/stats_examp.js
+erlmon_lib/src/yapp_test_lib_extprocess.erl
+erlmon_sock/test/ecopostpack.xml
+erlmon_sock/test/email_test
+erlmon_sock/test/odbc.config
+priv/echart_test_two
+priv/echarts_test
+priv/queries_install.sql
+ttb_last_config
+erlmon_sock/test/Test_java_client_post.java
