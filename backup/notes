@@ -1,0 +1,18 @@
+erl -mnesia dir '"/opt/erlang/erl_mon/Mnesia.nonode@nohost/"'
+erl -mnesia dir '"/opt/erlang/erl_mon/erl_mon/backup/mnesia_7611f6dfaed9/"' -sname erl_mon_web_release
+%% On mypl@machine1
+mnesia:backup("/home/nuku/Documents/PROJECTS/erlang/proj/yaws/test/yapp_test_root/mnesia_backup/old.mnesia.backup").
+util:change_node_name(mnesia_backup, nonode@nohost,'erl_mon_web_pdc@PDC-CSTW-01',
+"/opt/erlang/erl_mon/erl_mon/backup/old.mnesia.backup", 
+"/opt/erlang/erl_mon/erl_mon/backup/mnesia_PDC-CSTW-01.backup").
+
+%% On mypl@machine2
+mnesia:restore("/path/to/new.mnesia.backup", []).
+%%or below
+mnesia:create_schema([node()]).
+mnesia:start().
+mnesia:restore("/opt/erlang/erl_mon/erl_mon/backup/mnesia_PDC-CSTW-01.backup",[{recreate_tables,[usermod_roles,usermod_users,usermod_links,usermod_users_roles,usermod_role_links,test_rec,auto_inc,usermod_sites,usermod_inst,usermod_categories,tempmod_temp,tempmod_rules_temp,tempmod_temp_cat,tempmod_rule_cat,usermod_rules_users,test_transform,test_transform_new,usermod_users_links,y_registry]},{skip_tables,[mafiapp_friends,mafiapp_services,mafiapp_enemies]}]).
+
+
+erl -mnesia dir '"/home/nuku/Documents/PROJECTS/erlang/projaws/test/rebar_erlmon/erl_mon/backup/mnesia_install/"'
+ docker run --network=host -ti nayibor/erlmonweb:0.0.4 console
