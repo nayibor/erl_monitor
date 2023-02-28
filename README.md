@@ -1,10 +1,13 @@
 #What is this for
 
-This application is for an opensource transaction monitoring system.
+This application is for an opensource fraud monitoring system.
 
 
 This system receives iso 8583 messages from diverse sources on  a tcp-ip server.  
 It forwards it to a websocket server for distrubition to user browsers whom are authorized to view those messages.   
+rule system can be used to filter fraudulent transactions based on rules which have been put into the system.
+only caveat is that knowledge of erlang is needed to write rules.
+rules are also one line erlang statements but have to evaluate to true or false
 Main purpose of this application is to receive real time feedback on status of  transactions so that quick actions can be taken as opposed to polling of the database or other non real time means of monitoring.
 
 ##Components##
@@ -38,6 +41,5 @@ The ```erlmon_sock``` is the the tcp server.
 
 The ```erlmon_lib``` contains libraries used by ```erlmon_sock``` and ```erl_mon```.
 
-A release is being worked on and will be done soon with instructions for installation as well as converting to rebar3 . 
-
+A release has been worked  and with nstructions for installation.
 
