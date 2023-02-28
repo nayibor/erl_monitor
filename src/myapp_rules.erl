@@ -101,6 +101,7 @@ outa(_Arg, 'GET',
 	  Temps_new = myapp_util:convert_data(Temps),
       Categories = yapp_test_lib_rules:get_rule_cats(),
       NewCats = myapp_util:convert_data(Categories),
+      %%io:format("~nrule data is ~p",[Rule_single]),
 	  {ok, UiData} = yapp_test_add_rule:render([{data, Rule_single},
 						    {sites, Sites},
 						    {templates, Temps_new},
@@ -122,7 +123,8 @@ outa(Arg, 'POST', [_, "rules", "save_add_rule"]) ->
 	       orelse
 	       yaws_api:postvar(Arg, "siteid") =:= {ok, ""} orelse
 		 yaws_api:postvar(Arg, "category") =:= {ok, ""} orelse
-		   yaws_api:postvar(Arg, "templateid") =:= {ok, ""}
+		   yaws_api:postvar(Arg, "templateid") =:= {ok, ""} orelse
+		   yaws_api:postvar(Arg, "rule_expression") =:= {ok, ""}		   
 	of
       true ->
 	  yapp_test_lib_util:message_client(500,
@@ -136,13 +138,15 @@ outa(Arg, 'POST', [_, "rules", "save_add_rule"]) ->
 						     "description"),
 		{ok, Cat} = yaws_api:postvar(Arg, "category"),
 		{ok, Status} = yaws_api:postvar(Arg, "status"),
+		{ok, Rule_expression} = yaws_api:postvar(Arg, "rule_expression"),
 		case
-		  yapp_test_lib_rules:edit_rule(list_to_integer(Edit_id_val),
+		  yapp_test_lib_rules:edit_rule_expression(list_to_integer(Edit_id_val),
 						list_to_integer(Siteid),
 						list_to_integer(Templateid), [],
 						list_to_binary(Description),
 						list_to_integer(Cat),
-						list_to_binary(Status))
+						list_to_binary(Status),
+						list_to_binary(Rule_expression))
 		    of
 		  ok ->
 		      yapp_test_lib_util:message_client(200,
@@ -158,12 +162,15 @@ outa(Arg, 'POST', [_, "rules", "save_add_rule"]) ->
 						     "description"),
 		{ok, Cat} = yaws_api:postvar(Arg, "category"),
 		{ok, Status} = yaws_api:postvar(Arg, "status"),
+		{ok, Rule_expression} = yaws_api:postvar(Arg, "rule_expression"),
+
 		case
-		  yapp_test_lib_rules:add_rule(list_to_integer(Siteid),
+		  yapp_test_lib_rules:add_rule_expression(list_to_integer(Siteid),
 					       list_to_integer(Templateid), [],
 					       list_to_binary(Description),
 					       list_to_integer(Cat),
-					       list_to_binary(Status))
+					       list_to_binary(Status),
+					       list_to_binary(Rule_expression))
 		    of
 		  ok ->
 		      yapp_test_lib_util:message_client(200,
