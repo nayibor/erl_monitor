@@ -146,7 +146,7 @@ outa(Arg, 'POST', [_, "rules", "save_add_rule"]) ->
 						list_to_binary(Description),
 						list_to_integer(Cat),
 						list_to_binary(Status),
-						list_to_binary(Rule_expression))
+						Rule_expression)
 		    of
 		  ok ->
 		      yapp_test_lib_util:message_client(200,
@@ -170,7 +170,7 @@ outa(Arg, 'POST', [_, "rules", "save_add_rule"]) ->
 					       list_to_binary(Description),
 					       list_to_integer(Cat),
 					       list_to_binary(Status),
-					       list_to_binary(Rule_expression))
+					       Rule_expression)
 		    of
 		  ok ->
 		      yapp_test_lib_util:message_client(200,

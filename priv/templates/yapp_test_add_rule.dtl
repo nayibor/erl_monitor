@@ -103,6 +103,16 @@
                         </select>
                     </li>
                 </ul>
+                 <ul class='tableActions'>
+                    <li>
+                        <label>  Rule Expression </label> 
+                    </li>
+                    <li>
+                    </li>
+                    <li>
+						<textarea id="rule_expression" name="rule_expression" rows="10" cols="40">{% if type_user_tran == "edit_rules" %}{{  data.rule_fun  }}{%	endif	%}</textarea>
+                    </li>
+                </ul> 
                 
                 
                  {% comment %}  
