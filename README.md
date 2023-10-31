@@ -9,12 +9,12 @@ it filters those messages based on rules but rules have to be written in erlang 
 
 If a rule matches,it's forwarded to a websocket server for distrubition to user browsers whom are authorized to view those messages.
 
-browser will display transaction fields including field 39  which will show code which shows why transaction decline.
+browser will display transaction fields including field 39  which will show code which shows why transaction declined.
 
 Main purpose of this application is to receive real time feedback on status of  financial transactions.
 This is  so quick actions can be taken as opposed to polling of the database or other non real time means of monitoring.
 
-application can be used for checking for declines,suspicious transactions,timeout etc...
+application can be used for checking for declines,fraudulent transactions,timeout etc...
 
 
 ##Components##
@@ -52,6 +52,7 @@ The ```erlmon_sock``` is the the tcp server.
 
 The ```erlmon_lib``` contains libraries used by ```erlmon_sock``` and ```erl_mon```.
 
-A release is being worked on and will be done soon with instructions for installation as well as converting to rebar3 . 
+application can be run in a docker container using the Dockerfile_autobuild docker.
+it exposes ports 8004 for the web server and 8002 for the tcp where transactions can be sent to.
 
 
