@@ -23,8 +23,7 @@
 
 %%% @doc check to see whether use is logged in
 out(Arg) ->
-    out(Arg,
-	yapp_test_lib_sess:check_login(Arg, ?COOKIE_VARIABLE)).
+    out(Arg,yapp_test_lib_sess:check_login(Arg, ?COOKIE_VARIABLE)).
 
 %%% @doc for redirecting users not logged in back to login  page
 out(Arg, error) ->
@@ -52,6 +51,7 @@ outa(_Arg, 'GET',
 						     Title_Page},
 						    {page_type, "welcome"}]),
     {html, UiData};
+
 %% @doc	this is for the index_dashboard action get method. default page users get to see when loggin
 outa(Arg, 'GET', [_, "dashboard", "index_dashboard"]) ->
     Title_Page = "Welcome to Monitor",
@@ -63,6 +63,7 @@ outa(Arg, 'GET', [_, "dashboard", "index_dashboard"]) ->
 					{data, Links_Allowd},
 					{page_type, "welcome"}]),
     {html, UiData};
+
 %% @doc for unknown pages which may be specialized for this layout/controller
 %% 		logged in users entering in fake urls	
 outa(Arg, _Method, _) ->

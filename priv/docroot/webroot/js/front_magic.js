@@ -89,10 +89,10 @@ var front_magic = {
 	   if (_this.current_num>=_this.max_rows){
 		   //console.log("limit reached");
 		    $(_this.transaction_table+" tr:first").remove();
-			$(_this.transaction_table).append(_this.build_item(message)); 
+			$(_this.transaction_table).prepend(_this.build_item(message)); 
 	    }
 	   else{
-			$(_this.transaction_table).append(_this.build_item(message)); 
+			$(_this.transaction_table).prepend(_this.build_item(message)); 
 	
 		}	
 		//console.log("total number is "+_this.current_num);

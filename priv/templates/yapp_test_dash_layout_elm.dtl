@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />        
+        <title>ERL-MONITOR</title>
+        <link rel="stylesheet" type="text/css" href="webroot/css/login.css" />
+        <link rel="stylesheet" type="text/css" href="webroot/css/form.css" />
+        <link rel="stylesheet" type="text/css" href="webroot/css/main.css"/>
+        <link rel="stylesheet" type="text/css" href="webroot/css/jquery-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="webroot/css/ui.theme.css" />
+        <link rel="stylesheet" type="text/css" href="webroot/css/custom.jq.css"/>
+        <link rel="stylesheet" type="text/css" href="webroot/css/jquery-picklist.css" />
+        <link rel="stylesheet" type="text/css" href="webroot/css/chosen.css" />
+        <link rel="stylesheet" type="text/css" href="webroot/css/font-awesome.min.css"/>
+        <link rel="stylesheet" type="text/css" href="webroot/css/dashb.css"/>
+        <script type="text/javascript" src="webroot/js/jquery.min.1.8.js"></script>
+        <script type="text/javascript" src="webroot/js/jquery.main.js"></script>
+        <script type="text/javascript" src="webroot/js/custom.min.js"></script>
+        <script type="text/javascript" src="webroot/js/jquery-ui.js"></script>
+        <script type="text/javascript" src="webroot/js/form.js"></script>
+        <script type="text/javascript" src="webroot/js/jquery.ui.widget.min.js"></script>
+        <script type="text/javascript" src="webroot/js/jquery-picklist.min.js"></script>
+        <script type="text/javascript" src="webroot/js/settings.js"></script>
+	    <script type="text/javascript" src="webroot/js/wsClient.js"></script>
+		<script type="text/javascript" src="webroot/js/jem.js"></script>
+		<script type="text/javascript" src="webroot/js/echarts.js"></script>
+	    <script type="text/javascript" src="webroot/js/elm_main.js"></script>
+	</head>
+	<body class="hasInterface hasGradient hasSidebar">   
+<!--		<h3>TRANSACTION LIST PAGE</h3>-->
+		<p></p><p></p>
+		<div class="tableWrapper" style = "width:50% !important;">
+			<div id="elm_div" name ="elm_div">
+			</div>			
+		</div>
+			<div name="setting_dialog-confirm" id="setting_dialog-confirm" title="Message">
+			<p class="message"></p></div>
+			<div name="setting_dialog-message" id="setting_dialog-message" title="Message">
+			<p class="message"></p></div>
+			<div name="add_edit_user" id="add_edit_user" title="Message"></div>
+			<div name="get_role_div" id="get_role_div" title="Message"></div>
+			<div name="add_edit_link" id="add_edit_link" title="Message"></div>
+			<div name="role_div" id="role_div" title="Message"></div>
+			<div name="edit_role_div" id="edit_role_div" title="Message"></div>
+			<div name="edit_site_div" id="edit_site_div" title="Message"></div>
+			<div name="edit_inst_div" id="edit_inst_div" title="Message"></div>
+			<div name="edit_temp_div" id="edit_temp_div" title="Message"></div>
+			<div name="edit_rule_div" id="edit_rule_div" title="Message"></div>
+			<div name="edit_rulelist_div" id="edit_rulelist_div" title="Message"></div>
+		<script type="text/javascript" src="webroot/js/monitor_erl_frontmagic.js"></script>				
+	</body>
+</html>
