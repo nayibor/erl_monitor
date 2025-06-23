@@ -1,0 +1,23 @@
+		<p></p><p></p>
+		<div class="tableWrapper">
+			<div id="elm_div" name ="elm_div">
+			</div>			
+		</div>
+			<div name="setting_dialog-confirm" id="setting_dialog-confirm" title="Message">
+			<p class="message"></p></div>
+			<div name="setting_dialog-message" id="setting_dialog-message" title="Message">
+			<p class="message"></p></div>
+			<div name="add_edit_user" id="add_edit_user" title="Message"></div>
+			<div name="get_role_div" id="get_role_div" title="Message"></div>
+			<div name="add_edit_link" id="add_edit_link" title="Message"></div>
+			<div name="role_div" id="role_div" title="Message"></div>
+			<div name="edit_role_div" id="edit_role_div" title="Message"></div>
+			<div name="edit_site_div" id="edit_site_div" title="Message"></div>
+			<div name="edit_inst_div" id="edit_inst_div" title="Message"></div>
+			<div name="edit_temp_div" id="edit_temp_div" title="Message"></div>
+			<div name="edit_rule_div" id="edit_rule_div" title="Message"></div>
+			<div name="edit_rulelist_div" id="edit_rulelist_div" title="Message"></div>
+         	<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/wsClient.js"}}"></script>	    
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/jem.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/elm_main_new.js"}}"></script>
+		<script type="text/javascript" src="{{yapp_prepath|add:"webroot/js/monitor_erl_frontmagic.js"}}"></script>				

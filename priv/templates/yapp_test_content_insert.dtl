@@ -5,10 +5,13 @@
 	{% block yapp_test_content_inner %}
 				{% if page_type == "welcome" %}
 						{% include "yapp_test_trans_list.dtl"  %}
-					{% elif page_type == "view_stats" %}
+				{% elif page_type == "view_stats" %}
 						{% include "yapp_test_view_stats.dtl"  %}	
-					{% elif page_type == "reset_pass" %}
+				{% elif page_type == "reset_pass" %}
 						{% include "yapp_test_reset_pass.dtl"  %}
-                {% endif %}
+				{% elif page_type == "view_transactions" %}
+						{% include "view_transactions.dtl"  %}
+
+				{% endif %}
 					
 	{% endblock %} 

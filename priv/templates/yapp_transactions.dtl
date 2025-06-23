@@ -1,0 +1,14 @@
+{% extends "yapp_test_dash_layout.dtl" %}
+
+    {% block fname %}{{fname}}{% endblock %}
+	
+	{% block sidebar %}	 {% endblock %}
+	 <div style="margin-left: 0px !important;">
+	{% block content %}
+		{% include "yapp_test_content_insert.dtl"   %}
+	{% endblock %}
+	</div>
+	
+
+
+

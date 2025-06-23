@@ -37,13 +37,10 @@ init([_ReqArg, InitialState]) ->
 
 %% @doc initial setup for user is done here with user registering itself  with gproc service so it can be passed messages.
 handle_open(_WSState, State) ->
-    Userid = proplists:get_value(id,
-				 State#user_state.state_user),
+    Userid = proplists:get_value(id,State#user_state.state_user),
+    io:format("~n registering user ~p",[Userid]),
     try register_process(Userid) of
-      _Val ->
-	  {ok,
-	   State#user_state{state_test = <<"good">>,
-			    reg = <<"true">>}}
+      _Val ->{ok,State#user_state{state_test = <<"good">>,reg = <<"true">>}}
     catch
       _:_ -> {error, <<"already_registered">>}
     end.
@@ -69,6 +66,7 @@ handle_info(close, State) ->
      State};
 %% @doc for reciving transaction messages to be sent to the web browser
 handle_info({<<"tdata">>, FlData}, State) ->
+    %%io:format("~ndata received is ~p",[FlData]),
     {reply, {binary, FlData}, State};
 %% @doc for receiving unknown messages from other processes
 handle_info(_, State) -> {noreply, State}.

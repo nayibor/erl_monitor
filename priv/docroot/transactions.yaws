@@ -1,0 +1,24 @@
+<erl>
+-include_lib("erl_mon/include/yapp_test.hrl").
+
+%%% @doc check to see whether use is logged in 
+out(Arg) ->
+	out(Arg,yapp_test_lib_sess:check_login(Arg,?COOKIE_VARIABLE)).
+		
+%%% @doc for redirecting users not logged in back to index page  
+out(Arg,error)->
+	{page,yapp:prepath(Arg)++?AUTH_PAGE};
+
+%%% @doc for checking whether user is allowed to access particular url 
+out(Arg,ok) ->
+    Title_Page = "View Transactions",
+    [{_, Name}, {_, _}] =
+	yapp_test_lib_sess:get_user_data(Arg, ?COOKIE_VARIABLE),
+    {ok, UiData} = yapp_transactions:render([{fname, Name},
+					{title, Title_Page},
+					{yapp_prepath, yapp:prepath(Arg)},
+					{page_type, "view_transactions"}]),
+    {html, UiData}.
+</erl>
+
+
