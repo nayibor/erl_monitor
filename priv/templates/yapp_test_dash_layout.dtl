@@ -80,9 +80,18 @@
                         </a>
                         <ul id="UL_120">    
                             <li id="LI_127" class="infoUser">
+                                <a href="{{yapp_prepath|add:"index.yaws"}}" class="reset_pass_user" id="A_128">
+                                    <i id="I_129"></i>Dashboard</a>
+                            </li>
+                            <li id="LI_127" class="infoUser">
+                                <a href="{{yapp_prepath|add:"transactions.yaws"}}" class="reset_pass_user" id="A_128">
+                                    <i id="I_129"></i>View Transactions</a>
+                            </li>						              
+                            <li id="LI_127" class="infoUser">
                                 <a href="{{yapp_prepath|add:"reset_pass_self.yaws"}}" class="reset_pass_user" id="A_128">
                                     <i id="I_129"></i>Reset Pass</a>
                             </li>						              
+			    
                             <li id="LI_127" class="buttonLogout footer">
                                 <a href="{{yapp_prepath|add:"auth/logout"}}" class="logout" id="A_128">
                                     <i id="I_129"></i>Logout</a>
